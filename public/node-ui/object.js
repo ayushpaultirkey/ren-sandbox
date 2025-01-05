@@ -1,4 +1,6 @@
-class IObject {
+import H12 from "@library/h12";
+
+class UIObject extends H12 {
 
     #uuid = null;
     #name = null;
@@ -23,4 +25,4 @@ class IObject {
 
 }
 
-export { IObject };
+export { UIObject };

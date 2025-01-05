@@ -1,13 +1,13 @@
 import { IObject } from "./object.js";
 
 class IPin extends IObject {
-    constructor({ name, outer, type, value }) {
+    constructor({ uuid = crypto.randomUUID(), name = "IPin", outer = null, type = null, value = null } = {}) {
 
-        super({ name, outer });
+        super({ uuid, name, outer });
 
-        this.value = value || null;
+        this.value = value;
 
-        this.type = type || null;
+        this.type = type;
         this.validTypes = new Set([]);
 
         this.links = [];
@@ -18,6 +18,33 @@ class IPin extends IObject {
         INPUT: 1,
         OUTPUT: 2
     }
+    export() {
+
+        let links = [];
+
+        if(this.type !== IPin.TYPE.OUTPUT) {
+            return links;
+        }
+        
+        this.links.forEach(link => {
+
+            if(!link || !link.getOuter() || !this.getOuter()) {
+                return;
+            }
+
+            links.push({
+                sourceNodeUUID: this.getOuter().getUUID(),
+                sourcePinUUID: this.getUUID(),
+                targetNodeUUID: link.getOuter().getUUID(),
+                targetPinUUID: link.getUUID(),
+                value: this.value
+            });
+
+        });
+
+        return links;
+
+    }
     updateValue(value) {
         
         this.value = value;
@@ -27,11 +54,15 @@ class IPin extends IObject {
         return this.links.length > 0;
     }
     isLinked(index = 0) {
-        return this.links[index];
+        return this.getLink(index) ? true : false;
     }
     getLink(index) {
-        if(this.links[index]) {
-            return this.links[index];
+        return this.links[index];
+    }
+    getLinkNode(index) {
+        const link = this.getLink(index);
+        if(link) {
+            return link.getOuter();
         }
     }
     canLinkTo(targetPin) {
