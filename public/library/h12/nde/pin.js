@@ -10,6 +10,8 @@ class Pin extends H12 {
 
         this.links = [];
         this.linkLimit = -1;
+
+        this.newLink = [ "pin" ];
         
         this.type = -1;
         this.validTypes = new Set([]);
@@ -22,6 +24,10 @@ class Pin extends H12 {
     static SIDE = {
         INPUT: 0,
         OUTPUT: 1
+    }
+    
+    setValue() {
+        
     }
 
     getLinkNode(index = 0) {
@@ -77,8 +83,8 @@ class Pin extends H12 {
     render() {
         const title = this.args.title || "in";
         return <>
-            <span>
-                <button onclick={ this.onClick } class="text-green-500" onmouseup={ this.onMouseUp } onmousedown={ this.mouseDown }>{ title }</button>
+            <span class="border-2 border-green-500">
+                <button onclick={ this.onClick } class="text-green-00" onmouseup={ this.onMouseUp } onmousedown={ this.mouseDown }>{ title }</button>
             </span>
         </>;
     }
@@ -172,7 +178,7 @@ class ExecPin extends PinX {
     render() {
         const title = this.args.side == Pin.SIDE.INPUT ? "in" : "out";
         return <>
-            <span>
+            <span class="border border-green-500 px-2">
                 <button id="pin" onclick={ this.removeLinks } class="text-green-500" onmouseleave={ this.removeActiveHoverPin } onmouseover={ this.createActiveHoverPin } onmousedown={ this.createActivePin }>{ title }</button>
             </span>
         </>;
@@ -188,7 +194,7 @@ class IntPin extends PinX {
     render() {
         const title = this.args.title || "int";
         return <>
-            <span>
+            <span class="border border-blue-500 px-2">
                 <button id="pin" onclick={ this.removeLinks } class="text-blue-500" onmouseleave={ this.removeActiveHoverPin } onmouseover={ this.createActiveHoverPin } onmousedown={ this.createActivePin }>{ title }</button>
             </span>
         </>;

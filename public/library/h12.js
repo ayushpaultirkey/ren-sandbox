@@ -211,9 +211,9 @@ export default class H12 {
         * this.node("div", ["Hello world"], { class: { value: "bg-{color}-500", keys: ["color"] } });
         * this.node("div", ["Hello world"], { onclick: { value: () => {} } });
     */
-    node(type = "", children = [], attributes = {}, keys = []) {
+    node(type = "", children = [], attributes = {}, keys = [], svg = false) {
 
-        const element = document.createElement(type);
+        const element = svg ? document.createElementNS("http://www.w3.org/2000/svg", type) : document.createElement(type);
 
         children.forEach(child => {
 

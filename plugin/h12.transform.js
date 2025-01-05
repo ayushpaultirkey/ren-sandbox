@@ -213,6 +213,7 @@ function phraseDOM(element = document.body) {
     }
 
     const tag = element.tagName.toLowerCase();
+    const isSVG = element.namespaceURI === "http://www.w3.org/2000/svg";
 
     const childs = pharseNode(element);
     const childCode = `[${childs.child.join(",")}]`;
@@ -240,7 +241,7 @@ function phraseDOM(element = document.body) {
         name = `"${tag}"`;
     }
 
-    const code = `${scope}.${method}(${name},${childCode},${attributeCode},${JSON.stringify(childs.keys)})`;
+    const code = `${scope}.${method}(${name},${childCode},${attributeCode},${JSON.stringify(childs.keys)},${isSVG})`;
 
     return code.replace(/,\)/g, ")");
 

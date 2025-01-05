@@ -186,11 +186,11 @@ class Graph extends H12 {
             <div class="w-full h-full overflow-auto scroll relative">
                 <div id="backGraph"></div>
                 <div>
-                    <node args x="40" y="50" alias={ Node } title="begin" value="0"></node>
-                    <node args x="80" y="125" alias={ Node } title="task" value="1"></node>
-                    <node args x="220" y="125" alias={ Node } title="task" value="2"></node>
-                    <node args x="320" y="125" alias={ Node } title="task" value="4"></node>
-                    <node args x="120" y="200" alias={ Node } title="end" value="3"></node>
+                    <node args x="20" y="20" alias={ Node } title="begin" value="0"></node>
+                    <node args x="120" y="80" alias={ Node } title="task" value="1"></node>
+                    <node args x="220" y="140" alias={ Node } title="task" value="2"></node>
+                    <node args x="320" y="200" alias={ Node } title="task" value="4"></node>
+                    <node args x="420" y="260" alias={ Node } title="end" value="3"></node>
                 </div>
                 <div id="topGraph"></div>
             </div>
