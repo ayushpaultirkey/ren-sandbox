@@ -24,18 +24,39 @@ class UIPin extends H12 {
         const title = this.args.title || "title";
         return <>
             <span>
-                <button id="btn" class="text-green-500 px-1 border border-green-500" onmouseleave={ this.removeActiveHoverPin } onmouseover={ this.createActiveHoverPin } onmousedown={ this.createActivePin }>{ title }</button>
+                <button id="btn" class="text-green-500 px-1 border border-green-500" onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverPin } onmouseover={ this.createActiveHoverPin } onmousedown={ this.createActivePin }>{ title }</button>
             </span>
         </>;
 
     }
 
-    getNode() {
-        return this.ipin.getNode();
+    clearLinks() {
+
+        if(this.ipin.type != IPin.TYPES.INPUT) return;
+        dispatcher.call("clearLinkedPins", this);
+
     }
-    getUUID() {
+    removeLinks() {
+
+        this.links.forEach(link => {
+            link.remove();
+        });
+        this.links = [];
+        
+    }
+
+
+    getUINode() {
+        return this.parent;
+    }
+
+    getIPin() {
+        return this.ipin;
+    }
+    getIUUID() {
         return this.ipin.getUUID();
     }
+    
     addLink(link) {
         this.links.push(link);
     }
@@ -49,14 +70,6 @@ class UIPin extends H12 {
     removeActiveHoverPin() {
         if(this.ipin.type == IPin.TYPES.INPUT) {
             dispatcher.call("removeActiveHoverPin", this);
-        }
-    }
-
-    removeLinks() {
-        if(this.ipin.type == IPin.TYPES.INPUT) {
-            this.links.forEach(link => {
-                link.remove();
-            });
         }
     }
 

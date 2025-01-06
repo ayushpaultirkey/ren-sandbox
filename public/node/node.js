@@ -3,8 +3,8 @@ import { IPin } from "./pin.js";
 
 class INode extends IObject {
 
-    constructor({ uuid = crypto.randomUUID(), name = "INode", outer = null } = {}) {
-        super({ uuid, name, outer });
+    constructor({ uuid = crypto.randomUUID(), name = "Node", classId = "INode", outer = null } = {}) {
+        super({ uuid, outer, name, classId });
         this.in = {};
         this.out = {};
         this.isEntry = false;
@@ -56,6 +56,8 @@ class INode extends IObject {
 
     }
 
+    extendExport() { return null; }
+
     export() {
         
         let links = [];
@@ -67,7 +69,8 @@ class INode extends IObject {
 
         return {
             data: {
-                class: this.constructor.name
+                class: this.getClassId(),
+                ... this.extendExport()
             },
             links: links
         };

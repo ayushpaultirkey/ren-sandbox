@@ -21,7 +21,7 @@ html, body {
     background: #888;
 }
 .path {
-    stroke-dasharray: 5;
+    stroke-dasharray: 3;
     animation: dash 5s infinite linear;
 }
 

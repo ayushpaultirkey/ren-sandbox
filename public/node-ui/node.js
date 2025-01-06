@@ -16,13 +16,22 @@ class UINode extends H12 {
         
         Drag(this.root, this.root);
 
+        this.renderPins();
+
     }
     render() {
         
-        if(this.args.iobject) {
-            this.inode = this.args.iobject;
-            this.inode.addInputPin("in0", ExecPin, IPin.SUB_TYPES.EXEC);
-            this.inode.addOutputPin("out0", ExecPin, IPin.SUB_TYPES.EXEC);
+        this.inode = this.args.iobject;
+        this.inode.extendExport = () => {
+
+            const { x: parentX, y: parentY } = this.parent.root.getBoundingClientRect();
+            const { x, y } = this.root.getBoundingClientRect();
+
+            return {
+                x: x - parentX,
+                y: y - parentY
+            }
+
         };
 
         const x = this.args.x || 5;
@@ -31,17 +40,76 @@ class UINode extends H12 {
 
         return <>
             <div class="bg-zinc-800 w-28 text-zinc-100 border-2 border-green-500 p-1 space-y-1 text-xs absolute font-bold select-none" style={ `top: ${y}px; left: ${x}px;` }>
-                <label id="handle" class="mx-1">{ title + ": " + this.inode.getUUID() }</label>
+                <label id="handle" class="mx-1">{ this.inode.getName() }</label>
+                <button class="text-red-400" onclick={ this.removeNode }>x</button>
                 <div>
-                    <pin args alias={ UIPin } title="in0" iobject={ this.inode.getInputPin("in0") }></pin>
+                    {input}
                 </div>
                 <div class="text-right">
-                    <pin args alias={ UIPin } title="out0" iobject={ this.inode.getOutputPin("out0") }></pin>
+                    {output}
                 </div>
             </div>
         </>;
 
     }
+    
+    removeNode() {
+        this.parent.removeUINode(this);
+    }
+
+    renderPins() {
+
+        const { input, output } = this.key;
+        const inPins = this.inode.in;
+        const OutPins = this.inode.out;
+
+        input("");
+        for(const pinUUID in inPins) {
+            const pin = inPins[pinUUID];
+            input(<>
+                <pin args alias={ UIPin } title={ pin.getName() || "out" } id={ pin.getUUID() } iobject={ pin }></pin>
+            </>, "x++");
+        }
+
+        output("");
+        for(const pinUUID in OutPins) {
+            const pin = OutPins[pinUUID];
+            output(<>
+                <pin args alias={ UIPin } title={ pin.getName() || "in" } id={ pin.getUUID() } iobject={ pin }></pin>
+            </>, "x++");
+        }
+
+    }
+
+    addInputPin(pinName, pinUUID, pinClass, pinSubType) {
+
+        const pin = this.inode.addInputPin(pinUUID, pinClass, pinSubType);
+        if(!pin) return "";
+
+        return <>
+            <pin args alias={ UIPin } title={ pinName || "in" } id={ pin.getUUID() } iobject={ pin }></pin>
+        </>;
+
+    }
+    addOutputPin(pinName, pinUUID, pinClass, pinSubType) {
+
+        const pin = this.inode.addOutputPin(pinUUID, pinClass, pinSubType);
+        if(!pin) return "";
+
+        return <>
+            <pin args alias={ UIPin } title={ pinName || "out" } id={ pin.getUUID() } iobject={ pin }></pin>
+        </>;
+
+    }
+
+    getINode() {
+        return this.inode;
+    }
+
+    getUIPin(pinUUID) {
+        return this.child[pinUUID];
+    }
+
 }
 
 export { UINode };

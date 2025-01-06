@@ -1,9 +1,10 @@
 import { IObject } from "./object.js";
 
 class IPin extends IObject {
-    constructor({ uuid = crypto.randomUUID(), name = "IPin", outer = null, type = null, value = null } = {}) {
 
-        super({ uuid, name, outer });
+    constructor({ uuid = crypto.randomUUID(), name = "IPin", outer = null, classId = "NDE|IPin", type = null, value = null } = {}) {
+
+        super({ uuid, name, outer, classId });
 
         this.value = value;
 
@@ -67,7 +68,19 @@ class IPin extends IObject {
     }
     link(targetPin) {
         this.links.push(targetPin);
+        this.onLinked();
     }
+    unlink(targetPin) {
+        this.links = this.links.filter(link => link != targetPin);
+        this.onUnlinked();
+    }
+    unlinkAll() {
+        this.links = [];
+        this.onUnlinked();
+    }
+
+    onLinked() {}
+    onUnlinked() {}
 
     export() {
 

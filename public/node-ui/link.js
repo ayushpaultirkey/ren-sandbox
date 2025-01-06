@@ -10,6 +10,9 @@ class Link {
         this.fOnMouseDown = this.onMouseDown.bind(this);
 
     }
+    remove() {
+        this.line.remove();
+    }
     #createLine(x1, y1, x2, y2) {
 
         const line = document.createElementNS("http://www.w3.org/2000/svg", "line");

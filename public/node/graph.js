@@ -5,8 +5,8 @@ import { IPin } from "./pin.js";
 import { Begin, End, Log } from "./nodes/flow.js";
 
 class IGraph extends IObject {
-    constructor({ uuid = crypto.randomUUID(), name = "IGraph", outer = null } = {}) {
-        super({ uuid, name, outer });
+    constructor({ uuid = crypto.randomUUID(), name = "IGraph", outer = null, classId = "NDE|IGraph" } = {}) {
+        super({ uuid, name, outer, classId });
         this.nodes = {};
         this.values = {};
     }
@@ -23,9 +23,89 @@ class IGraph extends IObject {
         return node;
 
     }
+    removeNodeByUUID(nodeUUID) {
+        this.removeNode(this.nodes[nodeUUID]);
+    }
+    removeNode(node) {
+
+        if(!node) return null;
+
+        const inPins = node.in;
+        for(const pinUUID in inPins) {
+            const pin = inPins[pinUUID];
+            this.clearNodePin(pin);
+        }
+
+        const outPins = node.in;
+        for(const pinUUID in outPins) {
+            const pin = outPins[pinUUID];
+            this.clearNodePin(pin);
+        }
+
+        delete this.nodes[node.getUUID()];
+
+        return true;
+
+    }
     getNodeByUUID(nodeUUID) {
         return this.nodes[nodeUUID];
     }
+
+    clearNodePinByUUID(nodeUUID, pinUUID) {
+
+        const node = this.getNodeByUUID(nodeUUID);
+        if(!node) return;
+
+        const pin = node.getPin(pinUUID);
+        if(!pin) return;
+
+        return this.clearNodePin(pin);
+
+    }
+    clearNodePin(pin) {
+
+        if(!pin) return;
+
+        pin.links.forEach(linkedPin => {
+            linkedPin.unlink(pin);
+        });
+
+        pin.unlinkAll();
+
+        return true;
+
+    }
+    
+    unlinkNodesByUUID(sourceNodeUUID, sourcePinUUID, targetNodeUUID, targetPinUUID) {
+
+        const sourceNode = this.getNodeByUUID(sourceNodeUUID);
+        const targetNode = this.getNodeByUUID(targetNodeUUID);
+
+        this.unlinkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID);
+
+    }
+    unlinkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID) {
+        
+        if(!sourceNode || !targetNode) {
+            console.error("Invalid target or source node");
+            return;
+        }
+
+        const sourcePin = sourceNode.getOutputPin(sourcePinUUID);
+        const targetPin = targetNode.getInputPin(targetPinUUID);
+
+        if(!sourcePin || !targetPin) {
+            console.error("Invalid target or source pin");
+            return;
+        }
+
+        sourcePin.unlink(targetPin);
+        targetPin.unlink(sourcePin);
+
+        return true;
+
+    }
+
     linkNodesByUUID(sourceNodeUUID, sourcePinUUID, targetNodeUUID, targetPinUUID) {
         
         const sourceNode = this.getNodeByUUID(sourceNodeUUID);
@@ -75,6 +155,9 @@ class IGraph extends IObject {
         node.execute();
 
     }
+    getEntryNode() {
+        return Object.values(this.nodes).find(node => node.isEntry === true);
+    }
     export() {
 
         let nodes = {};
@@ -111,14 +194,5 @@ class IGraph extends IObject {
 
     }
 }
-
-// const g1 = new IGraph({ name: "Graph 1" });
-// g1.addNode(Begin, "Begin");
-// g1.addNode(Log, "Log");
-// g1.addNode(End, "End");
-// g1.linkNodesByUUID("Begin", "out0", "Log", "in0");
-// g1.linkNodesByUUID("Log", "out0", "End", "in0");
-// g1.execute("Begin");
-// g1.export();
 
 export { IGraph };

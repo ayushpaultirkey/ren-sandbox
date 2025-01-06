@@ -2,15 +2,10 @@ import { IObject } from "./object.js";
 import { IGraph } from "./graph.js";
 import { Begin, End, Log } from "./nodes/flow.js";
 
-const node_classes = {
-    "Begin": Begin,
-    "Log": Log,
-    "End": End
-}
-
 class IEngine extends IObject {
-    constructor({ uuid = crypto.randomUUID(), name = "IEngine" } = {}) {
-        super({ uuid, name });
+
+    constructor({ uuid = crypto.randomUUID(), name = "IEngine", classId = "NDE|IEngine"} = {}) {
+        super({ uuid, name, classId });
         this.graphs = {};
     }
     addGraph(graphClass, graphUUID) {
@@ -42,9 +37,12 @@ class IEngine extends IObject {
     export() {
 
         const graphs = [];
+        
         for(const graphUUID in this.graphs) {
             const graph = this.graphs[graphUUID];
-            graphs.push(graph.export());
+            const data = graph.export();
+            if(!data) continue;
+            graphs.push(data);
         }
 
         return graphs;
@@ -62,7 +60,7 @@ class IEngine extends IObject {
             if(!graph) return null;
     
             for(const nodeUUID in nodes) {
-                const nodeClass = node_classes[nodes[nodeUUID].class];
+                const nodeClass = IEngine.NODES[nodes[nodeUUID].class];
                 graph.addNode(nodeClass, nodeUUID);
             }
     
@@ -78,40 +76,13 @@ class IEngine extends IObject {
 
         });
     }
+
+    static NODES = {
+        "Event|Begin": Begin,
+        "Event|Log": Log,
+        "Event|End": End,
+    };
+
 }
-
-// const test = [
-//     {
-//         graphUUID: 'ef2f2150-b9e4-47ce-aba1-19e15fc89864',
-//         entryNodeUUID: 'Begin',
-//         nodes: {
-//             Begin: { class: 'Begin' },
-//             Log: { class: 'Log' },
-//             End: { class: 'End' }
-//         },
-//         links: [
-//             {
-//                 sourceNodeUUID: 'Begin',
-//                 sourcePinUUID: 'out0',
-//                 targetNodeUUID: 'Log',
-//                 targetPinUUID: 'in0',
-//                 value: null
-//             },
-//             {
-//                 sourceNodeUUID: 'Log',
-//                 sourcePinUUID: 'out0',
-//                 targetNodeUUID: 'End',
-//                 targetPinUUID: 'in0',
-//                 value: null
-//             }
-//         ]
-//     }
-// ]
-
-
-// const engine = new IEngine({ uuid: "engine1" });
-// engine.import(test);
-
-// console.log(engine.graphs);
 
 export { IEngine };

@@ -22,21 +22,18 @@ class UIGraph extends H12 {
 
     main(args = {}) {
 
-        this.igraph = args.iobject;
-
         this.registerSVG();
         this.registerActivePin();
         this.registerHelperLine();
         this.registerActiveHoverPin();
 
         this.set("{nodes}", "");
-        this.addNode(INode, null, 20, 20);
-        this.addNode(INode, null, 140, 40);
-        this.addNode(INode, null, 280, 80);
 
     }
 
     render() {
+
+        this.igraph = this.args.iobject;
 
         return <>
             <div class="w-full h-full overflow-hidden relative border-2 border-yellow-400">
@@ -50,15 +47,6 @@ class UIGraph extends H12 {
 
     }
 
-    addNode(nodeClass, nodeUUID, x = 20, y = 20) {
-
-        const node = this.igraph.addNode(nodeClass, nodeUUID);
-        if(!node) return;
-        
-        const { nodes } = this.key;
-        nodes(<><node args x={ x } y={ y } alias={ UINode } iobject={ node }></node></>, "x++");
-
-    }
 
     registerSVG() {
 
@@ -91,14 +79,115 @@ class UIGraph extends H12 {
         </>
     }
 
-    
-    linkNodes(nodeA, pinA, nodeB, pinB) {
-        return this.igraph.linkNodes(nodeA, pinA, nodeB, pinB);
+    getIGraph() {
+        return this.igraph;
+    }
+    getIGraphUUID() {
+        return this.igraph.getUUID();
+    }
+    getIGraphEntryNode() {
+        return this.igraph.getEntryNode();
+    }
+
+    addUINode(nodeClass, nodeUUID, x = 20, y = 20) {
+
+        const node = this.igraph.addNode(nodeClass, nodeUUID);
+        if(!node) {
+            console.error("Failed to add node");
+            return false;
+        };
+        
+        const { nodes } = this.key;
+        nodes(<><node args id={ node.getUUID() } x={ x } y={ y } iobject={ node } alias={ UINode }></node></>, "x++");
+
+    }
+    getUINode(nodeUUID) {
+        return this.child[nodeUUID];
+    }
+
+    linkUINodes(uiSourceNode, uiSourcePin, uiTargetNode, uiTargetPin) {
+
+        const iNodeA = uiSourceNode.getINode();
+        const iNodeB = uiTargetNode.getINode();
+        const iPinAUUID = uiSourcePin.getIUUID();
+        const iPinBUUID = uiTargetPin.getIUUID();
+
+        if(!iNodeA || !iNodeB || !iPinAUUID || !iPinBUUID) return false;
+
+        const success = this.igraph.linkNodes(iNodeA, iPinAUUID, iNodeB, iPinBUUID);
+        if(!success) {
+            console.error("Failed to link nodes");
+            return false;
+        };
+        
+        const link = new Link({ source: uiSourcePin, target: uiTargetPin, graph: this });
+        const line = link.create();
+
+        this.helperLinks[link.uuid] = line;
+
+        this.element.backGraph.append(line);
+
+        console.warn("connected");
+
+        return true;
+
+    }
+
+
+    removeUINode(uiNode) {
+
+        if(!uiNode) return false;
+        const inode = uiNode.getINode();
+
+        if(!inode) return false;
+
+        const inPins = inode.in;
+        const outPins = inode.out;
+
+        for(const pinUUID in inPins) {
+            console.log(uiNode.child[pinUUID]);
+            uiNode.child[pinUUID].removeLinks()
+        };
+        for(const pinUUID in outPins) {
+            console.warn(uiNode.child[pinUUID]);
+            uiNode.child[pinUUID].removeLinks();
+        };
+
+        const success = this.igraph.removeNode(inode);
+        if(!success) {
+            console.error("Failed to remove node");
+            return false;
+        };
+
+        console.log("removed node");
+        uiNode.destroy();
+
+        return true;
+
+    }
+
+    clearUINodePins(uiPin) {
+
+        const ipin = uiPin.getIPin();
+        if(!ipin) return;
+
+        const success = this.igraph.clearNodePin(ipin);
+        if(!success) {
+            console.error("Failed to clear pins");
+            return false;
+        };
+
+        uiPin.removeLinks();
+        console.log("cleared pins");
+
+        return true;
+
     }
 
     registerHelperLine() {
-        dispatcher.bind("createHelperLine", (e, pin) => {
 
+        dispatcher.bind("createHelperLine", (e, pin) => {
+            
             const pinID = pin.id;
 
             const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style="stroke:rgb(59,130,246);stroke-width:2;" class="path"></line></>;
@@ -132,13 +221,17 @@ class UIGraph extends H12 {
         dispatcher.bind("removeHelperLine", (e, pin) => {
 
             const pinID = pin.id;
+            const helperLink = this.helperLinks[pinID];
 
-            this.helperLinks[pinID].remove();
+            if(!helperLink) return;
+            helperLink.remove();
+
             delete this.helperLinks[pinID];
 
         });
     }
     registerActivePin() {
+
 
         dispatcher.bind("createActivePin", (e, pin) => {
             this.activePin = pin;
@@ -154,24 +247,14 @@ class UIGraph extends H12 {
             this.activeHoverPin = null;
 
             if(ipin && opin) {
-
-                const success = this.linkNodes(opin.getNode(), opin.getUUID(), ipin.getNode(), ipin.getUUID());
-                if(!success) {
-                    console.error("Cannot connect", ipin);
-                    return;
-                }
-
-                console.log("connected");
-            
-                const link = new Link({ source: opin, target: ipin, graph: this });
-                const line = link.create();
-
-                this.helperLinks[link.uuid] = line;
-
-                this.element.backGraph.append(line);
-
+                this.linkUINodes(opin.getUINode(), opin, ipin.getUINode(), ipin);
             }
 
+        });
+
+        dispatcher.bind("clearLinkedPins", (e, pin) => {
+            if(!pin) return;
+            this.clearUINodePins(pin);
         });
 
     }
