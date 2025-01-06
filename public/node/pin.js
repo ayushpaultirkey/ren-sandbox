@@ -8,21 +8,72 @@ class IPin extends IObject {
         this.value = value;
 
         this.type = type;
-        this.validTypes = new Set([]);
+
+        this.subType = -1;
+        this.validSubTypes = new Set([]);
 
         this.links = [];
         this.maxLinks = 1;
 
     }
-    static TYPE = {
-        INPUT: 1,
-        OUTPUT: 2
+
+    getNode() {
+        return this.getOuter();
     }
+
+    updateValue(value) {
+        this.value = value;
+    }
+
+    isAnyLinked() {
+        return this.links.length > 0;
+    }
+    isLinked(index = 0) {
+        return this.getLink(index) ? true : false;
+    }
+    getLink(index) {
+        return this.links[index];
+    }
+    getLinkNode(index) {
+        const link = this.getLink(index);
+        if(link) {
+            return link.getOuter();
+        }
+    }
+    canLinkTo(targetPin) {
+
+        if(!targetPin || !targetPin.type || !targetPin.getOuter() || targetPin.type == this.type) {
+            console.error("Invalid pin, type, or same pin type");
+            return;
+        }
+
+        if(targetPin.getOuter() == this.getOuter()) {
+            console.error("Source and target pins are the same");
+            return;
+        }
+
+        if(!this.validSubTypes.has(targetPin.subType)) {
+            console.error("Invalid sub pin type");
+            return;
+        }
+        
+        if(this.links.length >= this.maxLinks) {
+            console.error("Link limit failed");
+            return;
+        };
+
+        return true;
+
+    }
+    link(targetPin) {
+        this.links.push(targetPin);
+    }
+
     export() {
 
         let links = [];
 
-        if(this.type !== IPin.TYPE.OUTPUT) {
+        if(this.type !== IPin.TYPES.OUTPUT) {
             return links;
         }
         
@@ -45,49 +96,18 @@ class IPin extends IObject {
         return links;
 
     }
-    updateValue(value) {
-        
-        this.value = value;
 
+    
+    static TYPES = {
+        INPUT: 1,
+        OUTPUT: 2
     }
-    isAnyLinked() {
-        return this.links.length > 0;
-    }
-    isLinked(index = 0) {
-        return this.getLink(index) ? true : false;
-    }
-    getLink(index) {
-        return this.links[index];
-    }
-    getLinkNode(index) {
-        const link = this.getLink(index);
-        if(link) {
-            return link.getOuter();
-        }
-    }
-    canLinkTo(targetPin) {
 
-        if(!targetPin || !targetPin.type || !targetPin.getOuter() || targetPin.type == this.type) {
-            console.error("Invalid pin");
-            return;
-        }
-
-        // if(!this.validTypes.has(targetPin.type)) {
-        //     console.error("Invalid pin type");
-        //     return;
-        // }
-        
-        if(this.links.length >= this.maxLinks) {
-            console.error("Link limit failed");
-            return;
-        };
-
-        return true;
-
+    static SUB_TYPES = {
+        EXEC: 1
     }
-    link(targetPin) {
-        this.links.push(targetPin);
-    }
+
+
 }
 
 

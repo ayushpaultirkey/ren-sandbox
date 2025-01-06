@@ -39,6 +39,17 @@ class IEngine extends IObject {
         graph.execute(nodeUUID);
 
     }
+    export() {
+
+        const graphs = [];
+        for(const graphUUID in this.graphs) {
+            const graph = this.graphs[graphUUID];
+            graphs.push(graph.export());
+        }
+
+        return graphs;
+
+    }
     import(graphs = []) {
         graphs.forEach(data => {
 

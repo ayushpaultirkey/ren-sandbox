@@ -147,7 +147,7 @@ function pharseAttribute(element = document.body) {
         const keyMatch = attributeValue.match(/\{[^{}\s]*\}/gm);
         const filterKey = (keyMatch) ? keyMatch.filter(x => !x.includes(PLACEHOLDER_CODE)) : [];
 
-        if((attribute == "args" && attributeValue == "") || attribute == "alias" || attribute == "scope") {
+        if((attribute == "args" && attributeValue == "") || attribute == "alias" || attribute == "scope" || attribute == "svg") {
             continue;
         }
 
@@ -213,7 +213,7 @@ function phraseDOM(element = document.body) {
     }
 
     const tag = element.tagName.toLowerCase();
-    const isSVG = element.namespaceURI === "http://www.w3.org/2000/svg";
+    const svg = (element.namespaceURI === "http://www.w3.org/2000/svg" || element.hasAttribute("svg")) ? "http://www.w3.org/2000/svg" : "";
 
     const childs = pharseNode(element);
     const childCode = `[${childs.child.join(",")}]`;
@@ -241,7 +241,7 @@ function phraseDOM(element = document.body) {
         name = `"${tag}"`;
     }
 
-    const code = `${scope}.${method}(${name},${childCode},${attributeCode},${JSON.stringify(childs.keys)},${isSVG})`;
+    const code = `${scope}.${method}(${name},${childCode},${attributeCode},${JSON.stringify(childs.keys)},"${svg}")`;
 
     return code.replace(/,\)/g, ")");
 

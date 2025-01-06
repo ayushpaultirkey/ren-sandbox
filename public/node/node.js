@@ -10,26 +10,27 @@ class INode extends IObject {
         this.isEntry = false;
     }
     
-    addInputPin(pinClass, pinUUID) {
+    addInputPin(pinUUID, pinClass, pinSubType) {
         
         if(!pinClass) return null;
         if(this.in[pinUUID]) return null;
 
-        const pin = new pinClass({ uuid: pinUUID, outer: this, type: IPin.TYPE.INPUT });
+        const pin = new pinClass({ uuid: pinUUID, outer: this, type: IPin.TYPES.INPUT, subType: pinSubType });
         this.in[pinUUID] = pin;
 
         return pin;
 
     }
-    addOutputPin(pinClass, pinUUID) {
+    addOutputPin(pinUUID, pinClass, pinSubType) {
 
         if(!pinClass) return null;
-        if(this.out[pinName]) return null;
+        if(this.out[pinUUID]) return null;
 
-        const pin = new pinClass({ uuid: pinName, outer: this, type: IPin.TYPE.OUTPUT });
-        this.out[pinName] = pin;
+        const pin = new pinClass({ uuid: pinUUID, outer: this, type: IPin.TYPES.OUTPUT, subType: pinSubType });
+        this.out[pinUUID] = pin;
 
         return pin;
+        
     }
 
     getPin(pinUUID) {

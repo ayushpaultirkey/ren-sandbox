@@ -26,23 +26,23 @@ class IGraph extends IObject {
     getNodeByUUID(nodeUUID) {
         return this.nodes[nodeUUID];
     }
-    linkNodesByUUID(sourceNodeUUID, sourcePinName, targetNodeUUID, targetPinName) {
+    linkNodesByUUID(sourceNodeUUID, sourcePinUUID, targetNodeUUID, targetPinUUID) {
         
         const sourceNode = this.getNodeByUUID(sourceNodeUUID);
         const targetNode = this.getNodeByUUID(targetNodeUUID);
 
-        this.linkNodes(sourceNode, sourcePinName, targetNode, targetPinName);
+        this.linkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID);
 
     }
-    linkNodes(sourceNode, sourcePinName, targetNode, targetPinName) {
+    linkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID) {
         
         if(!sourceNode || !targetNode) {
             console.error("Invalid target or source node");
             return;
         }
 
-        const sourcePin = sourceNode.getOutputPin(sourcePinName);
-        const targetPin = targetNode.getInputPin(targetPinName);
+        const sourcePin = sourceNode.getOutputPin(sourcePinUUID);
+        const targetPin = targetNode.getInputPin(targetPinUUID);
 
         if(!sourcePin || !targetPin) {
             console.error("Invalid target or source pin");
@@ -61,6 +61,10 @@ class IGraph extends IObject {
 
         sourcePin.link(targetPin);
         targetPin.link(sourcePin);
+
+        console.warn(`Node Pin Linked ${sourceNode.getUUID()}.${sourcePinUUID} -> ${targetNode.getUUID()}.${targetPinUUID}`);
+
+        return true;
         
     }
     execute(nodeUUID) {
@@ -102,8 +106,6 @@ class IGraph extends IObject {
         };
 
         const exportData = { graphUUID: this.getUUID(), entryNodeUUID: entry, nodes: nodes, links: links };
-
-        console.dir(exportData, { depth: null });
 
         return exportData;
 
