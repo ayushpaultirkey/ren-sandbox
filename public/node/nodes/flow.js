@@ -1,31 +1,47 @@
-import { INode } from "../node.js"
-import { IPin } from "../pin.js"
+import { INode, NODES_REGISTRY } from "../node.js"
+import { ISocket } from "../socket.js"
 import { ExecPin } from "./../pins/exec.js";
 
 
 class Begin extends INode {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "INode.Event.Begin",
+        displayName: "Begin"
+    }
+
     constructor({ uuid, outer }) {
-        super({ uuid, outer, name: "Begin", classId: "Event|Begin" });
-        this.in = {};
-        this.out = {
-            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: IPin.TYPES.OUTPUT })
+        super({ uuid, outer });
+        this.input = {};
+        this.output = {
+            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT })
         };
         this.isEntry = true;
     }
+
     execute() {
         console.log("begin");
         this.executeLinkedNode("out0", 0);
     }
+
 }
 
 class Log extends INode {
+    
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "INode.Event.Log",
+        displayName: "Log"
+    }
+    
     constructor({ uuid, outer }) {
-        super({ uuid, outer, name: "Log", classId: "Event|Log" });
-        this.in = {
-            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: IPin.TYPES.INPUT })
+        super({ uuid, outer });
+        this.input = {
+            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT })
         };
-        this.out = {
-            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: IPin.TYPES.OUTPUT })
+        this.output = {
+            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT })
         };
     }
     execute() {
@@ -35,12 +51,19 @@ class Log extends INode {
 }
 
 class End extends INode {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "INode.Event.End",
+        displayName: "Return"
+    }
+
     constructor({ uuid, outer }) {
-        super({ uuid, outer, name: "Return", classId: "Event|End" });
-        this.in = {
-            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: IPin.TYPES.INPUT })
+        super({ uuid, outer });
+        this.input = {
+            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT })
         };
-        this.out = {};
+        this.output = {};
     }
     execute() {
         console.log("end");
@@ -48,5 +71,10 @@ class End extends INode {
 }
 
 
+NODES_REGISTRY.registerMany({
+    "INode.Event.Begin": Begin,
+    "INode.Event.Log": Log,
+    "INode.Event.End": End
+});
 
 export { Begin, Log, End }

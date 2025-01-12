@@ -1,15 +1,20 @@
 import { IObject } from "./object.js";
 
-class IPin extends IObject {
+class ISocket extends IObject {
 
-    constructor({ uuid = crypto.randomUUID(), name = "IPin", outer = null, classId = "NDE|IPin", type = null, value = null } = {}) {
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "IObject.Socket",
+        displayName: "Socket"
+    }
 
-        super({ uuid, name, outer, classId });
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null } = {}) {
+
+        super({ uuid, outer, name });
 
         this.value = value;
 
         this.type = type;
-
         this.subType = -1;
         this.validSubTypes = new Set([]);
 
@@ -18,13 +23,19 @@ class IPin extends IObject {
 
     }
 
+
+    getValue() {
+        return this.value;
+    }
+    setValue(value) {
+        this.value = value;
+    }
+
+
     getNode() {
         return this.getOuter();
     }
 
-    updateValue(value) {
-        this.value = value;
-    }
 
     isAnyLinked() {
         return this.links.length > 0;
@@ -35,26 +46,28 @@ class IPin extends IObject {
     getLink(index) {
         return this.links[index];
     }
-    getLinkNode(index) {
+    getLinkedNode(index) {
         const link = this.getLink(index);
         if(link) {
             return link.getOuter();
         }
     }
-    canLinkTo(targetPin) {
 
-        if(!targetPin || !targetPin.type || !targetPin.getOuter() || targetPin.type == this.type) {
-            console.error("Invalid pin, type, or same pin type");
+
+    canLinkTo(targetSocket) {
+
+        if(!targetSocket || !targetSocket.type || !targetSocket.getOuter() || targetSocket.type == this.type) {
+            console.error("Invalid socket, type, or same socket type");
             return;
         }
 
-        if(targetPin.getOuter() == this.getOuter()) {
-            console.error("Source and target pins are the same");
+        if(targetSocket.getOuter() == this.getOuter()) {
+            console.error("Source and target sockets are the same");
             return;
         }
 
-        if(!this.validSubTypes.has(targetPin.subType)) {
-            console.error("Invalid sub pin type");
+        if(!this.validSubTypes.has(targetSocket.subType)) {
+            console.error("Invalid sub-socket type");
             return;
         }
         
@@ -66,27 +79,22 @@ class IPin extends IObject {
         return true;
 
     }
-    link(targetPin) {
-        this.links.push(targetPin);
-        this.onLinked();
+    link(targetSocket) {
+        this.links.push(targetSocket);
     }
-    unlink(targetPin) {
-        this.links = this.links.filter(link => link != targetPin);
-        this.onUnlinked();
+    unlink(targetSocket) {
+        this.links = this.links.filter(link => link != targetSocket);
     }
     unlinkAll() {
         this.links = [];
-        this.onUnlinked();
     }
 
-    onLinked() {}
-    onUnlinked() {}
 
     export() {
 
         let links = [];
 
-        if(this.type !== IPin.TYPES.OUTPUT) {
+        if(this.type !== ISocket.TYPES.OUTPUT) {
             return links;
         }
         
@@ -97,10 +105,10 @@ class IPin extends IObject {
             }
 
             links.push({
-                sourceNodeUUID: this.getOuter().getUUID(),
-                sourcePinUUID: this.getUUID(),
-                targetNodeUUID: link.getOuter().getUUID(),
-                targetPinUUID: link.getUUID(),
+                sourceNodeUUID: this.getNode().getUUID(),
+                sourceSocketUUID: this.getUUID(),
+                targetNodeUUID: link.getNode().getUUID(),
+                targetSocketUUID: link.getUUID(),
                 value: this.value
             });
 
@@ -124,4 +132,4 @@ class IPin extends IObject {
 }
 
 
-export { IPin };
+export { ISocket };

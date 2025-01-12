@@ -4,36 +4,68 @@ import { Begin, End, Log } from "./nodes/flow.js";
 
 class IEngine extends IObject {
 
-    constructor({ uuid = crypto.randomUUID(), name = "IEngine", classId = "NDE|IEngine"} = {}) {
-        super({ uuid, name, classId });
-        this.graphs = {};
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "IObject.IEngine",
+        displayName: "Engine"
     }
+
+    constructor({ uuid = crypto.randomUUID() } = {}) {
+
+        super({ uuid });
+        this.graphs = {};
+
+    }
+
+    /**
+     * 
+     * @param {IGraph} graphClass 
+     * @param {string} graphUUID 
+     * @returns {IGraph}
+    */
     addGraph(graphClass, graphUUID) {
 
         const uuid = graphUUID || crypto.randomUUID();
 
         if(!graphClass) return null;
-        if(this.graphs[uuid]) return null;
-
+        if(this.getGraphByUUID(uuid)) return null;
+        
         const graph = new graphClass({ uuid: uuid, outer: this });
         this.graphs[uuid] = graph;
 
         return graph;
 
     }
+
+    /**
+     * 
+     * @param {string} graphUUID 
+     * @returns {IGraph}
+    */
     getGraphByUUID(graphUUID) {
 
         return this.graphs[graphUUID];
 
     }
+
+    /**
+     * 
+     * @param {string} graphUUID 
+     * @param {string} nodeUUID 
+     * @returns 
+    */
     executeGraph(graphUUID, nodeUUID) {
 
         const graph = this.getGraphByUUID(graphUUID);
         if(!graph) return null;
-
-        graph.execute(nodeUUID);
+        
+        graph.executeNode(nodeUUID);
 
     }
+    /**
+     * 
+     * @returns {Object}
+    */
     export() {
 
         const graphs = [];
@@ -48,6 +80,11 @@ class IEngine extends IObject {
         return graphs;
 
     }
+
+    /**
+     * 
+     * @param {[Object]} graphs 
+    */
     import(graphs = []) {
         graphs.forEach(data => {
 
@@ -65,9 +102,10 @@ class IEngine extends IObject {
             }
     
             for(const link of links) {
-                const sourceNode = graph.getNodeByUUID(link.sourceNodeUUID);
-                const targetNode = graph.getNodeByUUID(link.targetNodeUUID);
-                graph.linkNodes(sourceNode, link.sourcePinUUID, targetNode, link.targetPinUUID);
+                //const sourceNode = graph.getNodeByUUID(link.sourceNodeUUID);
+                //const targetNode = graph.getNodeByUUID(link.targetNodeUUID);
+                //graph.linkNodes(sourceNode, link.sourceSocketUUID, targetNode, link.targetSocketUUID);
+                graph.linkNodesByUUID(link.sourceNodeUUID, link.sourceSocketUUID, link.targetNodeUUID, link.targetSocketUUID);
             }
     
             if(data.entryNodeUUID) {
@@ -76,13 +114,7 @@ class IEngine extends IObject {
 
         });
     }
-
-    static NODES = {
-        "Event|Begin": Begin,
-        "Event|Log": Log,
-        "Event|End": End,
-    };
-
+    
 }
 
 export { IEngine };

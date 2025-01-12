@@ -238,7 +238,12 @@ function phraseDOM(element = document.body) {
         }
     }
     else {
-        name = `"${tag}"`;
+        if(hasAlias) {
+            name = `"${element.getAttribute("alias").replace(/\{|\}/g, "")}"`;
+        }
+        else {
+            name = `"${tag}"`;
+        }
     }
 
     const code = `${scope}.${method}(${name},${childCode},${attributeCode},${JSON.stringify(childs.keys)},"${svg}")`;

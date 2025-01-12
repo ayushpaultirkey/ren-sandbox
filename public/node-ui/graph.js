@@ -5,6 +5,8 @@ import { IGraph } from "../node/graph.js";
 import { INode } from "../node/node.js";
 import { UINode } from "./node.js";
 import { Link } from "./link.js";
+import VIEWPORT from "./viewport.js";
+import Drag from "./drag.js";
 
 
 class UIGraph extends H12 {
@@ -14,80 +16,66 @@ class UIGraph extends H12 {
         super();
         this.igraph = null;
 
-        this.activePin = null;
-        this.activeHoverPin = null;
+        this.activeSocket = null;
+        this.activeHoverSocket = null;
         this.helperLinks = {};
 
     }
 
     main(args = {}) {
 
-        this.registerSVG();
-        this.registerActivePin();
+        this.registerActiveSocket();
         this.registerHelperLine();
-        this.registerActiveHoverPin();
+        this.registerActiveHoverSocket();
 
-        this.set("{nodes}", "");
+        Drag(this.root, this.parent.element.viewport, this.parent.element.viewport, true);
 
     }
 
     render() {
 
+        if(!this.args.iobject) return <><label>Invalid graph</label></>;
         this.igraph = this.args.iobject;
 
         return <>
-            <div class="w-full h-full overflow-hidden relative border-2 border-yellow-400">
-                { this.createSVG("backGraph") }
-                <div class="w-full h-full relative border-2 border-red-400">
-                    {nodes}
+            <div class="absolute" onmousewheel={ this.zoom }>
+                <div id="frame" class="frame border-2 border-zinc-500 absolute w-[650px] h-[450px]">
+                    { this.createSVG("backGraph") }
+                    <div>
+                        {nodes}
+                    </div>
+                    { this.createSVG("topGraph") }
                 </div>
-                { this.createSVG("topGraph") }
             </div>
         </>;
 
     }
 
-
-    registerSVG() {
-
-        const { root: parent } = this;
-        const { topGraph, backGraph } = this.element;
-    
-        window.addEventListener("resize", (event) => {
-            this.resizeSVG([ backGraph, topGraph ], parent);
-        });
-
+    zoom(event) {
+        if(event.deltaY > 0) {
+            this.zoomOut();
+        } else {
+            this.zoomIn();
+        }
     }
-    resizeSVG(graphs = [], parent) {
-        
-        const rect = parent.getClientRects()[0];
-        if(!rect || !rect.width || !rect.height) return;
-
-        const w = rect.width;
-        const h = rect.height;
-        
-        graphs.forEach(graph => {
-            graph.setAttributeNS(null, "viewBox", `0 0 ${w} ${h}`);
-            graph.setAttributeNS(null, "width", w);
-            graph.setAttributeNS(null, "height", h);
-        });
-        
+    zoomIn() {
+        VIEWPORT.zoom = (VIEWPORT.zoom + 0.1) > VIEWPORT.zoomMax ? VIEWPORT.zoomMax : VIEWPORT.zoom + 0.1;
+        this.root.style.transform = `scale(${VIEWPORT.zoom})`;
     }
-    createSVG(id) {
-        return <>
-            <svg width="512" height="512" id={ id } class="absolute select-none pointer-events-none border-2 border-zinc-500 top-0 left-0"></svg>
-        </>
+    zoomOut() {
+        VIEWPORT.zoom -= (VIEWPORT.zoom - 0.1) < VIEWPORT.zoomMin ? 0 : 0.1;
+        this.root.style.transform = `scale(${VIEWPORT.zoom})`;
+    }
+    recenter() {
+        const parent = this.root.parentElement;
+        const frame = this.element.frame;
+        const parentRect = parent.getBoundingClientRect();
+        const frameRect = frame.getBoundingClientRect();
+        this.root.style.left = ((parentRect.width / 2) - (frameRect.width / 2)) + "px";
+        this.root.style.top = ((parentRect.height / 2) - (frameRect.height / 2)) + "px"; 
     }
 
-    getIGraph() {
-        return this.igraph;
-    }
-    getIGraphUUID() {
-        return this.igraph.getUUID();
-    }
-    getIGraphEntryNode() {
-        return this.igraph.getEntryNode();
-    }
+
 
     addUINode(nodeClass, nodeUUID, x = 20, y = 20) {
 
@@ -101,26 +89,64 @@ class UIGraph extends H12 {
         nodes(<><node args id={ node.getUUID() } x={ x } y={ y } iobject={ node } alias={ UINode }></node></>, "x++");
 
     }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    getIGraph() {
+        return this.igraph;
+    }
+    getIGraphUUID() {
+        return this.igraph.getUUID();
+    }
+    getIGraphEntryNode() {
+        return this.igraph.getEntryNode();
+    }
+
     getUINode(nodeUUID) {
         return this.child[nodeUUID];
     }
 
-    linkUINodes(uiSourceNode, uiSourcePin, uiTargetNode, uiTargetPin) {
+    linkUINodes(uiSourceNode, uiSourceSocket, uiTargetNode, uiTargetSocket) {
 
         const iNodeA = uiSourceNode.getINode();
         const iNodeB = uiTargetNode.getINode();
-        const iPinAUUID = uiSourcePin.getIUUID();
-        const iPinBUUID = uiTargetPin.getIUUID();
+        const iSocketAUUID = uiSourceSocket.getIUUID();
+        const iSocketBUUID = uiTargetSocket.getIUUID();
 
-        if(!iNodeA || !iNodeB || !iPinAUUID || !iPinBUUID) return false;
+        if(!iNodeA || !iNodeB || !iSocketAUUID || !iSocketBUUID) return false;
 
-        const success = this.igraph.linkNodes(iNodeA, iPinAUUID, iNodeB, iPinBUUID);
+        const success = this.igraph.linkSocketsByUUID(iNodeA, iSocketAUUID, iNodeB, iSocketBUUID);
         if(!success) {
             console.error("Failed to link nodes");
             return false;
         };
         
-        const link = new Link({ source: uiSourcePin, target: uiTargetPin, graph: this });
+        const link = new Link({ source: uiSourceSocket, target: uiTargetSocket, graph: this });
         const line = link.create();
 
         this.helperLinks[link.uuid] = line;
@@ -141,16 +167,16 @@ class UIGraph extends H12 {
 
         if(!inode) return false;
 
-        const inPins = inode.in;
-        const outPins = inode.out;
+        const inSockets = inode.input;
+        const outSockets = inode.output;
 
-        for(const pinUUID in inPins) {
-            console.log(uiNode.child[pinUUID]);
-            uiNode.child[pinUUID].removeLinks()
+        for(const socketUUID in inSockets) {
+            console.log(uiNode.child[socketUUID]);
+            uiNode.child[socketUUID].removeLinks()
         };
-        for(const pinUUID in outPins) {
-            console.warn(uiNode.child[pinUUID]);
-            uiNode.child[pinUUID].removeLinks();
+        for(const socketUUID in outSockets) {
+            console.warn(uiNode.child[socketUUID]);
+            uiNode.child[socketUUID].removeLinks();
         };
 
         const success = this.igraph.removeNode(inode);
@@ -166,109 +192,124 @@ class UIGraph extends H12 {
 
     }
 
-    clearUINodePins(uiPin) {
+    clearUINodeSockets(uiSocket) {
 
-        const ipin = uiPin.getIPin();
-        if(!ipin) return;
+        const isocket = uiSocket.getISocket();
+        if(!isocket) return;
 
-        const success = this.igraph.clearNodePin(ipin);
+        const success = this.igraph.clearSocketLinks(isocket);
         if(!success) {
-            console.error("Failed to clear pins");
+            console.error("Failed to clear socket");
             return false;
         };
 
-        uiPin.removeLinks();
-        console.log("cleared pins");
+        uiSocket.removeLinks();
+        console.log("cleared socket");
 
         return true;
 
     }
 
+    createSVG(id) {
+        return <>
+            <svg width={ VIEWPORT.size.width } height={ VIEWPORT.size.height } id={ id } class="absolute select-none pointer-events-none top-0 left-0">
+                <defs svg>
+                    <linearGradient alias="linearGradient" svg id="myGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                        <stop svg offset="0%" stop-color="white" />
+                        <stop svg offset="100%" stop-color="rgba(255,255,255,0.1)" />
+                    </linearGradient>
+                </defs>
+            </svg>
+        </>
+    }
     registerHelperLine() {
 
-        dispatcher.bind("createHelperLine", (e, pin) => {
-            
-            const pinID = pin.id;
+        dispatcher.bind("createHelperLine", (e, socket) => {
 
-            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style="stroke:rgb(59,130,246);stroke-width:2;" class="path"></line></>;
-
+            const socketID = socket.id;
             const { topGraph } = this.element;
+    
+            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style="stroke:rgb(59,130,246);stroke-width:2;" class="path"></line></>;
+        
             topGraph.append(line);
-            this.helperLinks[pinID] = line;
+            this.helperLinks[socketID] = line;
 
         });
-        dispatcher.bind("updateHelperLine", (e, { pin, event }) => {
 
-            const pinID = pin.id;
-            const pinRoot = pin.root;
+        dispatcher.bind("updateHelperLine", (e, { socket, event }) => {
+
+            const scale = VIEWPORT.zoom;
+            const socketID = socket.id;
+            const socketRoot = socket.getPinElement();
 
             const { x: parentX, y: parentY } = this.root.getBoundingClientRect();
-            const { x, y, width, height } = pinRoot.getBoundingClientRect();
+            const { x, y, width, height } = socketRoot.getBoundingClientRect();
 
-            const x1 = x - parentX + width / 2;
-            const y1 = y - parentY + height / 2;
+            const x1 = (x - parentX + width / 2) / scale;
+            const y1 = (y - parentY + height / 2) / scale;
 
-            const line = this.helperLinks[pinID];
+            const line = this.helperLinks[socketID];
             if(line) {
 
                 line.setAttributeNS(null, "x1", x1);
                 line.setAttributeNS(null, "y1", y1);
-                line.setAttributeNS(null, "x2", event.clientX - parentX);
-                line.setAttributeNS(null, "y2", event.clientY - parentY);
+                line.setAttributeNS(null, "x2", (event.clientX - parentX) / scale);
+                line.setAttributeNS(null, "y2", (event.clientY - parentY) / scale);
 
             }
-        });
-        dispatcher.bind("removeHelperLine", (e, pin) => {
 
-            const pinID = pin.id;
-            const helperLink = this.helperLinks[pinID];
+        });
+        dispatcher.bind("removeHelperLine", (e, socket) => {
+
+            const socketID = socket.id;
+            const helperLink = this.helperLinks[socketID];
 
             if(!helperLink) return;
             helperLink.remove();
 
-            delete this.helperLinks[pinID];
+            delete this.helperLinks[socketID];
 
         });
     }
-    registerActivePin() {
+    registerActiveSocket() {
 
 
-        dispatcher.bind("createActivePin", (e, pin) => {
-            this.activePin = pin;
-            console.log(this.activePin);
+        dispatcher.bind("createActiveSocket", (e, socket) => {
+            this.activeSocket = socket;
+            console.log(this.activeSocket);
         });
 
-        dispatcher.bind("removeActivePin", (e, pin) => {
+        dispatcher.bind("removeActiveSocket", (e, socket) => {
 
-            const opin = this.activePin;
-            const ipin = this.activeHoverPin;
+            const osocket = this.activeSocket;
+            const isocket = this.activeHoverSocket;
 
-            this.activePin = null;
-            this.activeHoverPin = null;
+            this.activeSocket = null;
+            this.activeHoverSocket = null;
 
-            if(ipin && opin) {
-                this.linkUINodes(opin.getUINode(), opin, ipin.getUINode(), ipin);
+            if(isocket && osocket) {
+                this.linkUINodes(osocket.getUINode(), osocket, isocket.getUINode(), isocket);
             }
 
         });
 
-        dispatcher.bind("clearLinkedPins", (e, pin) => {
-            if(!pin) return;
-            this.clearUINodePins(pin);
+        dispatcher.bind("clearLinkedSockets", (e, socket) => {
+            if(!socket) return;
+            this.clearUINodeSockets(socket);
         });
 
     }
-    registerActiveHoverPin() {
-        dispatcher.bind("createActiveHoverPin", (e, pin) => {
-            if(this.activePin) {
-                this.activeHoverPin = pin;
-                console.log(this.activeHoverPin);
+    registerActiveHoverSocket() {
+        dispatcher.bind("createActiveHoverSocket", (e, socket) => {
+            if(this.activeSocket) {
+                this.activeHoverSocket = socket;
+                console.log(this.activeHoverSocket);
             }
         });
-        dispatcher.bind("removeActiveHoverPin", (e, pin) => {
-            if(this.activePin) {
-                this.activeHoverPin = null;
-                console.log(this.activeHoverPin);
+        dispatcher.bind("removeActiveHoverSocket", (e, socket) => {
+            if(this.activeSocket) {
+                this.activeHoverSocket = null;
+                console.log(this.activeHoverSocket);
             }
         });
     }

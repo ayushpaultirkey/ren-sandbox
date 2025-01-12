@@ -1,21 +1,31 @@
 import { IObject } from "./object.js";
-import { INode } from "./node.js";
-import { IPin } from "./pin.js";
-
-import { Begin, End, Log } from "./nodes/flow.js";
+import { INode, NODES_REGISTRY } from "./node.js";
+import { ISocket } from "./socket.js";
 
 class IGraph extends IObject {
-    constructor({ uuid = crypto.randomUUID(), name = "IGraph", outer = null, classId = "NDE|IGraph" } = {}) {
-        super({ uuid, name, outer, classId });
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "IObject.IGraph",
+        displayName: "Graph"
+    }
+
+    constructor({ uuid = crypto.randomUUID(), outer = null } = {}) {
+
+        super({ uuid, outer });
+
         this.nodes = {};
         this.values = {};
+
     }
+
     addNode(nodeClass, nodeUUID) {
 
         const uuid = nodeUUID || crypto.randomUUID();
 
         if(!nodeClass) return null;
-        if(this.nodes[uuid]) return null;
+        if(this.getNodeByUUID(uuid)) return null;
+        if(!NODES_REGISTRY.isRegistered(nodeClass.meta.className)) return null;
 
         const node = new nodeClass({ uuid: uuid , outer: this });
         this.nodes[uuid] = node;
@@ -23,23 +33,29 @@ class IGraph extends IObject {
         return node;
 
     }
-    removeNodeByUUID(nodeUUID) {
-        this.removeNode(this.nodes[nodeUUID]);
+    
+    getNodeByUUID(nodeUUID) {
+        return this.nodes[nodeUUID];
     }
+
+    removeNodeByUUID(nodeUUID) {
+        return this.removeNode(this.getNodeByUUID(nodeUUID));
+    }
+
     removeNode(node) {
 
         if(!node) return null;
 
-        const inPins = node.in;
-        for(const pinUUID in inPins) {
-            const pin = inPins[pinUUID];
-            this.clearNodePin(pin);
+        const inSockets = node.input;
+        for(const socketUUID in inSockets) {
+            const socket = inSockets[socketUUID];
+            this.clearSocketLinks(socket);
         }
 
-        const outPins = node.in;
-        for(const pinUUID in outPins) {
-            const pin = outPins[pinUUID];
-            this.clearNodePin(pin);
+        const outSockets = node.output;
+        for(const socketUUID in outSockets) {
+            const socket = outSockets[socketUUID];
+            this.clearSocketLinks(socket);
         }
 
         delete this.nodes[node.getUUID()];
@@ -47,117 +63,126 @@ class IGraph extends IObject {
         return true;
 
     }
-    getNodeByUUID(nodeUUID) {
-        return this.nodes[nodeUUID];
-    }
 
-    clearNodePinByUUID(nodeUUID, pinUUID) {
+    clearSocketLinksByUUID(nodeUUID, socketUUID) {
 
         const node = this.getNodeByUUID(nodeUUID);
         if(!node) return;
 
-        const pin = node.getPin(pinUUID);
-        if(!pin) return;
+        const socket = node.getSocket(socketUUID);
+        if(!socket) return;
 
-        return this.clearNodePin(pin);
+        return this.clearSocketLinks(socket);
 
     }
-    clearNodePin(pin) {
+    clearSocketLinks(socket) {
 
-        if(!pin) return;
+        if(!socket) return;
 
-        pin.links.forEach(linkedPin => {
-            linkedPin.unlink(pin);
+        socket.links.forEach(linkedSockets => {
+            linkedSockets.unlink(socket);
         });
 
-        pin.unlinkAll();
-
+        socket.unlinkAll();
+        
         return true;
 
     }
     
-    unlinkNodesByUUID(sourceNodeUUID, sourcePinUUID, targetNodeUUID, targetPinUUID) {
+    unlinkNodesSocketsByUUID(sourceNodeUUID, sourceSocketUUID, targetNodeUUID, targetSocketUUID) {
 
         const sourceNode = this.getNodeByUUID(sourceNodeUUID);
         const targetNode = this.getNodeByUUID(targetNodeUUID);
 
-        this.unlinkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID);
-
+        this.unlinkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID);
+        
     }
-    unlinkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID) {
+
+    unlinkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID) {
         
         if(!sourceNode || !targetNode) {
             console.error("Invalid target or source node");
             return;
         }
 
-        const sourcePin = sourceNode.getOutputPin(sourcePinUUID);
-        const targetPin = targetNode.getInputPin(targetPinUUID);
+        const sourceSocket = sourceNode.getOutputSocket(sourceSocketUUID);
+        const targetSocket = targetNode.getInputSocket(targetSocketUUID);
 
-        if(!sourcePin || !targetPin) {
-            console.error("Invalid target or source pin");
+        return this.unlinkSockets(sourceSocket, targetSocket);
+
+    }
+
+    unlinkSockets(sourceSocket, targetSocket) {
+
+        if(!sourceSocket || !targetSocket) {
+            console.error("Invalid target or source socket");
             return;
         }
 
-        sourcePin.unlink(targetPin);
-        targetPin.unlink(sourcePin);
+        sourceSocket.unlink(targetSocket);
+        targetSocket.unlink(sourceSocket);
 
         return true;
 
     }
 
-    linkNodesByUUID(sourceNodeUUID, sourcePinUUID, targetNodeUUID, targetPinUUID) {
+    linkNodesSocketsByUUID(sourceNodeUUID, sourceSocketUUID, targetNodeUUID, targetSocketUUID) {
         
         const sourceNode = this.getNodeByUUID(sourceNodeUUID);
         const targetNode = this.getNodeByUUID(targetNodeUUID);
 
-        this.linkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID);
+        this.linkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID);
 
     }
-    linkNodes(sourceNode, sourcePinUUID, targetNode, targetPinUUID) {
+    linkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID) {
         
         if(!sourceNode || !targetNode) {
             console.error("Invalid target or source node");
             return;
         }
 
-        const sourcePin = sourceNode.getOutputPin(sourcePinUUID);
-        const targetPin = targetNode.getInputPin(targetPinUUID);
+        const sourceSocket = sourceNode.getOutputSocket(sourceSocketUUID);
+        const targetSocket = targetNode.getInputSocket(targetSocketUUID);
 
-        if(!sourcePin || !targetPin) {
-            console.error("Invalid target or source pin");
-            return;
-        }
-
-        if(sourcePin == targetPin) {
-            console.error("Source and target pins are the same");
-            return;
-        }
-
-        if(!sourcePin.canLinkTo(targetPin) || !targetPin.canLinkTo(sourcePin)) {
-            console.error("Cannot connect pins");
-            return;
-        }
-
-        sourcePin.link(targetPin);
-        targetPin.link(sourcePin);
-
-        console.warn(`Node Pin Linked ${sourceNode.getUUID()}.${sourcePinUUID} -> ${targetNode.getUUID()}.${targetPinUUID}`);
-
-        return true;
+        return this.linkSockets(sourceSocket, targetSocket);
         
     }
-    execute(nodeUUID) {
+    linkSockets(sourceSocket, targetSocket) {
 
+        if(!sourceSocket || !targetSocket) {
+            console.error("Invalid target or source socket");
+            return;
+        }
+
+        if(sourceSocket == targetSocket) {
+            console.error("Source and target socket are the same");
+            return;
+        }
+
+        if(!sourceSocket.canLinkTo(targetSocket) || !targetSocket.canLinkTo(sourceSocket)) {
+            console.error("Cannot connect socket");
+            return;
+        }
+
+        sourceSocket.link(targetSocket);
+        targetSocket.link(sourceSocket);
+
+        console.warn(`Sockets Linked ${sourceSocket.getUUID()} <--> ${targetSocket.getUUID()}`);
+
+        return true;
+
+    }
+
+    executeNode(nodeUUID) {
         const node = this.getNodeByUUID(nodeUUID);
         if(!node) return;
-
         node.execute();
-
     }
+
     getEntryNode() {
         return Object.values(this.nodes).find(node => node.isEntry === true);
     }
+
     export() {
 
         let nodes = {};
@@ -193,6 +218,7 @@ class IGraph extends IObject {
         return exportData;
 
     }
+
 }
 
 export { IGraph };

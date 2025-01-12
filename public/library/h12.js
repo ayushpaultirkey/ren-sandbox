@@ -105,9 +105,9 @@ export default class H12 {
             const name = key.split("{")[1].split("}")[0];
             this.key[name] = (value, position) => this.set(position ? (position.indexOf("++") > 0) ? `++{${name}}` : `{${name}}++` : key, value);
         }
-
-        if (!this.#binding[key]) this.#binding[key] = { element: [], data: "" };
-        this.#binding[key].element.push(data);
+        const bind = this.#binding;
+        if (!bind[key]) bind[key] = { element: [], data: "" };
+        bind[key].element.push(data);
 
     }
 
@@ -122,7 +122,7 @@ export default class H12 {
         *   this.set("{color}", "red");
         * }
     */
-    main(args = {}, callback) {}
+    main(args = {}) {}
 
     /**
         * Creates a render template for the element.
@@ -256,8 +256,8 @@ export default class H12 {
 
     destroy() {
         for(const event in this.#events) {
-            const { e, f, n } = this.#events[event];
-            e.removeEventListener(n, f);
+            const { e: element, f: method, n: name } = this.#events[event];
+            element.removeEventListener(name, method);
             delete this.#events[event];
         };
         delete this.parent.child[this.id];
@@ -281,6 +281,9 @@ export default class H12 {
     component(node = null, children = [], args = {}) {
         if (node instanceof Object) {
             
+            /**
+             * @type {H12}
+            */
             const component = new node();
 
             component.id = args.id || component.id;
@@ -350,9 +353,9 @@ export default class H12 {
 
             if(element.type == 0) {
                 if (value instanceof Element) {
-                    parent.replaceChild(value, node);
+                    parent.replaceChild(fValue, node);
                     element.type = 1;
-                    element.node = value;
+                    element.node = fValue;
                 }
                 else if (this.#isValidType(value)) {
                     node.nodeValue = index < 0 ? fValue : (index === 0 ? fValue + node.nodeValue : node.nodeValue + fValue);
@@ -361,18 +364,20 @@ export default class H12 {
             else if(element.type == 1) {
                 if (value instanceof Element) {
                     if (index !== -1) {
-                        if(index > 0) {
-                            parent.append(value);
-                        }
-                        else {
-                            parent.insertBefore(value, node);
-                        }
-                        element.clone.push(value);
+                        // if(index > 0) {
+                        //     parent.append(fValue);
+                        // }
+                        // else {
+                        //     parent.insertBefore(fValue, node);
+                        // }
+                        // parent.append(fValue);
+                        parent.insertAdjacentElement((index == 0) ? "afterbegin" : "beforeend", fValue);
+                        element.clone.push(fValue);
                         return;
                     }
                     else {
-                        parent.replaceChild(value, node);
-                        element.node = value;
+                        parent.replaceChild(fValue, node);
+                        element.node = fValue;
                     }
                 }
                 else if (this.#isValidType(value)) {
@@ -392,7 +397,7 @@ export default class H12 {
                 if (keyMatch) {
                     keyMatch.forEach(keyFound => {
                         if (keyFound === key) {
-                            elementMapping = elementMapping.replace(keyFound, value);
+                            elementMapping = elementMapping.replace(keyFound, fValue);
                         }
                         else {
                             const subKeyBinding = this.#binding[keyFound];
@@ -401,7 +406,7 @@ export default class H12 {
                     });
                 }
                 node.setAttribute(element.name, elementMapping);
-                this.#binding[key].data = value;
+                this.#binding[key].data = fValue;
             }
 
         });

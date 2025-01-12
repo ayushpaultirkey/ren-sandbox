@@ -1,15 +1,21 @@
-import { IPin } from "../pin";
+import { ISocket } from "../socket";
 
-class ExecPin extends IPin {
+class ExecPin extends ISocket {
 
-    constructor({ uuid = crypto.randomUUID(), name = "IPin", outer = null, type = null, value = null, classId = "ExecPin" } = {}) {
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "ISocket.ExecPin",
+        displayName: "Exec"
+    }
 
-        super({ uuid, name, outer, type, value, classId });
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "exec", type = null, value = null }) {
 
-        this.subType = IPin.SUB_TYPES.EXEC;
-        this.validSubTypes = new Set([ IPin.SUB_TYPES.EXEC ]);
+        super({ uuid, outer, name, type, value });
 
-        this.maxLinks = (type == IPin.TYPES.OUTPUT) ? 1 : 100;
+        this.subType = ISocket.SUB_TYPES.EXEC;
+        this.validSubTypes = new Set([ ISocket.SUB_TYPES.EXEC ]);
+
+        this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 1 : 100;
 
     }
 

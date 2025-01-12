@@ -1,3 +1,5 @@
+import VIEWPORT from "./viewport";
+
 class Link {
     constructor({ source, target, graph } = {}) {
 
@@ -32,15 +34,16 @@ class Link {
         source.addLink(this);
         target.addLink(this);
 
+        const scale = VIEWPORT.zoom;
         const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
 
-        const o = source.root.getBoundingClientRect();
-        const x1 = o.left - parentX + o.width / 2;
-        const y1 = o.top - parentY + o.height / 2;
+        const o = source.getPinElement().getBoundingClientRect();
+        const x1 = (o.left - parentX + o.width / 3) / scale;
+        const y1 = (o.top - parentY + o.height / 3) / scale;
 
-        const i = target.root.getBoundingClientRect();
-        const x2 = i.left - parentX + i.width / 2;
-        const y2 = i.top - parentY + i.height / 2;
+        const i = target.getPinElement().getBoundingClientRect();
+        const x2 = (i.left - parentX + i.width / 3) / scale;
+        const y2 = (i.top - parentY + i.height / 3) / scale;
 
         source.parent.root.addEventListener("mousedown", fOnMouseDown);
         target.parent.root.addEventListener("mousedown", fOnMouseDown);
@@ -53,18 +56,19 @@ class Link {
     onMouseDown(event) {
         
         const { source, target, graph, line } = this;
+        const scale = VIEWPORT.zoom;
 
         const onDragMove = (e) => {
 
             const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
     
-            const o = source.root.getBoundingClientRect();
-            const x1 = o.left - parentX + o.width / 2;
-            const y1 = o.top - parentY + o.height / 2;
+            const o = source.getPinElement().getBoundingClientRect();
+            const x1 = (o.left - parentX + o.width / 3) / scale;
+            const y1 = (o.top - parentY + o.height / 3) / scale;
     
-            const i = target.root.getBoundingClientRect();
-            const x2 = i.left - parentX + i.width / 2;
-            const y2 = i.top - parentY + i.height / 2;
+            const i = target.getPinElement().getBoundingClientRect();
+            const x2 = (i.left - parentX + i.width / 3) / scale;
+            const y2 = (i.top - parentY + i.height / 3) / scale;
 
             console.log(source.id, target.id);
 
