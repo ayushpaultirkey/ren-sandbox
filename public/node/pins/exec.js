@@ -1,4 +1,4 @@
-import { ISocket } from "../socket";
+import { ISocket } from "../socket.js";
 
 class ExecPin extends ISocket {
 
@@ -21,4 +21,29 @@ class ExecPin extends ISocket {
 
 }
 
-export { ExecPin }
+class FloatPin extends ISocket {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "ISocket.FloatPin",
+        displayName: "Float"
+    }
+
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "exec", type = null, value = null }) {
+
+        super({ uuid, outer, name, type, value });
+
+        this.subType = FloatPin.SUB_TYPES.FLOAT;
+        this.validSubTypes = new Set([ FloatPin.SUB_TYPES.FLOAT ]);
+
+        this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;
+
+    }
+
+    static SUB_TYPES = {
+        FLOAT: "FLOAT"
+    }
+
+}
+
+export { ExecPin, FloatPin }

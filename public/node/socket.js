@@ -23,11 +23,53 @@ class ISocket extends IObject {
 
     }
 
-
     getValue() {
-        return this.value;
+        if(this.type == ISocket.TYPES.INPUT) {
+
+            const link = this.links[0];
+            if(!link) return null;
+
+            const node = link.getNode();
+            if(!node) return null;
+
+            if(!node.getMeta().canCache) {
+                node.execute();
+            }
+
+            return link.getValue();
+
+        }
+        else {
+            return this.value;
+        }
+    }
+    getValues() {
+        if(this.type == ISocket.TYPES.INPUT) {
+
+            const values = [];
+
+            this.links.forEach(link => {
+                if(link) {
+
+                    const value = link.getValue();
+                    if(!value) return;
+
+                    values.push(value);
+                    
+                }
+            });
+
+            return values;
+        }
+        else {
+            return this.value;
+        }
     }
     setValue(value) {
+        if(this.type == ISocket.TYPES.INPUT) {
+            console.error("Cannot set input value");
+            return;
+        }
         this.value = value;
     }
 
@@ -108,8 +150,7 @@ class ISocket extends IObject {
                 sourceNodeUUID: this.getNode().getUUID(),
                 sourceSocketUUID: this.getUUID(),
                 targetNodeUUID: link.getNode().getUUID(),
-                targetSocketUUID: link.getUUID(),
-                value: this.value
+                targetSocketUUID: link.getUUID()
             });
 
         });

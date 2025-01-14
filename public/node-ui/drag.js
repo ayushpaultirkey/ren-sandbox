@@ -4,6 +4,8 @@ function Drag(element = null, handle = null, parent = null, isFrame = false) {
 
     if (!element || !handle || !parent) return;
 
+    const gridSize = 10;
+
     handle.addEventListener("mousedown", onDragDown);
 
     function onDragDown(event) {
@@ -29,17 +31,22 @@ function Drag(element = null, handle = null, parent = null, isFrame = false) {
             let width = elementRect.width;
             let height = elementRect.height;
 
-            let newX = (event.clientX - parentRect.left - offsetX) / (isFrame ? 1 : scale);
-            let newY = (event.clientY - parentRect.top - offsetY) / (isFrame ? 1 : scale);
+            // Calculate new positions
+            let rawX = (event.clientX - parentRect.left - offsetX) / (isFrame ? 1 : scale);
+            let rawY = (event.clientY - parentRect.top - offsetY) / (isFrame ? 1 : scale);
 
-            if(!isFrame) {
-                newX = Math.max(0, Math.min(newX, VIEWPORT.size.width - width / scale)); 
-                newY = Math.max(0, Math.min(newY, VIEWPORT.size.height - height / scale)); 
+            // Snap to grid
+            let snappedX = Math.round(rawX / gridSize) * gridSize;
+            let snappedY = Math.round(rawY / gridSize) * gridSize;
+
+            if (!isFrame) {
+                snappedX = Math.max(0, Math.min(snappedX, VIEWPORT.size.width - width / scale));
+                snappedY = Math.max(0, Math.min(snappedY, VIEWPORT.size.height - height / scale));
             }
 
             element.style.position = "absolute";
-            element.style.left = newX + "px";
-            element.style.top = newY + "px";
+            element.style.left = snappedX + "px";
+            element.style.top = snappedY + "px";
 
         }
 

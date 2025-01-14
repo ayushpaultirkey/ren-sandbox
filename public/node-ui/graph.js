@@ -52,19 +52,26 @@ class UIGraph extends H12 {
     }
 
     zoom(event) {
+
+        event.preventDefault();
+        
         if(event.deltaY > 0) {
             this.zoomOut();
-        } else {
+        }
+        else {
             this.zoomIn();
         }
+
     }
     zoomIn() {
-        VIEWPORT.zoom = (VIEWPORT.zoom + 0.1) > VIEWPORT.zoomMax ? VIEWPORT.zoomMax : VIEWPORT.zoom + 0.1;
+        VIEWPORT.zoom = (VIEWPORT.zoom + 0.1) > VIEWPORT.zoomMax ? VIEWPORT.zoomMax : VIEWPORT.zoom + 0.05;
         this.root.style.transform = `scale(${VIEWPORT.zoom})`;
+        dispatcher.call("onZoom", VIEWPORT.zoom);
     }
     zoomOut() {
-        VIEWPORT.zoom -= (VIEWPORT.zoom - 0.1) < VIEWPORT.zoomMin ? 0 : 0.1;
+        VIEWPORT.zoom -= (VIEWPORT.zoom - 0.1) < VIEWPORT.zoomMin ? 0 : 0.05;
         this.root.style.transform = `scale(${VIEWPORT.zoom})`;
+        dispatcher.call("onZoom", VIEWPORT.zoom);
     }
     recenter() {
         const parent = this.root.parentElement;
@@ -77,9 +84,9 @@ class UIGraph extends H12 {
 
 
 
-    addUINode(nodeClass, nodeUUID, x = 20, y = 20) {
+    addUINode(nodeClass, nodeUUID, nodeValue, x = 20, y = 20) {
 
-        const node = this.igraph.addNode(nodeClass, nodeUUID);
+        const node = this.igraph.addNode(nodeClass, nodeUUID, nodeValue);
         if(!node) {
             console.error("Failed to add node");
             return false;

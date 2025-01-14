@@ -6,16 +6,33 @@ class INode extends IObject {
     /** @type {IObject.meta} */
     static meta = {
         className: "IObject.INode",
-        displayName: "Node"
+        displayName: "Node",
+        canCache: true
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null } = {}) {
+
         super({ uuid, outer });
+
+        this.value = {};
         this.input = {};
         this.output = {};
         this.isEntry = false;
+
     }
     
+    setValues(values) {
+        for(const valueUUID in values) {
+
+            const value = values[valueUUID];
+
+            const valueField = this.value[valueUUID];
+            if(!valueField) continue;
+            
+            valueField.setValue(value);
+
+        }
+    }
     
     addInputSocket(socketUUID, socketClass, socketSubType) {
         
@@ -69,15 +86,22 @@ class INode extends IObject {
     export() {
         
         let links = [];
+        let values = {};
 
         for(const socketUUID in this.output) {
             const socket = this.output[socketUUID];
             links = links.concat(socket.export());
         }
 
+        for(const valueUUID in this.value) {
+            const value = this.value[valueUUID];
+            values[valueUUID] = value.getValue();
+        }
+
         return {
             data: {
-                class: this.getMeta().className, ... this.customExport()
+                class: this.getMeta().className, ... this.customExport(),
+                value: values
             },
             links: links
         };

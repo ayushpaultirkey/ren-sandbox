@@ -23,9 +23,9 @@ class UISocket extends H12 {
 
         const title = this.args.title || "title";
         return <>
-            <div class="h-5 px-2 relative">
-                <label>{ title }</label>
-                <button id="btn" class={ `absolute w-2 h-2 ${this.isocket.type == ISocket.TYPES.OUTPUT ? "-right-1" : "-left-1"} top-[5px] rounded-full bg-blue-500` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
+            <div class="px-2 relative">
+                <label style="font-size: 10px;">{ title }</label>
+                <button id="btn" class={ `absolute w-2 h-2 ${this.isocket.type == ISocket.TYPES.OUTPUT ? "-right-1" : "-left-1"} top-[6px] rounded bg-blue-500` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
             </div>
         </>;
 

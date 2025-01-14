@@ -1,6 +1,7 @@
 import { IObject } from "./object.js";
 import { IGraph } from "./graph.js";
-import { Begin, End, Log } from "./nodes/flow.js";
+import { INode } from "./node.js";
+import { Begin, Log, End } from "./nodes/flow.js";
 
 class IEngine extends IObject {
 
@@ -116,5 +117,20 @@ class IEngine extends IObject {
     }
     
 }
+
+// const engine = new IEngine();
+
+// engine.addGraph(IGraph, "main");
+
+// const graph = engine.getGraphByUUID("main");
+
+// graph.addNode(Begin, "begin");
+// graph.addNode(Log, "log");
+// graph.addNode(End, "end");
+
+// graph.linkNodesSocketsByUUID("begin", "out0", "log", "in0");
+// graph.linkNodesSocketsByUUID("log", "out0", "end", "in0");
+
+// engine.executeGraph("main", "begin");
 
 export { IEngine };

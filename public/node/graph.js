@@ -16,10 +16,18 @@ class IGraph extends IObject {
 
         this.nodes = {};
         this.values = {};
+        this.properties = {};
 
     }
 
-    addNode(nodeClass, nodeUUID) {
+    getProperty(property) {
+        return this.properties[property];
+    }
+    setProperty(property, value) {
+        this.properties[property] = value;
+    }
+
+    addNode(nodeClass, nodeUUID, nodeValue) {
 
         const uuid = nodeUUID || crypto.randomUUID();
 
@@ -28,6 +36,8 @@ class IGraph extends IObject {
         if(!NODES_REGISTRY.isRegistered(nodeClass.meta.className)) return null;
 
         const node = new nodeClass({ uuid: uuid , outer: this });
+        node.setValues(nodeValue);
+
         this.nodes[uuid] = node;
 
         return node;
