@@ -13,18 +13,16 @@ class IValue extends IObject {
         this.type = type;
         this.value = value;
     }
-
-    static DATA_TYPE = {
-        STRING: "STRING",
-        NUMBER: "NUMBER",
-        BOOLEAN: "BOOLEAN"
-    }
-
     getValue() {
         return this.value;
     }
+    
     setValue(value) {
         this.value = value;
+    }
+
+    getType() {
+        return this.type;
     }
 
 }

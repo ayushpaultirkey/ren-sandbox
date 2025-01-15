@@ -20,6 +20,8 @@ class UIGraph extends H12 {
         this.activeHoverSocket = null;
         this.helperLinks = {};
 
+        this.mouseLocation = { x: 0, y: 0 };
+
     }
 
     main(args = {}) {
@@ -30,6 +32,22 @@ class UIGraph extends H12 {
 
         Drag(this.root, this.parent.element.viewport, this.parent.element.viewport, true);
 
+        const { frame } = this.element;
+        frame.style.width = VIEWPORT.size.width + "px";
+        frame.style.height = VIEWPORT.size.height + "px";
+
+        this.igraph.customExport = () => {
+            const { x: parentX, y: parentY } = this.parent.element.viewport.getBoundingClientRect();
+            const { x, y } = this.root.getBoundingClientRect();
+            return {
+                position: {
+                    x: Math.round(x - parentX),
+                    y: Math.round(y - parentY),
+                    zoom: VIEWPORT.zoom
+                }
+            }
+        }
+
     }
 
     render() {
@@ -37,9 +55,15 @@ class UIGraph extends H12 {
         if(!this.args.iobject) return <><label>Invalid graph</label></>;
         this.igraph = this.args.iobject;
 
+        // const ui = this.args.ui;
+        // const x = ui.x || 0;
+        // const y = ui.y || 0;
+        // const scale = ui.zoom || 1;
+        // VIEWPORT.zoom = scale;
+
         return <>
-            <div class="absolute" onmousewheel={ this.zoom }>
-                <div id="frame" class="frame border-2 border-zinc-500 absolute w-[650px] h-[450px]">
+            <div class="absolute" onmousewheel={ this.zoom } style={ `left: ${0}px; top: ${0}px; transform: scale(${1});` }>
+                <div id="frame" class="frame border-2 border-zinc-500 absolute">
                     { this.createSVG("backGraph") }
                     <div>
                         {nodes}
@@ -50,17 +74,35 @@ class UIGraph extends H12 {
         </>;
 
     }
-
     zoom(event) {
 
         event.preventDefault();
-        
-        if(event.deltaY > 0) {
-            this.zoomOut();
-        }
-        else {
-            this.zoomIn();
-        }
+
+        const root = this.root;
+        const rect = root.getBoundingClientRect();
+
+        const mouseX = event.clientX - rect.left;
+        const mouseY = event.clientY - rect.top;
+
+        const zoomDelta = event.deltaY > 0 ? -0.05 : 0.05;
+
+        const newZoom = Math.min(
+            Math.max(VIEWPORT.zoom + zoomDelta, VIEWPORT.zoomMin),
+            VIEWPORT.zoomMax
+        );
+
+        const scaleDelta = newZoom / VIEWPORT.zoom;
+
+        const offsetX = mouseX - mouseX * scaleDelta;
+        const offsetY = mouseY - mouseY * scaleDelta;
+
+        root.style.transform = `scale(${newZoom})`;
+        root.style.left = `${(parseFloat(root.style.left || 0) || 0) + offsetX}px`;
+        root.style.top = `${(parseFloat(root.style.top || 0) || 0) + offsetY}px`;
+
+        VIEWPORT.zoom = newZoom;
+
+        dispatcher.call("onZoom", VIEWPORT.zoom);
 
     }
     zoomIn() {
@@ -235,8 +277,17 @@ class UIGraph extends H12 {
 
             const socketID = socket.id;
             const { topGraph } = this.element;
+
+            let color = "#3b82f6";
+            const isocket = socket.isocket;
+            if(isocket) {
+                const meta = isocket.getMeta();
+                if(meta) {
+                    color = meta.displayColor;
+                }
+            }
     
-            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style="stroke:rgb(59,130,246);stroke-width:2;" class="path"></line></>;
+            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style={ `stroke:${color};stroke-width:2;` } class="path"></line></>;
         
             topGraph.append(line);
             this.helperLinks[socketID] = line;

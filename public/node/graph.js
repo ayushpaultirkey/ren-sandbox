@@ -193,12 +193,14 @@ class IGraph extends IObject {
         return Object.values(this.nodes).find(node => node.isEntry === true);
     }
 
+    customExport() { return {}; }
     export() {
 
         let nodes = {};
         let links = [];
         let entry = null;
         let success = true;
+        let custom = this.customExport();
 
         for(const nodeUUID in this.nodes) {
 
@@ -223,7 +225,7 @@ class IGraph extends IObject {
             return;
         };
 
-        const exportData = { graphUUID: this.getUUID(), entryNodeUUID: entry, nodes: nodes, links: links };
+        const exportData = { graphUUID: this.getUUID(), entryNodeUUID: entry, nodes: nodes, links: links, ...custom };
 
         return exportData;
 

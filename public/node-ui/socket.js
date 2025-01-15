@@ -20,12 +20,15 @@ class UISocket extends H12 {
         
         if(!this.args.iobject) return <><label>Invalid socket</label></>;
         this.isocket = this.args.iobject;
+        
+        const meta = this.isocket.getMeta();
+        const name = this.isocket.getName() ||  meta.displayName;
+        const color = meta.displayColor || "gray";
 
-        const title = this.args.title || "title";
         return <>
-            <div class="px-2 relative">
-                <label style="font-size: 10px;">{ title }</label>
-                <button id="btn" class={ `absolute w-2 h-2 ${this.isocket.type == ISocket.TYPES.OUTPUT ? "-right-1" : "-left-1"} top-[6px] rounded bg-blue-500` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
+            <div class="px-[8px] relative">
+                <label style="font-size: 10px;">{ name }</label>
+                <button id="btn" style={ `background-color: ${color};` } class={ `absolute w-3 h-3 ${this.isocket.type == ISocket.TYPES.OUTPUT ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
             </div>
         </>;
 

@@ -12,7 +12,7 @@ class App extends H12 {
     }
     render() {
         return <>
-            <div class="w-full h-full overflow-auto scroll relative" id="graph">
+            <div class="w-full h-full overflow-hidden relative" id="graph">
                 <engine args alias={ UIEngine }></engine>
             </div>
         </>;

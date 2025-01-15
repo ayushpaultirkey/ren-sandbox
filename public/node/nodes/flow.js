@@ -2,7 +2,175 @@ import { IValue } from "../property.js";
 import { INode, NODES_REGISTRY } from "../node.js"
 import { IObject } from "../object.js";
 import { ISocket } from "../socket.js"
-import { ExecPin, FloatPin } from "./../pins/exec.js";
+import { ExecutionSocket, ObjectSocket, StringSocket, FloatSocket, WildcardSocket } from "./../pins/exec.js";
+import { PRIMITIVE_TYPES } from "../type/types.js";
+
+class GraphNode extends INode {
+
+    /** @type {INode.meta} */
+    static meta = {
+        className: "INode.Event.Graph",
+        displayName: "Graph",
+        canCache: true
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+        this.input = {
+            "in0": new ExecutionSocket({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT }),
+            "args0": new ObjectSocket({ uuid: "args0", name: "args", outer: this, type: ISocket.TYPES.INPUT })
+        };
+        this.output = {
+            "out0": new ExecutionSocket({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT }),
+            "args0": new ObjectSocket({ uuid: "args0", name: "args", outer: this, type: ISocket.TYPES.OUTPUT })
+        };
+        this.value = {
+            "value0": new IValue({
+                uuid: "value0",
+                name: "Value",
+                value: "graph.ren",
+                type: PRIMITIVE_TYPES.STRING
+            })
+        }
+    }
+
+    execute() {
+        
+    }
+
+}
+
+class WildcardToFloat extends INode {
+
+    /** @type {INode.meta} */
+    static meta = {
+        className: "INode.Cast.WildcardToFloat",
+        displayName: "Wildcard To Float",
+        canCache: false
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+        this.input = {
+            "wildcard0": new WildcardSocket({
+                uuid: "wildcard0",
+                name: "wildcard",
+                outer: this,
+                type: ISocket.TYPES.INPUT
+            })
+        };
+        this.output = {
+            "float0": new FloatSocket({
+                uuid: "float0",
+                name: "float",
+                outer: this,
+                type: ISocket.TYPES.OUTPUT
+            })
+        };
+    }
+
+    execute() {
+        try {
+            let data = this.input.wildcard0.getValue();
+            if(isNaN(data)) {
+                data = null
+            }
+            else {
+                data = parseFloat(data);
+            }
+            this.output.float0.setValue(data);
+        }
+        catch {
+            this.output.float0.setValue(null);
+        }
+    }
+
+}
+class WildcardToString extends INode {
+    
+    /** @type {INode.meta} */
+    static meta = {
+        className: "INode.Cast.WildcardToString",
+        displayName: "Wildcard To String",
+        canCache: false
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+        this.input = {
+            "wildcard0": new WildcardSocket({
+                uuid: "wildcard0",
+                name: "wildcard",
+                outer: this,
+                type: ISocket.TYPES.INPUT
+            })
+        };
+        this.output = {
+            "string0": new StringSocket({
+                uuid: "string0",
+                name: "string",
+                outer: this,
+                type: ISocket.TYPES.OUTPUT
+            })
+        };
+    }
+
+    execute() {
+        try {
+            const data = this.input.wildcard0.getValue();
+            this.output.string0.setValue(data.toString());
+        }
+        catch {
+            this.output.string0.setValue(null);
+        }
+    }
+
+}
+class FloatToString extends INode {
+
+    /** @type {INode.meta} */
+    static meta = {
+        className: "INode.Cast.FloatToString",
+        displayName: "Float to String",
+        canCache: false
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+        this.input = {
+            "float0": new FloatSocket({
+                uuid: "float0",
+                name: "float",
+                outer: this,
+                type: ISocket.TYPES.INPUT
+            })
+        };
+        this.output = {
+            "string0": new StringSocket({
+                uuid: "string0",
+                name: "string",
+                outer: this,
+                type: ISocket.TYPES.OUTPUT
+            })
+        };
+    }
+
+    execute() {
+        let data = this.input.float0.getValue();
+        if(isNaN(data)) {
+            data = null;
+        }
+        else {
+            data = data.toString();
+        }
+        this.output.string0.setValue(data);
+    }
+
+}
+
+
+
+
 
 class BreakObject extends INode {
 
@@ -16,7 +184,7 @@ class BreakObject extends INode {
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.input = {
-            "object0": new FloatPin({
+            "object0": new ObjectSocket({
                 uuid: "object0",
                 name: "object",
                 outer: this,
@@ -24,8 +192,8 @@ class BreakObject extends INode {
             })
         };
         this.output = {
-            "value0": new FloatPin({
-                uuid: "value0",
+            "wildcard0": new WildcardSocket({
+                uuid: "wildcard0",
                 name: "value",
                 outer: this,
                 type: ISocket.TYPES.OUTPUT
@@ -35,13 +203,21 @@ class BreakObject extends INode {
             "key0": new IValue({
                 uuid: "key0",
                 name: "name",
-                value: "key 1"
+                value: "key 1",
+                type: PRIMITIVE_TYPES.STRING
             })
         };
     }
 
     execute() {
-        
+        const data = this.input.object0.getValue();
+        const key = this.value.key0.getValue();
+        if(!data || !key || !data[key]) {
+            this.output.wildcard0.setValue(null);
+        }
+        else {
+            this.output.wildcard0.setValue(data[key]);
+        }
     }
 
 }
@@ -58,15 +234,15 @@ class MakeObject extends INode {
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.input = {
-            "value0": new FloatPin({
-                uuid: "value0",
+            "wildcard0": new WildcardSocket({
+                uuid: "wildcard0",
                 name: "value",
                 outer: this,
                 type: ISocket.TYPES.INPUT
             })
         };
         this.output = {
-            "object0": new FloatPin({
+            "object0": new ObjectSocket({
                 uuid: "object0",
                 name: "object",
                 outer: this,
@@ -76,14 +252,24 @@ class MakeObject extends INode {
         this.value = {
             "data0": new IValue({
                 uuid: "data0",
-                name: "name",
-                value: "key 1"
+                name: "Key",
+                value: "key 1",
+                type: PRIMITIVE_TYPES.STRING
             })
         };
     }
 
     execute() {
-        
+
+        const data = this.input.wildcard0.getValue();
+        const key = this.value.data0.getValue();
+        if(!key) {
+            this.output.object0.setValue(null);
+        }
+        else {
+            this.output.object0.setValue({ [key]: data });
+        }
+
     }
 
 }
@@ -101,8 +287,8 @@ class Begin extends INode {
         super({ uuid, outer });
         this.input = {};
         this.output = {
-            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT }),
-            "args0": new FloatPin({ uuid: "args0", name: "args", outer: this, type: ISocket.TYPES.OUTPUT })
+            "out0": new ExecutionSocket({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT }),
+            "args0": new ObjectSocket({ uuid: "args0", name: "args", outer: this, type: ISocket.TYPES.OUTPUT })
         };
         this.isEntry = true;
     }
@@ -126,11 +312,11 @@ class Log extends INode {
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.input = {
-            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT }),
-            "value1": new FloatPin({ uuid: "value1", name: "value", outer: this, type: ISocket.TYPES.INPUT })
+            "in0": new ExecutionSocket({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT }),
+            "value1": new StringSocket({ uuid: "value1", name: "value", outer: this, type: ISocket.TYPES.INPUT })
         };
         this.output = {
-            "out0": new ExecPin({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT })
+            "out0": new ExecutionSocket({ uuid: "out0", name: "out", outer: this, type: ISocket.TYPES.OUTPUT })
         };
     }
 
@@ -140,6 +326,7 @@ class Log extends INode {
 
         console.log("log", val);
         this.executeLinkedNode("out0", 0);
+
     }
 
 }
@@ -156,8 +343,8 @@ class End extends INode {
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.input = {
-            "in0": new ExecPin({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT }),
-            "value1": new FloatPin({ uuid: "value1", name: "value", outer: this, type: ISocket.TYPES.INPUT })
+            "in0": new ExecutionSocket({ uuid: "in0", name: "in", outer: this, type: ISocket.TYPES.INPUT }),
+            "args0": new ObjectSocket({ uuid: "args0", name: "args", outer: this, type: ISocket.TYPES.INPUT })
         };
         this.output = {};
     }
@@ -174,16 +361,16 @@ class Value extends INode {
     /** @type {IObject.meta} */
     static meta = {
         className: "INode.Event.Value",
-        displayName: "Value",
+        displayName: "Float",
         canCache: false
     }
 
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.output = {
-            "value0": new FloatPin({
+            "value0": new FloatSocket({
                 uuid: "value0",
-                name: "value",
+                name: "float",
                 outer: this,
                 type: ISocket.TYPES.OUTPUT
             })
@@ -192,14 +379,23 @@ class Value extends INode {
             "data0": new IValue({
                 uuid: "data0",
                 name: "Value",
-                value: 0
+                value: 0,
+                type: PRIMITIVE_TYPES.FLOAT
             })
         }
     }
 
     execute() {
-        const value = this.value.data0.getValue();
-        this.output.value0.setValue((value * 1) || 0);
+
+        let value = this.value.data0.getValue();
+        if(!isNaN(value)) {
+            value = parseFloat(value);
+        }
+        else {
+            value = null;
+        }
+        this.output.value0.setValue(value);
+        
     }
 
 }
@@ -209,20 +405,20 @@ class MathN extends INode {
     /** @type {IObject.meta} */
     static meta = {
         className: "INode.Event.MathN",
-        displayName: "Math",
+        displayName: "Add",
         canCache: false
     }
 
     constructor({ uuid, outer }) {
         super({ uuid, outer });
         this.input = {
-            "value1": new FloatPin({
+            "value1": new FloatSocket({
                 uuid: "value1",
                 name: "a",
                 outer: this,
                 type: ISocket.TYPES.INPUT
             }),
-            "value2": new FloatPin({
+            "value2": new FloatSocket({
                 uuid: "value2",
                 name: "b",
                 outer: this,
@@ -230,11 +426,12 @@ class MathN extends INode {
             })
         };
         this.output = {
-            "value3": new FloatPin({
+            "value3": new FloatSocket({
                 uuid: "value3",
-                name: "c",
+                name: "result",
                 outer: this,
-                type: ISocket.TYPES.OUTPUT
+                type: ISocket.TYPES.OUTPUT,
+                maxLinks: 1
             })
         };
     }
@@ -254,8 +451,13 @@ NODES_REGISTRY.registerMany({
     "INode.Event.End": End,
     "INode.Event.Value": Value,
     "INode.Event.MathN": MathN,
+    "INode.Event.Graph": GraphNode,
     "INode.Event.MakeObject": MakeObject,
-    "INode.Event.BreakObject": BreakObject
+    "INode.Event.BreakObject": BreakObject,
+    "INode.Cast.FloatToString": FloatToString,
+    "INode.Cast.WildcardToString": WildcardToString,
+    "INode.Cast.WildcardToFloat": WildcardToFloat,
+    "INode.Cast.WildcardToFloat": WildcardToFloat,
 });
 
 export { Begin, Log, End, Value, MathN, MakeObject, BreakObject };

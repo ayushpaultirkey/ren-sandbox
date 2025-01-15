@@ -4,9 +4,8 @@ import Drag from "./drag";
 
 import { INode } from "../node/node";
 import { ISocket } from "../node/socket";
-import { ExecPin } from "../node/pins/exec";
 import { UISocket } from "./socket";
-import { UIValue } from "./property";
+import { UIValue, VALUE_REGISTRY } from "./property";
 
 class UINode extends H12 {
     constructor() {
@@ -26,8 +25,8 @@ class UINode extends H12 {
                 const { x: parentX, y: parentY } = this.parent.root.getBoundingClientRect();
                 const { x, y } = this.root.getBoundingClientRect();
                 return {
-                    x: x - parentX,
-                    y: y - parentY
+                    x: Math.round(x - parentX),
+                    y: Math.round(y - parentY)
                 };
             }
         }
@@ -53,22 +52,21 @@ class UINode extends H12 {
         if(!this.args.iobject) return <><label>Invalid node</label></>;
         this.inode = this.args.iobject;
 
-        const x = this.args.x || 5;
-        const y = this.args.y || 5;
+        const x = Math.round(this.args.x || 5);
+        const y = Math.round(this.args.y || 5);
         const meta = this.inode.getMeta();
         const name = meta.displayName || "Node";
 
-        const canCache = meta.canCache ? "[f]" : "[d]";
+        const canCache = meta.canCache ? "" : "";
 
         return <>
-            <div class={ `bg-zinc-800 rounded-sm text-zinc-500 shadow-md border-2 ${meta.canCache ? "border-sky-800" : "border-teal-800"} text-xs absolute font-semibold select-none py-1` } style={ `top: ${y}px; left: ${x}px; min-width: 100px;` }>
+            <div class={ `bg-zinc-800 rounded-sm text-zinc-500 border-2 ${meta.canCache ? "border-sky-800" : "border-teal-800"} text-xs absolute font-semibold select-none py-1` } style={ `top: ${y}px; left: ${x}px; min-width: 100px;` }>
                 
-                <div id="header" class="flex flex-row text-zinc-400 px-2 space-x-1">
-                    <div class={ `flex-grow flex items-center space-x-1 ${meta.canCache ? "text-sky-500" : "text-teal-500"}` }>
-                        <i>{ canCache }</i>
+                <div id="header" class="flex flex-row text-zinc-400 px-2 space-x-2">
+                    <div class={ `flex-grow flex items-center space-x-1 ${meta.canCache ? "text-sky-600" : "text-teal-600"}` }>
                         <label id="handle">{ name }</label>
                     </div>
-                    <button class="text-red-700 font-bold" onclick={ this.removeNode }>&times;</button>
+                    <button class="text-rose-700 font-extrabold hidden" onclick={ this.removeNode }>&times;</button>
                 </div>
 
                 <div id="socket" class="flex flex-row w-full">
@@ -81,7 +79,7 @@ class UINode extends H12 {
                 </div>
 
                 <div id="values" class="px-1" onmousedown={ (e) => e.stopPropagation() }>
-                    {value}
+                    {values}
                 </div>
 
             </div>
@@ -94,18 +92,24 @@ class UINode extends H12 {
     }
     renderProperties() {
 
-        const { value: uiValue } = this.key;
+        const { values: uiValues } = this.key;
         const values = this.inode.value;
 
-        uiValue("");
+        uiValues("");
 
         for(const valueUUID in values) {
 
             const value = values[valueUUID];
             if(!value) continue;
 
-            uiValue(<>
-                <property args alias={ UIValue } iobject={ value }></property>
+            const type = value.getType();
+            if(!type) continue;
+
+            const valueClass = VALUE_REGISTRY[type];
+            if(!valueClass) continue;
+
+            uiValues(<>
+                <property args alias={ valueClass } iobject={ value }></property>
             </>, "++x");
 
         }
@@ -120,18 +124,16 @@ class UINode extends H12 {
         input("");
         for(const pinUUID in inPins) {
             const pin = inPins[pinUUID];
-            const name = pin.getName() || pin.getMeta().displayName;
             input(<>
-                <pin args alias={ UISocket } title={ name } id={ pin.getUUID() } iobject={ pin }></pin>
+                <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
             </>, "++x");
         }
 
         output("");
         for(const pinUUID in OutPins) {
             const pin = OutPins[pinUUID];
-            const name = pin.getName() || pin.getMeta().displayName;
             output(<>
-                <pin args alias={ UISocket } title={ name } id={ pin.getUUID() } iobject={ pin }></pin>
+                <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
             </>, "++x");
         }
 

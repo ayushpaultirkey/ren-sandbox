@@ -5,7 +5,8 @@ class ISocket extends IObject {
     /** @type {IObject.meta} */
     static meta = {
         className: "IObject.Socket",
-        displayName: "Socket"
+        displayName: "Socket",
+        displayColor: "gray"
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null } = {}) {
@@ -108,7 +109,7 @@ class ISocket extends IObject {
             return;
         }
 
-        if(!this.validSubTypes.has(targetSocket.subType)) {
+        if(this.type == ISocket.TYPES.INPUT && !this.validSubTypes.has(targetSocket.subType)) {
             console.error("Invalid sub-socket type");
             return;
         }
@@ -164,11 +165,6 @@ class ISocket extends IObject {
         INPUT: 1,
         OUTPUT: 2
     }
-
-    static SUB_TYPES = {
-        EXEC: 1
-    }
-
 
 }
 
