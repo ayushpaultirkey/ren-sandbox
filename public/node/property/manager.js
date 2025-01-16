@@ -1,6 +1,6 @@
 import { IObject } from "../object.js";
 import { IProperty } from "../property.js";
-import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "../type/types.js";
+import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "../types/default.js";
 
 
 class IPropertyManager extends IObject {

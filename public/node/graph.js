@@ -54,7 +54,7 @@ class IGraph extends IObject {
 
     }
 
-    addNode(nodeUUID, nodeData = { class: null, properties: {} }) {
+    addNode(nodeUUID, nodeData = { class: null, values: {} }) {
         try {
 
             const uuid = nodeUUID || crypto.randomUUID();
@@ -67,12 +67,15 @@ class IGraph extends IObject {
             };
 
             const nodeClass = NODES_REGISTRY.get(nodeData.class);
+
             if(!nodeClass) {
                 throw new Error(`Graph: Node class "${nodeData.class}" is not registered`);
             };
     
             const node = new nodeClass({ uuid: uuid , outer: this });
-            node.main({ properties: nodeData.properties });
+            node.main({
+                values: nodeData.values || {}
+            });
     
             this.#nodes.set(uuid, node);
     
@@ -109,7 +112,7 @@ class IGraph extends IObject {
             this.clearSocketLinks(socket);
         }
 
-        this.#nodes.delete(node.getUUID());
+        this.#nodes.delete(node.uuid);
 
         return true;
 

@@ -2,8 +2,12 @@ import { IProperty } from "../property.js";
 import { INode, NODES_REGISTRY } from "../node.js"
 import { IObject } from "../object.js";
 import { ISocket } from "../socket.js"
-import { ExecutionSocket, ObjectSocket, StringSocket, FloatSocket, WildcardSocket } from "./../pins/exec.js";
-import { PRIMITIVE_TYPES } from "../type/types.js";
+
+import { FloatSocket, StringSocket, WildcardSocket } from "../sockets/primitive.js";
+import { ExecutionSocket } from "../sockets/derived.js";
+import { ObjectSocket } from "../sockets/user.js";
+
+import { PRIMITIVE_TYPES } from "../types/default.js";
 
 class GraphNode extends INode {
 

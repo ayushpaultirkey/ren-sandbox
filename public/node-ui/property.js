@@ -1,6 +1,6 @@
 import "@style/main.css";
 import H12 from "@library/h12";
-import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "../node/type/types";
+import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "../node/types/default";
 import { UIValue, VALUE_REGISTRY } from "./value";
 import { IValue } from "../node/property";
 

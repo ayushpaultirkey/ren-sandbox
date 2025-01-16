@@ -2,62 +2,63 @@ import H12 from "@library/h12.js";
 import dispatcher from "@library/h12/dispatcher.js";
 
 import { IEngine } from "../node/engine.js";
-import { IGraph } from "../node/graph.js";
-import { INode, NODES_REGISTRY } from "../node/node.js";
-import { UIGraph } from "./graph.js";
-import VIEWPORT from "./viewport.js";
-import { Category } from "./menu.js";
-import { UIProperty } from "./property.js";
+import { IGraphSet } from "../node/graphset.js";
 
 class UIEngine extends H12 {
 
+    /** @type {IEngine} */
+    #iengine = null;
+
+    /** @type {IGraphSet} */
+    #igraphSet = null;
+
     constructor() {
         super();
-        this.iengine = null;
-        this.menuCreated = false;
-        this.menu = {};
     }
-
     main() {
 
-        this.createIEngine();
-        //this.createUIGraph(IGraph, null);
-        this.createNodeList();
+        this.addIEngine();
+        this.addIGraphSet();
 
-        this.data = [{"graphUUID":"ffe3bcbe-9acd-4d87-8243-c63c2a08105b","entryNodeUUID":"ab1ee8b6-11c5-476a-8abc-746da2af7a27","nodes":{"ab1ee8b6-11c5-476a-8abc-746da2af7a27":{"class":"INode.Event.Begin","x":11,"y":30,"value":{}},"7f3d3789-0760-41eb-87c9-09a51e91e041":{"class":"INode.Event.Log","x":363,"y":30,"value":{}},"8bcdd38b-65e2-4b17-a39c-005615764d83":{"class":"INode.Event.End","x":505,"y":30,"value":{}},"92e8d87b-6664-455c-a57a-3e6b58c16aca":{"class":"INode.Event.Value","x":11,"y":125,"value":{"data0":"34"}},"772d78b9-1258-42ff-8b39-1b83c86728c6":{"class":"INode.Event.MakeObject","x":192,"y":125,"value":{"data0":"age"}},"c2972b81-fe5d-4d35-938d-e9fe9f63aa62":{"class":"INode.Event.BreakObject","x":11,"y":230,"value":{"key0":"age"}},"af267afc-45eb-417d-b4b1-43d97af959d5":{"class":"INode.Cast.WildcardToString","x":429,"y":230,"value":{}},"1f836934-961e-468f-8886-a7a20aae0125":{"class":"INode.Event.MathN","x":315,"y":230,"value":{}},"39ddf1b4-52d8-4abb-9b0c-c5871cdc8067":{"class":"INode.Cast.WildcardToFloat","x":125,"y":230,"value":{}},"407b420f-3543-4b02-8852-1d7e537936ab":{"class":"INode.Event.Value","x":125,"y":277,"value":{"data0":"5"}}},"links":[{"sourceNodeUUID":"ab1ee8b6-11c5-476a-8abc-746da2af7a27","sourceSocketUUID":"out0","targetNodeUUID":"7f3d3789-0760-41eb-87c9-09a51e91e041","targetSocketUUID":"in0"},{"sourceNodeUUID":"7f3d3789-0760-41eb-87c9-09a51e91e041","sourceSocketUUID":"out0","targetNodeUUID":"8bcdd38b-65e2-4b17-a39c-005615764d83","targetSocketUUID":"in0"},{"sourceNodeUUID":"92e8d87b-6664-455c-a57a-3e6b58c16aca","sourceSocketUUID":"value0","targetNodeUUID":"772d78b9-1258-42ff-8b39-1b83c86728c6","targetSocketUUID":"wildcard0"},{"sourceNodeUUID":"772d78b9-1258-42ff-8b39-1b83c86728c6","sourceSocketUUID":"object0","targetNodeUUID":"c2972b81-fe5d-4d35-938d-e9fe9f63aa62","targetSocketUUID":"object0"},{"sourceNodeUUID":"c2972b81-fe5d-4d35-938d-e9fe9f63aa62","sourceSocketUUID":"wildcard0","targetNodeUUID":"39ddf1b4-52d8-4abb-9b0c-c5871cdc8067","targetSocketUUID":"wildcard0"},{"sourceNodeUUID":"af267afc-45eb-417d-b4b1-43d97af959d5","sourceSocketUUID":"string0","targetNodeUUID":"7f3d3789-0760-41eb-87c9-09a51e91e041","targetSocketUUID":"value1"},{"sourceNodeUUID":"1f836934-961e-468f-8886-a7a20aae0125","sourceSocketUUID":"value3","targetNodeUUID":"af267afc-45eb-417d-b4b1-43d97af959d5","targetSocketUUID":"wildcard0"},{"sourceNodeUUID":"39ddf1b4-52d8-4abb-9b0c-c5871cdc8067","sourceSocketUUID":"float0","targetNodeUUID":"1f836934-961e-468f-8886-a7a20aae0125","targetSocketUUID":"value1"},{"sourceNodeUUID":"407b420f-3543-4b02-8852-1d7e537936ab","sourceSocketUUID":"value0","targetNodeUUID":"1f836934-961e-468f-8886-a7a20aae0125","targetSocketUUID":"value2"}],"position":{"x":-40,"y":40,"zoom":0.95}}];
-
-        this.import(this.data);
-        
     }
-
-    recenter() {
-        this.child.graph.recenter();
-    }
-
     render() {
 
         return <>
             <div class="w-full h-full flex flex-col overflow-hidden">
                 <div class="text-xs border-4 space-y-2 border-red-500">
                     <div class="space-x-1">
-                        <button onclick={ this.export } class="bg-blue-300 p-1 px-4 font-bold rounded-md">Export</button>
-                        <button onclick={ this.execute } class="bg-blue-300 p-1 px-4 font-bold rounded-md">Execute</button>
                         <button onclick={ this.debug } class="bg-blue-300 p-1 px-4 font-bold rounded-md">Debug</button>
-                        <button onclick={ this.recenter } class="bg-blue-300 p-1 px-4 font-bold rounded-md">R</button>
+                        <button onclick={ this.addIGraph } class="bg-blue-300 p-1 px-4 font-bold rounded-md">Add Graph</button>
                     </div>
                 </div>
                 <div class="flex flex-row w-full h-full">
-                    <div class="p-2 border-r-2 border-zinc-700 w-64 min-w-64 space-y-2 bg-zinc-800 overflow-auto">
-                        <div class="text-zinc-400">
-                            <property args alias={ UIProperty } id="property"></property>
+                    <div class="p-2 border-r-2 border-zinc-700 w-64 min-w-64 space-y-2 bg-zinc-800 flex flex-col overflow-hidden text-zinc-400">
+                        <div class="text-xs">
+                            <div class="flex flex-col text-[10px]">
+                                <label class="text-xs font-bold underline">Engine:</label>
+                                <label><b>UUID:</b> {engineUUID}</label>
+                                <label><b>Name:</b> {engineName}</label>
+                                <label><b>Graph Sets:</b> {engineSet}</label>
+                                <label class="text-xs font-bold mt-1 underline">Graph Set:</label>
+                                <label><b>UUID:</b> {setUUID}</label>
+                                <label><b>Name:</b> {setName}</label>
+                                <label><b>Graphs:</b> {setGraph}</label>
+                                <label><b>Properties:</b> {setProps}</label>
+                            </div>
+                        </div>
+                        <div class="border-t-2 border-zinc-700">
+                            {graphs}
+                        </div>
+                        <div class="border-t-2 border-zinc-700">
+                            {properties}
                         </div>
                     </div>
                     <div id="viewport" class="viewport w-full relative overflow-hidden">
-                        {graphs}
+                        {graph}
                     </div>
                     <div class="text-xs p-2 border-l-2 border-zinc-700 w-64 min-w-64 space-y-2 bg-zinc-800 overflow-auto">
                         <div class="text-zinc-400">
-                            <category args autocreate={ true } alias={ Category }></category>
+                            {nodes}
                         </div>
                     </div>
                 </div>
@@ -70,80 +71,66 @@ class UIEngine extends H12 {
         return this.element.viewport;
     }
 
-    createIEngine() {
-        this.iengine = new IEngine();
+    addIEngine() {
+        try {
+            this.#iengine = new IEngine();
+            const _graphSetRefresh = () => {
+                const { engineUUID, engineName, engineSet } = this.key;
+                engineUUID(this.#iengine.uuid);
+                engineName(this.#iengine.name || "no name");
+                engineSet(this.#iengine.graphSets.size);
+            };
+            _graphSetRefresh();
+            this.#iengine.dispatcher.on("graphSetAdded", _graphSetRefresh);
+            this.#iengine.dispatcher.on("graphSetRemoved", _graphSetRefresh);
+            console.warn("IEngine added");
+        }
+        catch(error) {
+            console.error(error || "Error adding IEngine");
+        }
     }
-    
-    createUIGraph(graphClass, graphUUID, graphPosition) {
 
-        const graph = this.iengine.addGraph(graphClass, graphUUID);
-        if(!graph) return null;
-
-        const { graphs } = this.key;
-        graphs(<><graph id="graph" args alias={ UIGraph } iobject={ graph } ui={ graphPosition }></graph></>);
-
-        return this.child.graph;
-
+    addIGraphSet(graphSetUUID, graphSetData = { name: null, properties: {}, graphs: {} }) {
+        try {
+            this.#igraphSet = this.#iengine.addGraphSet(graphSetUUID, graphSetData);
+            const _graphRefresh = () => {
+                const { setUUID, setName, setGraph, setProps } = this.key;
+                setUUID(this.#igraphSet.uuid);
+                setName(this.#igraphSet.name || "no name");
+                setGraph(this.#igraphSet.graphs.size);
+                setProps(this.#igraphSet.propertyManager.properties.size);
+            }
+            _graphRefresh();
+            this.#igraphSet.dispatcher.on("graphAdded", _graphRefresh);
+            this.#igraphSet.dispatcher.on("graphRemoved", _graphRefresh);
+            console.warn("Graph Set added");
+        }
+        catch(error) {
+            console.error(error || "Error adding graph set");
+        }
     }
 
-    getGraph() {
-        return this.child.graph.igraph;
-    }
-
-    createNodeList() {
-        dispatcher.bind("onNodeAdd", (e, node) => {
-            this.child.graph.addUINode(node, null, 10, 10);
-        });
+    addIGraph() {
+        try {
+            if(!this.#igraphSet) {
+                throw new Error(`Graph set not found`);
+            }
+            this.#igraphSet.addGraph();
+            console.warn("Graph added");
+        }
+        catch(error) {
+            console.error(error || "Error adding graph");
+        }
     }
 
     debug() {
-        console.log(this.iengine);
+        console.log(this.#igraphSet);
     }
-    export() {
-        const graphs = this.iengine.export();
-        console.log(graphs);
-        console.log(JSON.stringify(graphs)); 
+    destroy() {
+        this.#iengine?.destroy();
+        this.#igraphSet?.destroy();
+        super.destroy();
     }
-    execute() {
-        const { graph } = this.child;
-        const uuid = graph.getIGraphUUID();
-        const node = graph.getIGraphEntryNode();
-        if(!uuid || !node) {
-            console.error("Invalid graph");
-            return;
-        }
-        this.iengine.executeGraph(uuid, node.getUUID());
-    }
-    import(graphs = []) {
-        graphs.forEach(data => {
-            
-            if(!data.graphUUID) return null;
-
-            const nodes = data.nodes;
-            const links = data.links;
-            const uiGraph = this.createUIGraph(IGraph, data.graphUUID, data.position);
-
-            if(!uiGraph) return null;
-            for(const nodeUUID in nodes) {
-                const nodeClass = NODES_REGISTRY.get(nodes[nodeUUID].class);
-                const nodeValue = nodes[nodeUUID].value;
-                uiGraph.addUINode(nodeClass, nodeUUID, nodeValue, nodes[nodeUUID].x, nodes[nodeUUID].y);
-            }
-
-            queueMicrotask(() => {
-                for(const link of links) {
-                    const sourceNode = uiGraph.getUINode(link.sourceNodeUUID);
-                    const targetNode = uiGraph.getUINode(link.targetNodeUUID);
-                    const sourceSocket = sourceNode.getUISocket(link.sourceSocketUUID);
-                    const targetSocket = targetNode.getUISocket(link.targetSocketUUID);
-                    uiGraph.linkUINodes(sourceNode, sourceSocket, targetNode, targetSocket);
-                }
-            });
-
-        });
-        console.warn("imported");
-    }
-
 
 }
 

@@ -1,7 +1,7 @@
 import "@style/main.css";
 import H12 from "@library/h12";
 import { IValue } from "../node/property";
-import { PRIMITIVE_TYPES } from "../node/type/types";
+import { PRIMITIVE_TYPES } from "../node/types/default";
 
 class UIValue extends H12 {
     constructor() {

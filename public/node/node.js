@@ -30,9 +30,12 @@ class INode extends IObject {
 
     }
 
-    main({ properties = {} } = {}) {
+    main({ values = {} } = {}) {
         try {
-            this.#propertyManager.main(properties);
+            // for(const name in properties) {
+            //     const value = properties[name];
+            //     this.#propertyManager.setProperty(name, value);
+            // }
             return true;
         }
         catch(error) {
@@ -130,10 +133,10 @@ class INode extends IObject {
 
 }
 
-const REGISTERED_NODES = {};
+const REGISTERED_NODES = new Map();
 const NODES_REGISTRY = {
     register: function(classId, nodeClass) {
-        REGISTERED_NODES[classId] = nodeClass;
+        REGISTERED_NODES.set(classId, nodeClass);
     },
     registerMany: function(nodes = {}) {
         for(const classId in nodes) {
@@ -141,16 +144,16 @@ const NODES_REGISTRY = {
         }
     },
     unregister: function(classId) {
-        delete REGISTERED_NODES[classId];
+        return REGISTERED_NODES.delete(classId);
     },
     get: function(classId) {
-        return REGISTERED_NODES[classId];
+        return REGISTERED_NODES.get(classId);
     },
     getAll: function() {
-        return REGISTERED_NODES;
+        return REGISTERED_NODES.entries();
     },
     isRegistered: function(classId) {
-        return classId in REGISTERED_NODES;
+        return REGISTERED_NODES.has(classId);
     },
 };
 

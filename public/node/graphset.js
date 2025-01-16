@@ -90,6 +90,8 @@ class IGraphSet extends IObject {
             });
             this.#graphs.set(uuid, graph);
 
+            this.dispatcher.emit("graphAdded", graph);
+
             return graph;
             
         }
@@ -122,6 +124,10 @@ class IGraphSet extends IObject {
 
         return data;
 
+    }
+
+    destroy() {
+        super.destroy();
     }
 
 }

@@ -1,3 +1,5 @@
+import { Dispatcher } from "./dispatcher.js";
+
 class IObject {
 
     /** @type {string} */
@@ -8,7 +10,10 @@ class IObject {
 
     /** @type {string} */
     #name = null;
-    
+
+    /** @type {Dispatcher} */
+    #dispatcher = new Dispatcher();
+
     /** @type {{ className: string, displayName: string }} */
     static meta = {
         className: "IObject.IObject",
@@ -23,7 +28,13 @@ class IObject {
     }
 
     main() {}
+    destroy() {
+        this.#dispatcher.clearAll();
+    }
 
+    get dispatcher() {
+        return this.#dispatcher;
+    }
     get uuid() {
         return this.#uuid;
     }
