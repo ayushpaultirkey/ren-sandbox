@@ -1,106 +1,99 @@
 import "@style/main.css";
 import H12 from "@library/h12";
+import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "../node/type/types";
+import { UIValue, VALUE_REGISTRY } from "./value";
 import { IValue } from "../node/property";
-import { PRIMITIVE_TYPES } from "../node/type/types";
 
-class UIValue extends H12 {
+class UIProperty extends H12 {
     constructor() {
         super();
-        this.ivalue = null;
     }
     main() {
 
-        const value = this.ivalue.getValue();
-        this.setValue(value);
+        
 
-    }
-    wrapper() {
-        return <>
-            <textarea id="box" rows="1" cols="10" class="-mt-[1px] text-xs bg-zinc-700 px-1 text-zinc-400 rounded-sm" oninput={ this.update }></textarea>
-        </>
     }
     render() {
         
-        if(!this.args.iobject) return <><label>Invalid property</label></>;
-        this.ivalue = this.args.iobject;
-
-        const name = this.ivalue.getName() || this.ivalue.getMeta().displayName;
-
         return <>
-            <div class="flex flex-col">
-                <label style="font-size: 10px;" class="text-zinc-400 text-opacity-80">{ name }:</label>
-                { this.wrapper() }
+            <div class="flex flex-col space-y-1">
+                <label class="text-zinc-400 text-sm text-opacity-80" onclick={ this.displayValue }>Values:</label>
+                <div class="flex flex-row text-xs bg-zinc-200">
+                    <input type="text" id="var_name" placeholder="name" class="bg-transparent w-full px-1" />
+                    <select class="bg-transparent" id="var_type">
+                        <option>Float</option>
+                        <option>Int</option>
+                        <option>String</option>
+                        <option>Boolean</option>
+                        <option>Object</option>
+                    </select>
+                    <button class="px-1" onclick={ this.add }>add</button>
+                </div>
+                <div class="space-y-1">
+                    {value}
+                </div>
             </div>
         </>;
 
     }
-    update() {
-        let value = this.element.box.value;
-        this.ivalue.setValue(value);
-    }
-    getValue() {
-        return this.element.box.value;
-    }
-    setValue(value) {
-        this.element.box.value = value;
-    }
-}
+    displayValue() {
 
+        this.igraph = this.parent.getGraph();
 
-class FloatValue extends UIValue {
-    constructor() {
-        super();
-    }
-    wrapper() {
-        return <>
-            <input type="number" id="box" size="5" step="0.01" class="-mt-[1px] w-24 text-xs bg-zinc-700 px-1 text-zinc-400 rounded-sm" value="0" oninput={ this.update } />
-        </>
-    }
-    update() {
-        let value = this.element.box.value;
-        if(!isNaN(value)) {
-            value = parseFloat(value);
+        const { value: uiValues } = this.key;
+
+        uiValues("");
+
+        const values = this.igraph.getVariables();
+        for(const valueUUID in values) {
+
+            const value = values[valueUUID];
+            if(!value) continue;
+
+            const type = value.getType();
+            if(!type) continue;
+
+            const valueClass = VALUE_REGISTRY[type];
+            if(!valueClass) continue;
+
+            uiValues(<>
+                <div class="flex">
+                    <property args alias={ valueClass } iobject={ value }></property>
+                    <button onclick={ () => { this.remove(valueUUID) } }>&times;</button>
+                </div>
+            </>, "++x");
+
         }
-        else {
-            value = 0;
+        
+    }
+    remove(valueUUID) {
+        
+        const graph = this.parent.getGraph();
+        const variables = graph.removeVariable(valueUUID);
+
+        this.displayValue();
+
+    }
+    add() {
+
+        const graph = this.parent.getGraph();
+        const variables = graph.getVariables();
+
+        const { var_name, var_type } = this.element;
+        let type = var_type.value.toUpperCase();
+        let name = var_name.value;
+
+        const finalType = PRIMITIVE_TYPES[type] || USER_DEFINED_TYPES[type];
+
+        if(variables[name] || !finalType) {
+            alert("Variable already exists or invalid type");
+            return;
         }
-        this.ivalue.setValue(value);
-    }
-    getValue() {
-        return this.element.box.value;
-    }
-    setValue(value) {
-        this.element.box.value = value;
+
+        graph.addVariable(name, finalType);
+
+        this.displayValue();
+
     }
 }
-
-class StringValue extends UIValue {
-    constructor() {
-        super();
-    }
-    wrapper() {
-        const isMultiline = this.ivalue.multiline;
-        return <>
-            <textarea id="box" rows="1" cols="10" class={ `-mt-[1px] text-xs bg-zinc-700 px-1 text-zinc-400 rounded-sm ${isMultiline ? "" : "resize-none" }` } oninput={ this.update }></textarea>
-        </>
-    }
-    update() {
-        let value = this.element.box.value;
-        this.ivalue.setValue(value);
-    }
-    getValue() {
-        return this.element.box.value;
-    }
-    setValue(value) {
-        this.element.box.value = value;
-    }
-}
-
-
-
-const VALUE_REGISTRY = {
-    [PRIMITIVE_TYPES.FLOAT]: FloatValue,
-    [PRIMITIVE_TYPES.STRING]: StringValue
-}
-
-export { UIValue, VALUE_REGISTRY };
+export { UIProperty };

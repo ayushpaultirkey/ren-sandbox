@@ -2,6 +2,7 @@ import { IObject } from "./object.js";
 import { IGraph } from "./graph.js";
 import { INode } from "./node.js";
 import { Begin, Log, End } from "./nodes/flow.js";
+import { IGraphSet } from "./graphset.js";
 
 class IEngine extends IObject {
 
@@ -11,6 +12,9 @@ class IEngine extends IObject {
         displayName: "Engine"
     }
 
+    /** @type {Map<string, IGraphSet>} */
+    #graphSets = new Map();
+
     constructor({ uuid = crypto.randomUUID() } = {}) {
 
         super({ uuid });
@@ -18,12 +22,6 @@ class IEngine extends IObject {
 
     }
 
-    /**
-     * 
-     * @param {IGraph} graphClass 
-     * @param {string} graphUUID 
-     * @returns {IGraph}
-    */
     addGraph(graphClass, graphUUID) {
 
         const uuid = graphUUID || crypto.randomUUID();
@@ -38,23 +36,12 @@ class IEngine extends IObject {
 
     }
 
-    /**
-     * 
-     * @param {string} graphUUID 
-     * @returns {IGraph}
-    */
     getGraphByUUID(graphUUID) {
 
         return this.graphs[graphUUID];
 
     }
 
-    /**
-     * 
-     * @param {string} graphUUID 
-     * @param {string} nodeUUID 
-     * @returns 
-    */
     executeGraph(graphUUID, nodeUUID) {
 
         const graph = this.getGraphByUUID(graphUUID);
@@ -63,10 +50,7 @@ class IEngine extends IObject {
         graph.executeNode(nodeUUID);
 
     }
-    /**
-     * 
-     * @returns {Object}
-    */
+
     export() {
 
         const graphs = [];
@@ -115,7 +99,47 @@ class IEngine extends IObject {
 
         });
     }
+
+    get graphSets() {
+        return this.#graphSets;
+    }
     
+    addGraphSet(graphSetUUID, graphSetData = { name: null, properties: {}, graphs: {} }) {
+        try {
+
+            const uuid = graphSetUUID || crypto.randomUUID();
+            if(this.#graphSets.has(uuid)) {
+                console.error(`Graph set "${uuid}" already exists`);
+                return null;
+            }
+
+            const graphSet = new IGraphSet({ uuid: uuid, outer: this, name: graphSetData.name });
+            const success = graphSet.main({
+                properties: graphSetData.properties,
+                graphs: graphSetData.graphs
+            });
+            if(!success) {
+                throw new Error(`Graph set "${uuid}" could not be created`);
+            };
+
+            this.#graphSets.set(uuid, graphSet);
+
+            return graphSet;
+
+        }
+        catch(error) {
+            console.error(error);
+        }
+    }
+    /**
+        * 
+        * @param {*} graphSetUUID 
+        * @returns {IGraphSet}
+    */
+    getGraphSet(graphSetUUID) {
+        return this.#graphSets.get(graphSetUUID);
+    }
+
 }
 
 // const engine = new IEngine();
@@ -132,5 +156,34 @@ class IEngine extends IObject {
 // graph.linkNodesSocketsByUUID("log", "out0", "end", "in0");
 
 // engine.executeGraph("main", "begin");
+
+let engine = new IEngine();
+engine.addGraphSet("main0", {
+    properties: {
+        age: { type: "INT", value: 23 }
+    },
+    graphs: {
+        init0: {
+            name: "init function",
+            properties: {
+                name: { type: "STRING", value: "some name" }
+            },
+            nodes: {
+                begin0: {
+                    class: "INode.Event.Begin",
+                    properties: {}
+                },
+                log0: {
+                    class: "INode.Event.Log",
+                    properties: {}
+                }
+            },
+            links: [
+                { sourceNode: "begin0", sourceSocket: "out0", targetNode: "log0", targetSocket: "in0" }
+            ]
+        }
+    }
+});
+debugger;
 
 export { IEngine };

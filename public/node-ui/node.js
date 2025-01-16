@@ -5,7 +5,7 @@ import Drag from "./drag";
 import { INode } from "../node/node";
 import { ISocket } from "../node/socket";
 import { UISocket } from "./socket";
-import { UIValue, VALUE_REGISTRY } from "./property";
+import { UIValue, VALUE_REGISTRY } from "./value";
 
 class UINode extends H12 {
     constructor() {

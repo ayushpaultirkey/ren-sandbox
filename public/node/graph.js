@@ -1,6 +1,6 @@
 import { IObject } from "./object.js";
 import { INode, NODES_REGISTRY } from "./node.js";
-import { ISocket } from "./socket.js";
+import { IPropertyManager } from "./property/manager.js";
 
 class IGraph extends IObject {
 
@@ -10,65 +10,106 @@ class IGraph extends IObject {
         displayName: "Graph"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null } = {}) {
+    /** @type {Map<string, INode>} */
+    #nodes = new Map();
 
-        super({ uuid, outer });
+    /** @type {IPropertyManager} */
+    #propertyManager = null;
 
-        this.nodes = {};
-        this.values = {};
-        this.properties = {};
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = null } = {}) {
+
+        super({ uuid, outer, name });
+        this.#propertyManager = new IPropertyManager({ outer: this });
 
     }
 
-    getProperty(property) {
-        return this.properties[property];
-    }
-    setProperty(property, value) {
-        this.properties[property] = value;
+    get propertyManager() {
+        return this.#propertyManager;
     }
 
-    addNode(nodeClass, nodeUUID, nodeValue) {
+    main({ properties = {}, nodes = {}, links = [] } = {}) {
 
-        const uuid = nodeUUID || crypto.randomUUID();
+        for(const name in properties) {
+            const property = properties[name];
 
-        if(!nodeClass) return null;
-        if(this.getNodeByUUID(uuid)) return null;
-        if(!NODES_REGISTRY.isRegistered(nodeClass.meta.className)) return null;
+            const type = property.type;
+            const value = property.value;
+            const custom = property.custom;
 
-        const node = new nodeClass({ uuid: uuid , outer: this });
-        node.setValues(nodeValue);
+            this.#propertyManager.addProperty(name, type, value, custom);
+        }
 
-        this.nodes[uuid] = node;
+        for(const uuid in nodes) {
+            const node = nodes[uuid];
+            this.addNode(uuid, node);
+        }
 
-        return node;
+        for(const link of links) {
+            const sourceNode = this.getNode(link.sourceNode);
+            const targetNode = this.getNode(link.targetNode);
+            this.linkSocketsByUUID(sourceNode, link.sourceSocket, targetNode, link.targetSocket);
+        }
 
+        return true;
+
+    }
+
+    addNode(nodeUUID, nodeData = { class: null, properties: {} }) {
+        try {
+
+            const uuid = nodeUUID || crypto.randomUUID();
+    
+            if(this.#nodes.has(uuid)) {
+                throw new Error(`Graph: Node "${uuid}" already exists`);
+            };
+            if(!nodeData || !nodeData.class) {
+                throw new Error(`Graph: Node class is required`);
+            };
+
+            const nodeClass = NODES_REGISTRY.get(nodeData.class);
+            if(!nodeClass) {
+                throw new Error(`Graph: Node class "${nodeData.class}" is not registered`);
+            };
+    
+            const node = new nodeClass({ uuid: uuid , outer: this });
+            node.main({ properties: nodeData.properties });
+    
+            this.#nodes.set(uuid, node);
+    
+            return node;
+
+        }
+        catch(error) {
+            console.error(error);
+        }
     }
     
-    getNodeByUUID(nodeUUID) {
-        return this.nodes[nodeUUID];
+    getNode(nodeUUID) {
+        return this.#nodes.get(nodeUUID);
     }
 
     removeNodeByUUID(nodeUUID) {
-        return this.removeNode(this.getNodeByUUID(nodeUUID));
+        const node = this.getNode(nodeUUID);
+        return this.removeNode(node);
     }
 
     removeNode(node) {
 
         if(!node) return null;
 
-        const inSockets = node.input;
+        const inSockets = node.inputs;
         for(const socketUUID in inSockets) {
             const socket = inSockets[socketUUID];
             this.clearSocketLinks(socket);
         }
 
-        const outSockets = node.output;
+        const outSockets = node.outputs;
         for(const socketUUID in outSockets) {
             const socket = outSockets[socketUUID];
             this.clearSocketLinks(socket);
         }
 
-        delete this.nodes[node.getUUID()];
+        this.#nodes.delete(node.getUUID());
 
         return true;
 
@@ -76,7 +117,7 @@ class IGraph extends IObject {
 
     clearSocketLinksByUUID(nodeUUID, socketUUID) {
 
-        const node = this.getNodeByUUID(nodeUUID);
+        const node = this.getNode(nodeUUID);
         if(!node) return;
 
         const socket = node.getSocket(socketUUID);
@@ -101,8 +142,8 @@ class IGraph extends IObject {
     
     unlinkNodesSocketsByUUID(sourceNodeUUID, sourceSocketUUID, targetNodeUUID, targetSocketUUID) {
 
-        const sourceNode = this.getNodeByUUID(sourceNodeUUID);
-        const targetNode = this.getNodeByUUID(targetNodeUUID);
+        const sourceNode = this.getNode(sourceNodeUUID);
+        const targetNode = this.getNode(targetNodeUUID);
 
         this.unlinkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID);
         
@@ -138,8 +179,8 @@ class IGraph extends IObject {
 
     linkNodesSocketsByUUID(sourceNodeUUID, sourceSocketUUID, targetNodeUUID, targetSocketUUID) {
         
-        const sourceNode = this.getNodeByUUID(sourceNodeUUID);
-        const targetNode = this.getNodeByUUID(targetNodeUUID);
+        const sourceNode = this.getNode(sourceNodeUUID);
+        const targetNode = this.getNode(targetNodeUUID);
 
         this.linkSocketsByUUID(sourceNode, sourceSocketUUID, targetNode, targetSocketUUID);
 
@@ -177,14 +218,14 @@ class IGraph extends IObject {
         sourceSocket.link(targetSocket);
         targetSocket.link(sourceSocket);
 
-        console.warn(`Sockets Linked ${sourceSocket.getUUID()} <--> ${targetSocket.getUUID()}`);
+        console.warn(`Sockets Linked ${sourceSocket.uuid} <--> ${targetSocket.uuid}`);
 
         return true;
 
     }
 
     executeNode(nodeUUID) {
-        const node = this.getNodeByUUID(nodeUUID);
+        const node = this.getNode(nodeUUID);
         if(!node) return;
         node.execute();
     }
@@ -202,32 +243,32 @@ class IGraph extends IObject {
         let success = true;
         let custom = this.customExport();
 
-        for(const nodeUUID in this.nodes) {
+        // for(const nodeUUID in this.#nodes) {
 
-            const node = this.nodes[nodeUUID];
-            const nodeData = node.export();
+        //     const node = this.nodes[nodeUUID];
+        //     const nodeData = node.export();
 
-            nodes[nodeUUID] = nodeData.data;
-            links.push(...nodeData.links); 
+        //     nodes[nodeUUID] = nodeData.data;
+        //     links.push(...nodeData.links); 
 
-            if(node.isEntry) {
-                if(entry) {
-                    success = false;
-                    break;
-                };
-                entry = nodeUUID;
-            }
+        //     if(node.isEntry) {
+        //         if(entry) {
+        //             success = false;
+        //             break;
+        //         };
+        //         entry = nodeUUID;
+        //     }
 
-        }
+        // }
 
-        if(!success) {
-            console.error("Multiple entry found");
-            return;
-        };
+        // if(!success) {
+        //     console.error("Multiple entry found");
+        //     return;
+        // };
 
-        const exportData = { graphUUID: this.getUUID(), entryNodeUUID: entry, nodes: nodes, links: links, ...custom };
+        // const exportData = { graphUUID: this.getUUID(), entryNodeUUID: entry, nodes: nodes, links: links, ...custom };
 
-        return exportData;
+        // return exportData;
 
     }
 

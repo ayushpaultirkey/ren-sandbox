@@ -1,13 +1,19 @@
 class IObject {
 
+    /** @type {string} */
     #uuid = null;
-    #outer = null;
-    #name = null;
 
+    /** @type {IObject} */
+    #outer = null;
+
+    /** @type {string} */
+    #name = null;
+    
     /** @type {{ className: string, displayName: string }} */
     static meta = {
         className: "IObject.IObject",
-        displayName: "Object"
+        displayName: "Object",
+        description: "Object"
     };
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = null } = {}) {
@@ -16,27 +22,27 @@ class IObject {
         this.#name = name;
     }
 
-    getUUID() {
+    main() {}
+
+    get uuid() {
         return this.#uuid;
     }
-    getOuter() {
-        return this.#outer;
-    }
-    getName() {
+    get name() {
         return this.#name;
     }
-    
+    get outer() {
+        return this.#outer;
+    }
+
     /**
-     * 
-     * @returns {IObject.meta}
+        * @returns {IObject.meta}
     */
     getMeta() {
         return this.constructor.meta;
     }
 
     /**
-     * 
-     * @returns {IObject.meta}
+        * @returns {IObject.meta}
     */
     static getMeta() {
         return this.meta;

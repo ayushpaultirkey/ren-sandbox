@@ -76,7 +76,7 @@ class ISocket extends IObject {
 
 
     getNode() {
-        return this.getOuter();
+        return this.outer;
     }
 
 
@@ -92,19 +92,19 @@ class ISocket extends IObject {
     getLinkedNode(index) {
         const link = this.getLink(index);
         if(link) {
-            return link.getOuter();
+            return link.outer;
         }
     }
 
 
     canLinkTo(targetSocket) {
 
-        if(!targetSocket || !targetSocket.type || !targetSocket.getOuter() || targetSocket.type == this.type) {
+        if(!targetSocket || !targetSocket.type || !targetSocket.outer || targetSocket.type == this.type) {
             console.error("Invalid socket, type, or same socket type");
             return;
         }
 
-        if(targetSocket.getOuter() == this.getOuter()) {
+        if(targetSocket.outer == this.outer) {
             console.error("Source and target sockets are the same");
             return;
         }
@@ -143,7 +143,7 @@ class ISocket extends IObject {
         
         this.links.forEach(link => {
 
-            if(!link || !link.getOuter() || !this.getOuter()) {
+            if(!link || !link.outer || !this.outer) {
                 return;
             }
 

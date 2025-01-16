@@ -1,31 +1,47 @@
 import { IObject } from "./object.js";
 
-class IValue extends IObject {
+class IProperty extends IObject {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "IObject.IValue",
+        className: "IObject.IProperty",
         displayName: "Data"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, type = null, value = null, name = null } = {}) {
+    #type = null;
+    #value = null;
+    #custom = null;
+
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null, custom = null } = {}) {
         super({ uuid, outer, name });
-        this.type = type;
-        this.value = value;
-    }
-    getValue() {
-        return this.value;
-    }
-    
-    setValue(value) {
-        this.value = value;
+        this.#type = type;
+        this.#value = value;
+        this.#custom = custom;
     }
 
-    getType() {
-        return this.type;
+    get value() {
+        return this.#value;
+    }
+    set value(data) {
+        this.#value = data;
+    }
+    get type() {
+        return this.#type;
+    }
+    get custom() {
+        return this.#custom;
+    }
+
+    export() {
+        return {
+            name: this.name,
+            type: this.#type,
+            value: this.#value,
+            custom: this.#custom
+        }
     }
 
 }
 
 
-export { IValue };
+export { IProperty };
