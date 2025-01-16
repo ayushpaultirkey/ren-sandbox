@@ -5,12 +5,15 @@ import { dispatcher } from "./dispatcher.js";
 import { ISocket } from "../node/socket";
 
 class UISocket extends H12 {
+
+    /** @type {ISocket} */
+    #isocket = null;
+
     constructor() {
         
         super();
 
         this.links = [];
-        this.isocket = null;
 
     }
     main() {
@@ -19,16 +22,17 @@ class UISocket extends H12 {
     render() {
         
         if(!this.args.iobject) return <><label>Invalid socket</label></>;
-        this.isocket = this.args.iobject;
+        this.#isocket = this.args.iobject;
         
-        const meta = this.isocket.getMeta();
-        const name = this.isocket.getName() ||  meta.displayName;
+        const meta = this.#isocket.meta;
+        const name = this.#isocket.name ||  meta.displayName;
         const color = meta.displayColor || "gray";
+        const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
         return <>
             <div class="px-[8px] relative">
                 <label style="font-size: 10px;">{ name }</label>
-                <button id="btn" style={ `background-color: ${color};` } class={ `absolute w-3 h-3 ${this.isocket.type == ISocket.TYPES.OUTPUT ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
+                <button id="btn" style={ `background-color: ${color};` } class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
             </div>
         </>;
 
@@ -36,7 +40,7 @@ class UISocket extends H12 {
 
     clearLinks() {
 
-        if(this.isocket.type != ISocket.TYPES.INPUT) return;
+        if(this.#isocket.type != ISocket.TYPES.INPUT) return;
         dispatcher.call("clearLinkedSockets", this);
 
     }
@@ -57,10 +61,10 @@ class UISocket extends H12 {
     }
 
     getISocket() {
-        return this.isocket;
+        return this.#isocket;
     }
     getIUUID() {
-        return this.isocket.getUUID();
+        return this.#isocket.uuid;
     }
     
     addLink(link) {
@@ -68,20 +72,20 @@ class UISocket extends H12 {
     }
 
     createActiveHoverSocket() {
-        if(this.isocket.type == ISocket.TYPES.INPUT) {
+        if(this.#isocket.type == ISocket.TYPES.INPUT) {
             dispatcher.call("createActiveHoverSocket", this);
         }
     }
     
     removeActiveHoverSocket() {
-        if(this.isocket.type == ISocket.TYPES.INPUT) {
+        if(this.#isocket.type == ISocket.TYPES.INPUT) {
             dispatcher.call("removeActiveHoverSocket", this);
         }
     }
 
     createActiveSocket(event) {
 
-        if(this.isocket.type !== ISocket.TYPES.OUTPUT) {
+        if(this.#isocket.type !== ISocket.TYPES.OUTPUT) {
             return;
         }
 

@@ -69,14 +69,12 @@ class UIGraph extends H12 {
     }
 
     #displayNodes() {
-
         this.set("{nodes}", "");
-
+        
         const nodes = this.#igraph.nodes;
         for(const [uuid, node] of nodes) {
             this.#displayNode(node);
         }
-
     }
     #displayNode(node) {
         this.set("{nodes}++", <>
@@ -95,16 +93,14 @@ class UIGraph extends H12 {
         this.#dragHandler.register();
 
     }
+    
     #registerDispatchers() {
         this.#registerNodeDispatchers();
     }
-
     #registerNodeDispatchers() {
         dispatcher.on("addNode", (nodeClass) => {
             this.#igraph.addNode(null, { class: nodeClass });
         });
-
-        const { nodes: uiNodes } = this.key;
         this.#igraph.dispatcher.on("nodeAdded", (node) => {
             console.warn(`UIGraph: Node ${node.uuid} added`);
             this.#displayNode(node);
@@ -116,14 +112,12 @@ class UIGraph extends H12 {
         if(!this.args.iobject) return <><label>Invalid graph</label></>;
         this.#igraph = this.args.iobject;
 
-        // const ui = this.args.ui;
-        // const x = ui.x || 0;
-        // const y = ui.y || 0;
-        // const scale = ui.zoom || 1;
-        // VIEWPORT.zoom = scale;
+        const x = Math.round(this.#igraph.custom.x || 0);
+        const y = Math.round(this.#igraph.custom.y || 0);
+        const z = VIEWPORT.zoom = this.#igraph.custom.z || 1;
 
         return <>
-            <div class="absolute" style={ `left: ${0}px; top: ${0}px; transform: scale(${1});` }>
+            <div class="absolute" style={ `left: ${x}px; top: ${y}px; transform: scale(${z});` }>
                 <div id="frame" class="frame border-2 border-zinc-500 absolute">
                     { this.createSVG("backGraph") }
                     <div>
@@ -135,47 +129,7 @@ class UIGraph extends H12 {
         </>;
 
     }
-    zoom(event) {
-
-        event.preventDefault();
-
-        const root = this.root;
-        const rect = root.getBoundingClientRect();
-
-        const mouseX = event.clientX - rect.left;
-        const mouseY = event.clientY - rect.top;
-
-        const zoomDelta = event.deltaY > 0 ? -0.05 : 0.05;
-
-        const newZoom = Math.min(
-            Math.max(VIEWPORT.zoom + zoomDelta, VIEWPORT.zoomMin),
-            VIEWPORT.zoomMax
-        );
-
-        const scaleDelta = newZoom / VIEWPORT.zoom;
-
-        const offsetX = mouseX - mouseX * scaleDelta;
-        const offsetY = mouseY - mouseY * scaleDelta;
-
-        root.style.transform = `scale(${newZoom})`;
-        root.style.left = `${(parseFloat(root.style.left || 0) || 0) + offsetX}px`;
-        root.style.top = `${(parseFloat(root.style.top || 0) || 0) + offsetY}px`;
-
-        VIEWPORT.zoom = newZoom;
-
-        dispatcher.call("onZoom", VIEWPORT.zoom);
-
-    }
-    zoomIn() {
-        VIEWPORT.zoom = (VIEWPORT.zoom + 0.1) > VIEWPORT.zoomMax ? VIEWPORT.zoomMax : VIEWPORT.zoom + 0.05;
-        this.root.style.transform = `scale(${VIEWPORT.zoom})`;
-        dispatcher.call("onZoom", VIEWPORT.zoom);
-    }
-    zoomOut() {
-        VIEWPORT.zoom -= (VIEWPORT.zoom - 0.1) < VIEWPORT.zoomMin ? 0 : 0.05;
-        this.root.style.transform = `scale(${VIEWPORT.zoom})`;
-        dispatcher.call("onZoom", VIEWPORT.zoom);
-    }
+    
     recenter() {
         const parent = this.root.parentElement;
         const frame = this.element.frame;
@@ -443,7 +397,16 @@ class UIGraph extends H12 {
             this.#zoomHandler.unregister();
         }
         if(this.#dragHandler) {
+
+            const x = this.root.style.left.replace("px", "");
+            const y = this.root.style.top.replace("px", "");
+    
+            this.#igraph.custom["x"] = Math.round(x);
+            this.#igraph.custom["y"] = Math.round(y);
+            this.#igraph.custom["z"] = VIEWPORT.zoom;
+
             this.#dragHandler.unregister();
+
         }
 
         super.destroy();

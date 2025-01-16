@@ -30,7 +30,8 @@ class UINode extends H12 {
         this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
         this.#dragHandler.register();
 
-        // this.renderPins();
+        this.renderPins();
+
         // this.renderProperties();
 
         // if(this.inode) {
@@ -67,8 +68,9 @@ class UINode extends H12 {
 
         const x = Math.round(this.#inode.custom.x || 5);
         const y = Math.round(this.#inode.custom.y || 5);
-        const meta = this.#inode.getMeta();
-        const name = meta.displayName || "Node";
+        
+        const meta = this.#inode.meta;
+        const name = this.#inode.name || meta.displayName || "Node";
 
         const canCache = meta.canCache ? "" : "";
 
@@ -84,10 +86,10 @@ class UINode extends H12 {
 
                 <div id="socket" class="flex flex-row w-full">
                     <div class="w-full relative">
-                        {input}
+                        {inputs}
                     </div>
                     <div class="w-full relative text-right">
-                        {output}
+                        {outputs}
                     </div>
                 </div>
 
@@ -128,29 +130,30 @@ class UINode extends H12 {
     //     }
 
     // }
-    // renderPins() {
 
-    //     const { input, output } = this.key;
-    //     const inPins = this.inode.input;
-    //     const OutPins = this.inode.output;
+    renderPins() {
 
-    //     input("");
-    //     for(const pinUUID in inPins) {
-    //         const pin = inPins[pinUUID];
-    //         input(<>
-    //             <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
-    //         </>, "++x");
-    //     }
+        const { inputs, outputs } = this.key;
+        const inSockets = this.#inode.inputs;
+        const outSockets = this.#inode.outputs;
 
-    //     output("");
-    //     for(const pinUUID in OutPins) {
-    //         const pin = OutPins[pinUUID];
-    //         output(<>
-    //             <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
-    //         </>, "++x");
-    //     }
+        inputs("");
+        for(const uuid in inSockets) {
+            const socket = inSockets[uuid];
+            inputs(<>
+                <pin args alias={ UISocket } id={ socket.uuid } iobject={ socket }></pin>
+            </>, "x++");
+        }
 
-    // }
+        outputs("");
+        for(const uuid in outSockets) {
+            const socket = outSockets[uuid];
+            outputs(<>
+                <pin args alias={ UISocket } id={ socket.uuid } iobject={ socket }></pin>
+            </>, "x++");
+        }
+
+    }
 
 
     // getINode() {
@@ -164,10 +167,17 @@ class UINode extends H12 {
     destroy() {
 
         if(this.#dragHandler) {
-            const { parent: { x: parentX, y: parentY }, target: { x, y } } = this.#dragHandler.lastBound();
+            
+            const x = this.root.style.left.replace("px", "");
+            const y = this.root.style.top.replace("px", "");
     
-            this.#inode.custom["x"] = Math.round(x - parentX);
-            this.#inode.custom["y"] = Math.round(y - parentY);
+            this.#inode.custom["x"] = Math.round(x);
+            this.#inode.custom["y"] = Math.round(y);
+
+            // const { parent: { x: parentX, y: parentY }, target: { x, y } } = this.#dragHandler.lastBound();
+    
+            // this.#inode.custom["x"] = Math.round(x - parentX);
+            // this.#inode.custom["y"] = Math.round(y - parentY);
     
             this.#dragHandler.unregister();
         }

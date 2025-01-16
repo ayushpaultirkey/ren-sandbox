@@ -44,11 +44,7 @@ class IObject {
     get outer() {
         return this.#outer;
     }
-
-    /**
-        * @returns {IObject.meta}
-    */
-    getMeta() {
+    get meta() {
         return this.constructor.meta;
     }
 

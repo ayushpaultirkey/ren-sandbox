@@ -19,6 +19,7 @@ class IGraph extends IObject {
     constructor({ uuid = crypto.randomUUID(), outer = null, name = null } = {}) {
 
         super({ uuid, outer, name });
+        this.custom = {};
         this.#propertyManager = new IPropertyManager({ outer: this });
 
     }

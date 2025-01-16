@@ -167,8 +167,7 @@ class UIEngine extends H12 {
             const { graph: uiGraph } = this.key;
             
             uiGraph("");
-            VIEWPORT.zoom = 1;
-            
+
             if(this.child.graph) {
                 this.child.graph.destroy();
             }

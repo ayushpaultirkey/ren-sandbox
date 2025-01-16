@@ -20,8 +20,12 @@ class INode extends IObject {
 
         this.value = {};
 
+        /** @type {Object.<string, ISocket>} */
         this.inputs = {};
+
+        /** @type {Object.<string, ISocket>} */
         this.outputs = {};
+        
         this.properties = {};
         this.custom = {};
 
