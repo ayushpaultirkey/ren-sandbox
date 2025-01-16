@@ -23,6 +23,9 @@ class IGraph extends IObject {
 
     }
 
+    get nodes() {
+        return this.#nodes;
+    }
     get propertyManager() {
         return this.#propertyManager;
     }
@@ -78,6 +81,8 @@ class IGraph extends IObject {
             });
     
             this.#nodes.set(uuid, node);
+
+            this.dispatcher.emit("nodeAdded", node);
     
             return node;
 

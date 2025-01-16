@@ -1,5 +1,5 @@
 import H12 from "@library/h12.js";
-import dispatcher from "@library/h12/dispatcher.js";
+import { dispatcher } from "./dispatcher.js";
 
 import { NODES_REGISTRY } from "../node/node.js";
 import VIEWPORT from "./viewport.js";
@@ -13,7 +13,7 @@ class Category extends H12 {
         this.items = [];
     }
     main(args) {
-        if(args && args.autocreate) {
+        if(args && args.auto) {
             this.createCategory();
         }
     }
@@ -61,7 +61,7 @@ class Category extends H12 {
             
             if(isLast) {
                 this.staticFields[current].children[1].appendChild(<>
-                    <button onclick={ () => { this.addNode(nodeClass); } } class="text-left italic hover:font-semibold hover:underline">{ name }</button>
+                    <button onclick={ () => { this.addNode(category); } } class="text-left italic hover:font-semibold hover:underline">{ name }</button>
                 </>);
             }
 
@@ -110,30 +110,21 @@ class Category extends H12 {
 
     }
 
-    addNode(nodeClass) {
-        dispatcher.call("onNodeAdd", nodeClass);
+    addNode(className) {
+        dispatcher.emit("addNode", className);
     }
     
     createCategory() {
         
-        if(!this.isActive) {
+        if(!this.staticFieldCreated) {
+            
     
-            if(!this.staticFieldCreated) {
-    
-                const nodes = NODES_REGISTRY.getAll();
-                for(const node in nodes) {
-                    const nodeClass = nodes[node];
-                    this.createField(node, nodeClass);
-                }
-                this.staticFieldCreated = true;
-    
+            const nodes = NODES_REGISTRY.getAll();
+            for(const [ className, nodeClass ] of nodes) {
+                this.createField(className, nodeClass);
             }
+            this.staticFieldCreated = true;
 
-            this.isActive = true;
-
-        }
-        else {
-            this.isActive = false;
         }
 
     }

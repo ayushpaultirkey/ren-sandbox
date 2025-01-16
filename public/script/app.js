@@ -1,6 +1,6 @@
 import "@style/main.css";
 import H12 from "@library/h12";
-import dispatcher from "@library/h12/dispatcher";
+import { dispatcher } from "../node-ui/dispatcher";
 import { UIEngine } from "../node-ui/engine";
 
 class App extends H12 {

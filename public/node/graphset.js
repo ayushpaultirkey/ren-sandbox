@@ -100,7 +100,11 @@ class IGraphSet extends IObject {
         }
     }
     removeGraph(graphUUID) {
-        return this.#graphs.delete(graphUUID);
+        if(this.#graphs.delete(graphUUID)) {
+            this.dispatcher.emit("graphRemoved");
+            return true;
+        }
+        return false;
     }
 
 

@@ -103,7 +103,7 @@ export default class H12 {
 
         if (!this.key[key]) {
             const name = key.split("{")[1].split("}")[0];
-            this.key[name] = (value, position) => this.set(position ? (position.indexOf("++") > 0) ? `++{${name}}` : `{${name}}++` : key, value);
+            this.key[name] = (value, position) => this.set(position ? position.replace(/\w+/gm, key) : key, value);
         }
         const bind = this.#binding;
         if (!bind[key]) bind[key] = { element: [], data: "" };
@@ -260,6 +260,9 @@ export default class H12 {
             element.removeEventListener(name, method);
             delete this.#events[event];
         };
+        Object.values(this.child).forEach(child => {
+            child.destroy();
+        });
         delete this.parent.child[this.id];
         this.root.remove();
     }

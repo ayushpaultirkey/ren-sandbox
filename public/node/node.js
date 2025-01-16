@@ -23,6 +23,7 @@ class INode extends IObject {
         this.inputs = {};
         this.outputs = {};
         this.properties = {};
+        this.custom = {};
 
         this.isEntry = false;
 

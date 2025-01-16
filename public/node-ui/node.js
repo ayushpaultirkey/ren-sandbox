@@ -1,60 +1,73 @@
 import H12 from "@library/h12.js";
-import dispatcher from "@library/h12/dispatcher.js";
+import { dispatcher } from "./dispatcher.js";
 import Drag from "./drag";
 
 import { INode } from "../node/node";
 import { ISocket } from "../node/socket";
 import { UISocket } from "./socket";
-import { UIValue, VALUE_REGISTRY } from "./value";
+import { DragHandler } from "./handler/drag-handler.js";
+// import { UIValue, VALUE_REGISTRY } from "./value";
 
 class UINode extends H12 {
+
+    /** @type {INode} */
+    #inode = null;
+
+    /** @type {DragHandler} */
+    #dragHandler = null;
+
     constructor() {
         super();
-        this.inode = null;
     }
     main(args = {}) {
         
-        // Drag(this.root, this.root);
-
-        Drag(this.root, this.root, this.parent.root, false);
-        this.renderPins();
-        this.renderProperties();
-
-        if(this.inode) {
-            this.inode.customExport = () => {
-                const { x: parentX, y: parentY } = this.parent.root.getBoundingClientRect();
-                const { x, y } = this.root.getBoundingClientRect();
-                return {
-                    x: Math.round(x - parentX),
-                    y: Math.round(y - parentY)
-                };
-            }
+        if(!this.#inode) {
+            return;
         }
 
-        const { header, socket, values } = this.element;
-        dispatcher.bind("onZoom", (e, zoom) => {
-            if(zoom < 0.6) {
-                header.classList.add("invisible");
-                socket.classList.add("invisible");
-                values.classList.add("invisible");
-            }
-            else {
-                header.classList.remove("invisible");
-                socket.classList.remove("invisible");
-                values.classList.remove("invisible");
-            }
-        })
+        // Drag(this.root, this.root, this.parent.root, false);
+       
+        this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
+        this.#dragHandler.register();
+
+        // this.renderPins();
+        // this.renderProperties();
+
+        // if(this.inode) {
+        //     this.inode.customExport = () => {
+        //         const { x: parentX, y: parentY } = this.parent.root.getBoundingClientRect();
+        //         const { x, y } = this.root.getBoundingClientRect();
+        //         return {
+        //             x: Math.round(x - parentX),
+        //             y: Math.round(y - parentY)
+        //         };
+        //     }
+        // }
+
+        // const { header, socket, values } = this.element;
+        // dispatcher.bind("onZoom", (e, zoom) => {
+        //     if(zoom < 0.6) {
+        //         header.classList.add("invisible");
+        //         socket.classList.add("invisible");
+        //         values.classList.add("invisible");
+        //     }
+        //     else {
+        //         header.classList.remove("invisible");
+        //         socket.classList.remove("invisible");
+        //         values.classList.remove("invisible");
+        //     }
+        // })
 
     }
 
     render() {
         
         if(!this.args.iobject) return <><label>Invalid node</label></>;
-        this.inode = this.args.iobject;
+        this.#inode = this.args.iobject;
 
-        const x = Math.round(this.args.x || 5);
-        const y = Math.round(this.args.y || 5);
-        const meta = this.inode.getMeta();
+        const x = Math.round(this.#inode.custom.x || 5);
+        const y = Math.round(this.#inode.custom.y || 5);
+        const meta = this.#inode.getMeta();
         const name = meta.displayName || "Node";
 
         const canCache = meta.canCache ? "" : "";
@@ -87,65 +100,80 @@ class UINode extends H12 {
 
     }
     
-    removeNode() {
-        this.parent.removeUINode(this);
-    }
-    renderProperties() {
+    // removeNode() {
+    //     this.parent.removeUINode(this);
+    // }
+    // renderProperties() {
 
-        const { values: uiValues } = this.key;
-        const values = this.inode.value;
+    //     const { values: uiValues } = this.key;
+    //     const values = this.inode.value;
 
-        uiValues("");
+    //     uiValues("");
 
-        for(const valueUUID in values) {
+    //     for(const valueUUID in values) {
 
-            const value = values[valueUUID];
-            if(!value) continue;
+    //         const value = values[valueUUID];
+    //         if(!value) continue;
 
-            const type = value.getType();
-            if(!type) continue;
+    //         const type = value.getType();
+    //         if(!type) continue;
 
-            const valueClass = VALUE_REGISTRY[type];
-            if(!valueClass) continue;
+    //         const valueClass = VALUE_REGISTRY[type];
+    //         if(!valueClass) continue;
 
-            uiValues(<>
-                <property args alias={ valueClass } iobject={ value }></property>
-            </>, "++x");
+    //         uiValues(<>
+    //             <property args alias={ valueClass } iobject={ value }></property>
+    //         </>, "++x");
 
+    //     }
+
+    // }
+    // renderPins() {
+
+    //     const { input, output } = this.key;
+    //     const inPins = this.inode.input;
+    //     const OutPins = this.inode.output;
+
+    //     input("");
+    //     for(const pinUUID in inPins) {
+    //         const pin = inPins[pinUUID];
+    //         input(<>
+    //             <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
+    //         </>, "++x");
+    //     }
+
+    //     output("");
+    //     for(const pinUUID in OutPins) {
+    //         const pin = OutPins[pinUUID];
+    //         output(<>
+    //             <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
+    //         </>, "++x");
+    //     }
+
+    // }
+
+
+    // getINode() {
+    //     return this.inode;
+    // }
+
+    // getUISocket(socketUUID) {
+    //     return this.child[socketUUID];
+    // }
+
+    destroy() {
+
+        if(this.#dragHandler) {
+            const { parent: { x: parentX, y: parentY }, target: { x, y } } = this.#dragHandler.lastBound();
+    
+            this.#inode.custom["x"] = Math.round(x - parentX);
+            this.#inode.custom["y"] = Math.round(y - parentY);
+    
+            this.#dragHandler.unregister();
         }
 
-    }
-    renderPins() {
+        super.destroy();
 
-        const { input, output } = this.key;
-        const inPins = this.inode.input;
-        const OutPins = this.inode.output;
-
-        input("");
-        for(const pinUUID in inPins) {
-            const pin = inPins[pinUUID];
-            input(<>
-                <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
-            </>, "++x");
-        }
-
-        output("");
-        for(const pinUUID in OutPins) {
-            const pin = OutPins[pinUUID];
-            output(<>
-                <pin args alias={ UISocket } id={ pin.getUUID() } iobject={ pin }></pin>
-            </>, "++x");
-        }
-
-    }
-
-
-    getINode() {
-        return this.inode;
-    }
-
-    getUISocket(socketUUID) {
-        return this.child[socketUUID];
     }
 
 }
