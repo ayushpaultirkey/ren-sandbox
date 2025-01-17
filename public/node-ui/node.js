@@ -6,7 +6,7 @@ import { INode } from "../node/node";
 import { ISocket } from "../node/socket";
 import { UISocket } from "./socket";
 import { DragHandler } from "./handler/drag-handler.js";
-// import { UIValue, VALUE_REGISTRY } from "./value";
+import { UIProperty, PROPERTY_REGISTRY } from "./property.js";
 
 class UINode extends H12 {
 
@@ -30,9 +30,8 @@ class UINode extends H12 {
         this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
         this.#dragHandler.register();
 
-        this.renderPins();
-
-        // this.renderProperties();
+        this.renderSockets();
+        this.renderProperties();
 
         // if(this.inode) {
         //     this.inode.customExport = () => {
@@ -66,8 +65,11 @@ class UINode extends H12 {
         if(!this.args.iobject) return <><label>Invalid node</label></>;
         this.#inode = this.args.iobject;
 
-        const x = Math.round(this.#inode.custom.x || 5);
-        const y = Math.round(this.#inode.custom.y || 5);
+        if(this.#inode.custom.x == null) this.#inode.custom.x = 5;
+        if(this.#inode.custom.y == null) this.#inode.custom.y = 5;
+        
+        const x = Math.round(this.#inode.custom.x);
+        const y = Math.round(this.#inode.custom.y);
         
         const meta = this.#inode.meta;
         const name = this.#inode.name || meta.displayName || "Node";
@@ -94,7 +96,7 @@ class UINode extends H12 {
                 </div>
 
                 <div id="values" class="px-1" onmousedown={ (e) => e.stopPropagation() }>
-                    {values}
+                    {properties}
                 </div>
 
             </div>
@@ -105,38 +107,38 @@ class UINode extends H12 {
     // removeNode() {
     //     this.parent.removeUINode(this);
     // }
-    // renderProperties() {
 
-    //     const { values: uiValues } = this.key;
-    //     const values = this.inode.value;
+    renderProperties() {
 
-    //     uiValues("");
+        const { properties: uiProperties } = this.key;
+        const properties = this.#inode.propertyManager.properties;
 
-    //     for(const valueUUID in values) {
+        uiProperties("");
 
-    //         const value = values[valueUUID];
-    //         if(!value) continue;
+        for(const [uuid, property] of properties) {
 
-    //         const type = value.getType();
-    //         if(!type) continue;
+            if(!property) continue;
+            
+            const type = property.type;
+            if(!type) continue;
 
-    //         const valueClass = VALUE_REGISTRY[type];
-    //         if(!valueClass) continue;
+            const propertyClass = PROPERTY_REGISTRY[type];
+            if(!propertyClass) continue;
 
-    //         uiValues(<>
-    //             <property args alias={ valueClass } iobject={ value }></property>
-    //         </>, "++x");
+            uiProperties(<>
+                <property args alias={ propertyClass } iobject={ property }></property>
+            </>, "x++");
 
-    //     }
+        }
 
-    // }
+    }
 
-    renderPins() {
+    renderSockets() {
 
         const { inputs, outputs } = this.key;
         const inSockets = this.#inode.inputs;
         const outSockets = this.#inode.outputs;
-
+        
         inputs("");
         for(const uuid in inSockets) {
             const socket = inSockets[uuid];
@@ -167,17 +169,11 @@ class UINode extends H12 {
     destroy() {
 
         if(this.#dragHandler) {
-            
             const x = this.root.style.left.replace("px", "");
             const y = this.root.style.top.replace("px", "");
     
-            this.#inode.custom["x"] = Math.round(x);
-            this.#inode.custom["y"] = Math.round(y);
-
-            // const { parent: { x: parentX, y: parentY }, target: { x, y } } = this.#dragHandler.lastBound();
-    
-            // this.#inode.custom["x"] = Math.round(x - parentX);
-            // this.#inode.custom["y"] = Math.round(y - parentY);
+            this.#inode.custom["x"] = Math.round(x) || 5;
+            this.#inode.custom["y"] = Math.round(y) || 5;
     
             this.#dragHandler.unregister();
         }

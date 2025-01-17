@@ -7,7 +7,7 @@ class WildcardSocket extends ISocket {
     static meta = {
         className: "ISocket.WildcardSocket",
         displayName: "Float",
-        displayColor: "#e5e7eb"
+        displayColor: "#e5e7eb",
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null }) {

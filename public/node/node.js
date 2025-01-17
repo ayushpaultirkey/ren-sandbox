@@ -1,6 +1,7 @@
 import { IObject } from "./object.js";
 import { ISocket } from "./socket.js";
 import { IPropertyManager } from "./property/manager.js";
+import { IProperty } from "./property.js";
 
 class INode extends IObject {
 
@@ -26,6 +27,7 @@ class INode extends IObject {
         /** @type {Object.<string, ISocket>} */
         this.outputs = {};
         
+        /** @type {Object.<string, IProperty>} */
         this.properties = {};
         this.custom = {};
 
@@ -35,12 +37,19 @@ class INode extends IObject {
 
     }
 
-    main({ values = {} } = {}) {
+    get propertyManager() {
+        return this.#propertyManager;
+    }
+
+    main({ properties = {}, custom = {} } = {}) {
         try {
-            // for(const name in properties) {
-            //     const value = properties[name];
-            //     this.#propertyManager.setProperty(name, value);
-            // }
+            if(custom) {
+                this.custom = custom;
+            }
+            for(const name in properties) {
+                const property = properties[name];
+                this.#propertyManager.setProperty(name, property.value);
+            }
             return true;
         }
         catch(error) {
@@ -61,23 +70,33 @@ class INode extends IObject {
         }
     }
     
-    addInputSocket(socketUUID, socketClass, socketSubType) {
+    addInputSocket(socketUUID, socketName, socketClass) {
         
         if(!socketClass) return null;
         if(this.inputs[socketUUID]) return null;
 
-        const socket = new socketClass({ uuid: socketUUID, outer: this, type: ISocket.TYPES.INPUT, subType: socketSubType });
+        const socket = new socketClass({
+            uuid: socketUUID,
+            outer: this,
+            name: socketName,
+            type: ISocket.TYPES.INPUT
+        });
         this.inputs[socketUUID] = socket;
-
+        
         return socket;
 
     }
-    addOutputSocket(socketUUID, socketClass, socketSubType) {
+    addOutputSocket(socketUUID, socketName, socketClass) {
 
         if(!socketClass) return null;
         if(this.outputs[socketUUID]) return null;
 
-        const socket = new socketClass({ uuid: socketUUID, outer: this, type: ISocket.TYPES.OUTPUT, subType: socketSubType });
+        const socket = new socketClass({
+            uuid: socketUUID,
+            outer: this,
+            name: socketName,
+            type: ISocket.TYPES.OUTPUT
+        });
         this.outputs[socketUUID] = socket;
 
         return socket;
@@ -113,26 +132,23 @@ class INode extends IObject {
     customExport() { return null; }
     export() {
         
-        let links = [];
-        let values = {};
-
-        for(const socketUUID in this.outputs) {
-            const socket = this.outputs[socketUUID];
-            links = links.concat(socket.export());
-        }
-
-        for(const valueUUID in this.value) {
-            const value = this.value[valueUUID];
-            values[valueUUID] = value.getValue();
-        }
-
-        return {
+        const data = {
             data: {
-                class: this.getMeta().className, ... this.customExport(),
-                value: values
+                class: this.meta.className,
+                properties: this.#propertyManager.export(),
+                custom: this.custom
             },
-            links: links
+            links: []
         };
+
+        let links = [];
+        for(const uuid in this.outputs) {
+            const socket = this.outputs[uuid];
+            links = links.concat(socket.export());   
+        }
+        data.links = links;
+
+        return data;
 
     }
 

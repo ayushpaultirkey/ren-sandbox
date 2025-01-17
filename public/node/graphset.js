@@ -70,7 +70,7 @@ class IGraphSet extends IObject {
         }
     }
 
-    addGraph(graphUUID, graphData = { name: null, nodes: {}, links: [], properties: {} }) {
+    addGraph(graphUUID, graphData = { name: null, nodes: {}, links: [], properties: {}, custom: {} }) {
         try {
 
             const uuid = graphUUID || crypto.randomUUID();
@@ -87,6 +87,7 @@ class IGraphSet extends IObject {
                 nodes: graphData.nodes,
                 links: graphData.links,
                 properties: graphData.properties,
+                custom: graphData.custom
             });
             this.#graphs.set(uuid, graph);
 
@@ -115,18 +116,17 @@ class IGraphSet extends IObject {
     export() {
 
         const graphs = this.#graphs;
-        const data = {};
+        const data = { graphs: {}, properties: {}, name: this.name };
         
         for(const [uuid, graph] of graphs) {
-
             const exportData = graph.export();
             if(!exportData) continue;
-
-            data[uuid] = exportData;
-
+            data.graphs[uuid] = exportData;
         }
 
-        return data;
+        data.properties = this.#propertyManager.export();
+
+        return { [this.uuid]: data };
 
     }
 

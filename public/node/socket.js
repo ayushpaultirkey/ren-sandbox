@@ -9,31 +9,45 @@ class ISocket extends IObject {
         displayColor: "gray"
     }
 
+    /** @type {ISocket[]} */
+    #links = [];
+    get links() {
+        return this.#links;
+    }
+
+    #value = null;
+
+    #type = null;
+    get type() {
+        return this.#type;
+    }
+
+
     constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null } = {}) {
 
         super({ uuid, outer, name });
 
-        this.value = value;
+        this.#value = value;
+        this.#type = type;
+        this.#links = [];
 
-        this.type = type;
         this.subType = -1;
         this.validSubTypes = new Set([]);
-
-        this.links = [];
+    
         this.maxLinks = 1;
 
     }
 
     getValue() {
-        if(this.type == ISocket.TYPES.INPUT) {
+        if(this.#type == ISocket.TYPES.INPUT) {
 
-            const link = this.links[0];
+            const link = this.#links[0];
             if(!link) return null;
 
             const node = link.getNode();
             if(!node) return null;
 
-            if(!node.getMeta().canCache) {
+            if(!node.meta.canCache) {
                 node.execute();
             }
 
@@ -41,15 +55,15 @@ class ISocket extends IObject {
 
         }
         else {
-            return this.value;
+            return this.#value;
         }
     }
     getValues() {
-        if(this.type == ISocket.TYPES.INPUT) {
+        if(this.#type == ISocket.TYPES.INPUT) {
 
             const values = [];
 
-            this.links.forEach(link => {
+            this.#links.forEach(link => {
                 if(link) {
 
                     const value = link.getValue();
@@ -63,15 +77,15 @@ class ISocket extends IObject {
             return values;
         }
         else {
-            return this.value;
+            return [this.#value];
         }
     }
     setValue(value) {
-        if(this.type == ISocket.TYPES.INPUT) {
+        if(this.#type == ISocket.TYPES.INPUT) {
             console.error("Cannot set input value");
             return;
         }
-        this.value = value;
+        this.#value = value;
     }
 
 
@@ -81,25 +95,23 @@ class ISocket extends IObject {
 
 
     isAnyLinked() {
-        return this.links.length > 0;
+        return this.#links.length > 0;
     }
     isLinked(index = 0) {
         return this.getLink(index) ? true : false;
     }
     getLink(index) {
-        return this.links[index];
+        return this.#links[index];
     }
     getLinkedNode(index) {
         const link = this.getLink(index);
-        if(link) {
-            return link.outer;
-        }
+        return link ? link.outer : null;
     }
 
 
     canLinkTo(targetSocket) {
 
-        if(!targetSocket || !targetSocket.type || !targetSocket.outer || targetSocket.type == this.type) {
+        if(!targetSocket || !targetSocket.type || !targetSocket.outer || targetSocket.type == this.#type) {
             console.error("Invalid socket, type, or same socket type");
             return;
         }
@@ -109,12 +121,12 @@ class ISocket extends IObject {
             return;
         }
 
-        if(this.type == ISocket.TYPES.INPUT && !this.validSubTypes.has(targetSocket.subType)) {
+        if(this.#type == ISocket.TYPES.INPUT && !this.validSubTypes.has(targetSocket.subType)) {
             console.error("Invalid sub-socket type");
             return;
         }
         
-        if(this.links.length >= this.maxLinks) {
+        if(this.#links.length >= this.maxLinks) {
             console.error("Link limit failed");
             return;
         };
@@ -123,13 +135,13 @@ class ISocket extends IObject {
 
     }
     link(targetSocket) {
-        this.links.push(targetSocket);
+        this.#links.push(targetSocket);
     }
     unlink(targetSocket) {
-        this.links = this.links.filter(link => link != targetSocket);
+        this.#links = this.#links.filter(link => link != targetSocket);
     }
-    unlinkAll() {
-        this.links = [];
+    clear() {
+        this.#links = [];
     }
 
 
@@ -148,10 +160,10 @@ class ISocket extends IObject {
             }
 
             links.push({
-                sourceNodeUUID: this.getNode().getUUID(),
-                sourceSocketUUID: this.getUUID(),
-                targetNodeUUID: link.getNode().getUUID(),
-                targetSocketUUID: link.getUUID()
+                sourceNode: this.outer.uuid,
+                sourceSocket: this.uuid,
+                targetNode: link.outer.uuid,
+                targetSocket: link.uuid
             });
 
         });

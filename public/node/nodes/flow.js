@@ -442,40 +442,32 @@ class Value extends INode {
     static meta = {
         className: "INode.Event.Value",
         displayName: "Make Float",
-        canCache: false
+        canCache: false,
     }
 
     constructor({ uuid, outer }) {
         super({ uuid, outer });
-        this.outputs = {
-            "value0": new FloatSocket({
-                uuid: "value0",
-                name: "float",
-                outer: this,
-                type: ISocket.TYPES.OUTPUT
-            })
-        };
-        this.value = {
-            "data0": new IProperty({
-                uuid: "data0",
-                name: "Value",
-                outer: this,
-                value: 0,
-                type: PRIMITIVE_TYPES.FLOAT
-            })
-        }
+    }
+
+    main() {
+
+        this.addOutputSocket("value0", FloatSocket);
+        this.propertyManager.addProperty("value", PRIMITIVE_TYPES.FLOAT, 0);
+
+        super.main();
+
     }
 
     execute() {
 
-        let value = this.value.data0.getValue();
+        let value = this.propertyManager.getProperty("value").value;
         if(!isNaN(value)) {
             value = parseFloat(value);
         }
         else {
             value = null;
         }
-        this.outputs.value0.setValue(value);
+        this.getOutputSocket("value0").setValue(value);
         
     }
 

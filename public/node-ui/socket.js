@@ -30,30 +30,40 @@ class UISocket extends H12 {
         const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
         return <>
-            <div class="px-[8px] relative">
+            <div class="px-[8px] relative" onmouseover={ this.#createTargetSocket } onmouseleave={ this.#clearTargetSocket }>
                 <label style="font-size: 10px;">{ name }</label>
-                <button id="btn" style={ `background-color: ${color};` } class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` } onclick={ this.clearLinks } onmouseleave={ this.removeActiveHoverSocket } onmouseover={ this.createActiveHoverSocket } onmousedown={ this.createActiveSocket }></button>
+                <button
+                    id="btn"
+                    style={ `background-color: ${color};` } 
+                    class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` }
+                    onclick={ this.#clearAllInputLinks }
+                    onmousedown={ this.#createSourceSocket }>
+                </button>
             </div>
         </>;
 
     }
 
-    clearLinks() {
+    #clearAllInputLinks() {
 
         if(this.#isocket.type != ISocket.TYPES.INPUT) return;
-        dispatcher.call("clearLinkedSockets", this);
-
+        dispatcher.emit("clearAllInputLinks", this);
+        
     }
-    removeLinks() {
 
+    clearLinks() {
         this.links.forEach(link => {
             link.remove();
         });
         this.links = [];
-        
     }
+
     getPinElement() {
         return this.element.btn;
+    }
+
+    get isocket() {
+        return this.#isocket;
     }
 
     getUINode() {
@@ -71,19 +81,18 @@ class UISocket extends H12 {
         this.links.push(link);
     }
 
-    createActiveHoverSocket() {
-        if(this.#isocket.type == ISocket.TYPES.INPUT) {
-            dispatcher.call("createActiveHoverSocket", this);
-        }
-    }
-    
-    removeActiveHoverSocket() {
-        if(this.#isocket.type == ISocket.TYPES.INPUT) {
-            dispatcher.call("removeActiveHoverSocket", this);
-        }
-    }
 
-    createActiveSocket(event) {
+    #createTargetSocket() {
+        if(this.#isocket.type == ISocket.TYPES.INPUT) {
+            dispatcher.emit("createTargetSocket", this);
+        }
+    }
+    #clearTargetSocket() {
+        if(this.#isocket.type == ISocket.TYPES.INPUT) {
+            dispatcher.emit("clearTargetSocket", this);
+        }
+    }
+    #createSourceSocket(event) {
 
         if(this.#isocket.type !== ISocket.TYPES.OUTPUT) {
             return;
@@ -94,11 +103,12 @@ class UISocket extends H12 {
 
         const reference = this;
         const socket = this.root;
+        const pin = this.getPinElement();
 
         if(socket) {
 
-            dispatcher.call("createHelperLine", reference);
-            dispatcher.call("createActiveSocket", reference);
+            dispatcher.emit("createSocketHelper", reference);
+            dispatcher.emit("createSourceSocket", reference);
     
             window.addEventListener("mousemove", onDragMove);
             window.addEventListener("mouseup", onDragStop);
@@ -108,7 +118,12 @@ class UISocket extends H12 {
                 event.stopPropagation();
                 event.preventDefault();
 
-                dispatcher.call("updateHelperLine", { socket: reference, event: event });
+                dispatcher.emit("updateSocketHelper", {
+                    socketId: reference.id,
+                    socketPin: pin,
+                    x: event.clientX,
+                    y: event.clientY
+                });
         
             };
     
@@ -120,13 +135,12 @@ class UISocket extends H12 {
                 window.removeEventListener("mousemove", onDragMove);
                 window.removeEventListener("mouseup", onDragStop);
     
-                dispatcher.call("removeHelperLine", reference);
-                dispatcher.call("removeActiveSocket", reference);
+                dispatcher.emit("clearSocketHelper", reference.id);
+                dispatcher.emit("clearSourceSocket", reference);
         
             };
     
         }
-
 
     }
 

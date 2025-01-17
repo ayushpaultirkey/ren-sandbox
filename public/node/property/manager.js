@@ -25,7 +25,7 @@ class IPropertyManager extends IObject {
                 const type = property.type;
                 const value = property.value;
                 const custom = property.custom;
-
+                
                 this.addProperty(name, type, value, custom);
             }
         }
@@ -63,6 +63,8 @@ class IPropertyManager extends IObject {
             });
             this.#properties.set(name, property);
 
+            this.dispatcher.emit("propertyAdded", property);
+
         }
         catch(error) {
             console.error(error);
@@ -70,7 +72,11 @@ class IPropertyManager extends IObject {
 
     }
     removeProperty(name) {
-        return this.#properties.delete(name);
+        if(this.#properties.delete(name)) {
+            this.dispatcher.emit("propertyRemoved", name);
+            return true;
+        }
+        return false;
     }
     getProperty(name) {
         try {
@@ -83,7 +89,7 @@ class IPropertyManager extends IObject {
             console.error(error);
         };
     }
-    setProperty(name, value) {
+    setProperty(name, value, addIfNotExist = false) {
         try {
             if(!this.#properties.has(name)) {
                 throw new Error(`PropertyManager: Property "${name}" does not exist`);

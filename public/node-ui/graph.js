@@ -10,6 +10,8 @@ import Drag from "./drag.js";
 import { UINode } from "./node.js";
 import { ZoomHandler } from "./handler/zoom-handler.js";
 import { DragHandler } from "./handler/drag-handler.js";
+import { UISocket } from "./socket.js";
+import { Link } from "./link.js";
 
 
 class UIGraph extends H12 {
@@ -27,9 +29,14 @@ class UIGraph extends H12 {
         
         super();
 
-        this.activeSocket = null;
-        this.activeHoverSocket = null;
-        this.helperLinks = {};
+        /** @type {UISocket} */
+        this.sourceSocket = null;
+
+        /** @type {UISocket} */
+        this.targetSocket = null;
+
+        /** @type {Map<string, SVGLineElement>} */
+        this.helperLinks = new Map();
 
         this.mouseLocation = { x: 0, y: 0 };
 
@@ -37,9 +44,6 @@ class UIGraph extends H12 {
 
     main(args = {}) {
 
-        // this.registerActiveSocket();
-        // this.registerHelperLine();
-        // this.registerActiveHoverSocket();
         if(!this.#igraph) {
             return;
         };
@@ -48,6 +52,7 @@ class UIGraph extends H12 {
         this.#registerDispatchers();
         
         this.#displayNodes();
+        this.#displayLinks();
 
 
         const { frame } = this.element;
@@ -78,8 +83,29 @@ class UIGraph extends H12 {
     }
     #displayNode(node) {
         this.set("{nodes}++", <>
-            <node args alias={ UINode } iobject={ node }></node>
+            <node args alias={ UINode } id={ node.uuid } iobject={ node }></node>
         </>);
+    }
+    #displayLinks() {
+        queueMicrotask(() => {
+            const links = this.#igraph.links;
+            for(const link of links) {
+                this.#displayLink(link);
+            }
+        })
+    }
+    #displayLink(link = {}) {
+        
+        const uiSourceNode = this.child[link.sourceNode];
+        const uiTargetNode = this.child[link.targetNode];
+
+        const uiSourceSocket = uiSourceNode.child[link.sourceSocket];
+        const uiTargetSocket = uiTargetNode.child[link.targetSocket];
+
+        const uiLink = new Link({ source: uiSourceSocket, target: uiTargetSocket, graph: this });
+        const uiLine = uiLink.create();
+        this.element.backGraph.append(uiLine);
+
     }
 
     #registerHandlers() {
@@ -95,7 +121,13 @@ class UIGraph extends H12 {
     }
     
     #registerDispatchers() {
+
         this.#registerNodeDispatchers();
+        this.registerActiveSocket();
+        this.registerHelperLine();
+
+        this.registerTargetSocket();
+
     }
     #registerNodeDispatchers() {
         dispatcher.on("addNode", (nodeClass) => {
@@ -112,9 +144,13 @@ class UIGraph extends H12 {
         if(!this.args.iobject) return <><label>Invalid graph</label></>;
         this.#igraph = this.args.iobject;
 
-        const x = Math.round(this.#igraph.custom.x || 0);
-        const y = Math.round(this.#igraph.custom.y || 0);
-        const z = VIEWPORT.zoom = this.#igraph.custom.z || 1;
+        if(this.#igraph.custom.x == null) this.#igraph.custom.x = 0;
+        if(this.#igraph.custom.y == null) this.#igraph.custom.y = 0;
+        if(this.#igraph.custom.z == null) this.#igraph.custom.z = 1;
+
+        const x = Math.round(this.#igraph.custom.x);
+        const y = Math.round(this.#igraph.custom.y);
+        const z = VIEWPORT.zoom = this.#igraph.custom.z;
 
         return <>
             <div class="absolute" style={ `left: ${x}px; top: ${y}px; transform: scale(${z});` }>
@@ -256,23 +292,25 @@ class UIGraph extends H12 {
 
     // }
 
-    // clearUINodeSockets(uiSocket) {
+    clearUINodeSockets(uiSocket) {
 
-    //     const isocket = uiSocket.getISocket();
-    //     if(!isocket) return;
+        if(!uiSocket) return;
 
-    //     const success = this.igraph.clearSocketLinks(isocket);
-    //     if(!success) {
-    //         console.error("Failed to clear socket");
-    //         return false;
-    //     };
+        const isocket = uiSocket.isocket;
+        if(!isocket) return;
 
-    //     uiSocket.removeLinks();
-    //     console.log("cleared socket");
+        const success = this.#igraph.clearSocketLinks(isocket);
+        if(!success) {
+            console.error("Failed to clear socket");
+            return false;
+        };
 
-    //     return true;
+        uiSocket.removeLinks();
+        console.log("cleared socket");
 
-    // }
+        return true;
+
+    }
 
     createSVG(id) {
         return <>
@@ -286,112 +324,146 @@ class UIGraph extends H12 {
             </svg>
         </>
     }
-    // registerHelperLine() {
+    registerHelperLine() {
 
-    //     dispatcher.bind("createHelperLine", (e, socket) => {
+        const { topGraph } = this.element;
 
-    //         const socketID = socket.id;
-    //         const { topGraph } = this.element;
+        dispatcher.on("createSocketHelper", (socket) => {
 
-    //         let color = "#3b82f6";
-    //         const isocket = socket.isocket;
-    //         if(isocket) {
-    //             const meta = isocket.getMeta();
-    //             if(meta) {
-    //                 color = meta.displayColor;
-    //             }
-    //         }
+            const socketID = socket.id;
+
+            let color = "#3b82f6";
+            const isocket = socket.isocket;
+            if(isocket) {
+                const meta = isocket.meta;
+                if(meta) {
+                    color = meta.displayColor;
+                }
+            }
     
-    //         const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style={ `stroke:${color};stroke-width:2;` } class="path"></line></>;
+            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style={ `stroke:${color};stroke-width:2;` } class="path"></line></>;
         
-    //         topGraph.append(line);
-    //         this.helperLinks[socketID] = line;
+            topGraph.append(line);
+            this.helperLinks.set(socketID, line);
 
-    //     });
+        });
+        dispatcher.on("updateSocketHelper", ({ socketId, socketPin, x, y }) => {
 
-    //     dispatcher.bind("updateHelperLine", (e, { socket, event }) => {
+            const line = this.helperLinks.get(socketId);
+            if(line) {
 
-    //         const scale = VIEWPORT.zoom;
-    //         const socketID = socket.id;
-    //         const socketRoot = socket.getPinElement();
+                const scale = VIEWPORT.zoom;
+    
+                const { x: parentX, y: parentY } = this.root.getBoundingClientRect();
+                const { x: socketX, y: socketY, width, height } = socketPin.getBoundingClientRect();
+    
+                const x1 = (socketX - parentX + width / 2.5) / scale;
+                const y1 = (socketY - parentY + height / 2.5) / scale;
+                const x2 = (x - parentX) / scale;
+                const y2 = (y - parentY) / scale;
 
-    //         const { x: parentX, y: parentY } = this.root.getBoundingClientRect();
-    //         const { x, y, width, height } = socketRoot.getBoundingClientRect();
+                line.setAttributeNS(null, "x1", x1);
+                line.setAttributeNS(null, "y1", y1);
+                line.setAttributeNS(null, "x2", x2);
+                line.setAttributeNS(null, "y2", y2);
 
-    //         const x1 = (x - parentX + width / 2) / scale;
-    //         const y1 = (y - parentY + height / 2) / scale;
+            }
 
-    //         const line = this.helperLinks[socketID];
-    //         if(line) {
+        });
+        dispatcher.on("clearSocketHelper", (socketId) => {
 
-    //             line.setAttributeNS(null, "x1", x1);
-    //             line.setAttributeNS(null, "y1", y1);
-    //             line.setAttributeNS(null, "x2", (event.clientX - parentX) / scale);
-    //             line.setAttributeNS(null, "y2", (event.clientY - parentY) / scale);
+            const helperLink = this.helperLinks.get(socketId);
 
-    //         }
+            if(!helperLink) return;
+            helperLink.remove();
 
-    //     });
-    //     dispatcher.bind("removeHelperLine", (e, socket) => {
+            this.helperLinks.delete(socketId);
 
-    //         const socketID = socket.id;
-    //         const helperLink = this.helperLinks[socketID];
+        });
+    }
+    registerActiveSocket() {
 
-    //         if(!helperLink) return;
-    //         helperLink.remove();
+        dispatcher.on("createSourceSocket", (socket) => {
+            this.sourceSocket = socket;
+            console.warn(`Source socket set to ${socket.id}`);
+        });
+        dispatcher.on("clearSourceSocket", (socket) => {
 
-    //         delete this.helperLinks[socketID];
+            const osocket = this.sourceSocket;
+            const isocket = this.targetSocket;
 
-    //     });
-    // }
-    // registerActiveSocket() {
+            this.sourceSocket = null;
+            this.targetSocket = null;
 
+            if(isocket && osocket) {
+                this.#igraph.linkSockets(osocket.isocket, isocket.isocket);
+            }
 
-    //     dispatcher.bind("createActiveSocket", (e, socket) => {
-    //         this.activeSocket = socket;
-    //         console.log(this.activeSocket);
-    //     });
+        });
+        dispatcher.on("clearAllInputLinks", (socket) => {
 
-    //     dispatcher.bind("removeActiveSocket", (e, socket) => {
+            if(!socket) return;
 
-    //         const osocket = this.activeSocket;
-    //         const isocket = this.activeHoverSocket;
+            const isocket = socket.isocket;
+            if(!isocket) return;
 
-    //         this.activeSocket = null;
-    //         this.activeHoverSocket = null;
+            const success = this.#igraph.clearAllSocketLinks(isocket);
+            if(!success) {
+                console.error("Failed to clear socket");
+                return;
+            };
 
-    //         if(isocket && osocket) {
-    //             this.linkUINodes(osocket.getUINode(), osocket, isocket.getUINode(), isocket);
-    //         }
+            socket.clearLinks();
+            console.warn("Cleared all input links");
 
-    //     });
+        });
+        this.#igraph.dispatcher.on("socketsLinked", ({ sourceNode, sourceSocket, targetNode, targetSocket }) => {
+            this.#displayLink({
+                sourceNode: sourceNode,
+                sourceSocket: sourceSocket,
+                targetNode: targetNode,
+                targetSocket: targetSocket,
+            });
+        });
+        
 
-    //     dispatcher.bind("clearLinkedSockets", (e, socket) => {
-    //         if(!socket) return;
-    //         this.clearUINodeSockets(socket);
-    //     });
-
-    // }
-    // registerActiveHoverSocket() {
-    //     dispatcher.bind("createActiveHoverSocket", (e, socket) => {
-    //         if(this.activeSocket) {
-    //             this.activeHoverSocket = socket;
-    //             console.log(this.activeHoverSocket);
-    //         }
-    //     });
-    //     dispatcher.bind("removeActiveHoverSocket", (e, socket) => {
-    //         if(this.activeSocket) {
-    //             this.activeHoverSocket = null;
-    //             console.log(this.activeHoverSocket);
-    //         }
-    //     });
-    // }
+    }
+    registerTargetSocket() {
+        dispatcher.on("createTargetSocket", (socket) => {
+            if(this.sourceSocket) {
+                this.targetSocket = socket;
+                console.log(`Target socket set to ${socket.id}`);
+            }
+        });
+        dispatcher.on("clearTargetSocket", (socket) => {
+            if(this.sourceSocket) {
+                this.targetSocket = null;
+                console.log(`Target socket cleared`);
+            }
+        });
+    }
 
     destroy() {
 
         if(this.#igraph) {
+
             dispatcher.clear("addNode");
+
+            dispatcher.clear("createSocketHelper");
+            dispatcher.clear("updateSocketHelper");
+            dispatcher.clear("clearSocketHelper");
+
+            dispatcher.clear("createSourceSocket");
+            dispatcher.clear("clearSourceSocket");
+            
+            dispatcher.clear("createTargetSocket");
+            dispatcher.clear("clearTargetSocket");
+
+            dispatcher.clear("clearAllInputLinks");
+
             this.#igraph.dispatcher.clear("nodeAdded");
+            this.#igraph.dispatcher.clear("socketsLinked");
+
         }
         if(this.#zoomHandler) {
             this.#zoomHandler.unregister();

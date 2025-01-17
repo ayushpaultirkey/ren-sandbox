@@ -1,6 +1,7 @@
 import { IObject } from "./object.js";
 import { IGraphSet } from "./graphset.js";
-import { Begin } from "./nodes/flow.js"
+import "./nodes/value.js";
+import "./nodes/execution.js";
 
 class IEngine extends IObject {
 

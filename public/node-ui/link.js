@@ -22,7 +22,7 @@ class Link {
         const isocket = this.source.isocket;
         if(!isocket) return color;
 
-        const meta = isocket.getMeta();
+        const meta = isocket.meta;
         if(!meta) return color;
         if(!meta.displayColor) return color;
 
