@@ -22,10 +22,7 @@ class UIPropertyManager extends H12 {
     constructor() {
         super();
     }
-    main() {
-
-
-    }
+    
     refresh() {
         
         const { properties: uiProperties } = this.key;
@@ -36,15 +33,15 @@ class UIPropertyManager extends H12 {
         }
 
         const properties = this.#ipropertyManager.properties;
-        for(const [name, property] of properties) {
+        for(const [uuid, property] of properties) {
 
             const propertyClass = PROPERTY_REGISTRY[property.type];
             if(!propertyClass) continue;
 
             uiProperties(<>
                 <div class="flex flex-row">
-                    <property args alias={ propertyClass } id={ name } iobject={ property }>
-                        <button class="text-red-500 text-xs px-2 pb-1" onclick={ () => { this.removeProperty(name) } }>&times;</button>
+                    <property args alias={ propertyClass } id={ uuid } iobject={ property }>
+                        <button class="text-red-500 text-xs px-2 pb-1" onclick={ () => { this.removeProperty(uuid) } }>&times;</button>
                     </property>
                 </div>
             </>, "x++");
@@ -52,14 +49,14 @@ class UIPropertyManager extends H12 {
         }
 
     }
-    removeProperty(name) {
+    removeProperty(uuid) {
 
         if(!this.#ipropertyManager) {
             console.error("Property manager not found");
             return;
         }
 
-        this.#ipropertyManager.removeProperty(name);
+        this.#ipropertyManager.removeProperty(uuid);
 
     }
     addProperty() {
@@ -71,7 +68,7 @@ class UIPropertyManager extends H12 {
 
         const { box, type } = this.element;
         
-        this.#ipropertyManager.addProperty(box.value, type.value);
+        this.#ipropertyManager.addProperty(null, box.value, type.value);
         box.value = "";
 
     }
@@ -82,7 +79,7 @@ class UIPropertyManager extends H12 {
                 <label>{ this.args.title || "Properties" }:</label>
                 <div class="w-full flex flex-row overflow-hidden bg-zinc-300 text-xs text-zinc-800">
                     <input type="text" id="box" class="w-full bg-transparent" />
-                    <select id="type" class="bg-transparent">
+                    <select id="type" class="bg-transparent hover:bg-zinc-400">
                         {
                             ... Object.keys(PROPERTY_REGISTRY).map(key => {
                                 return <><option value={ key }>{ key }</option></>

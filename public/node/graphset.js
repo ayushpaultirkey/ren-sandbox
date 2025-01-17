@@ -17,10 +17,11 @@ class IGraphSet extends IObject {
     /** @type {IPropertyManager} */
     #propertyManager = null;
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = null } = {}) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "Graph Set" } = {}) {
 
         super({ uuid, outer, name });
 
+        this.custom = {};
         this.#propertyManager = new IPropertyManager({
             outer: this,
             properties: {}
@@ -35,8 +36,11 @@ class IGraphSet extends IObject {
         return this.#propertyManager;
     }
 
-    main({ properties = {}, graphs = {} } = {}) {
+    main({ properties = {}, graphs = {}, custom = {} } = {}) {
         try {
+
+            this.custom = custom || {};
+            this.custom.name = custom.name || this.name;
 
             this.#propertyManager.main(properties);
     
@@ -70,7 +74,7 @@ class IGraphSet extends IObject {
         }
     }
 
-    addGraph(graphUUID, graphData = { name: null, nodes: {}, links: [], properties: {}, custom: {} }) {
+    addGraph(graphUUID, graphData = { nodes: {}, links: [], properties: {}, custom: {} }) {
         try {
 
             const uuid = graphUUID || crypto.randomUUID();
@@ -82,12 +86,12 @@ class IGraphSet extends IObject {
                 throw new Error(`IGraphSet: Graph "${uuid}" already exists`);
             }
 
-            const graph = new IGraph({ uuid: uuid, outer: this, name: graphData.name });
+            const graph = new IGraph({ uuid: uuid, outer: this });
             graph.main({
                 nodes: graphData.nodes,
                 links: graphData.links,
                 properties: graphData.properties,
-                custom: graphData.custom
+                custom: graphData.custom,
             });
             this.#graphs.set(uuid, graph);
 
@@ -116,7 +120,11 @@ class IGraphSet extends IObject {
     export() {
 
         const graphs = this.#graphs;
-        const data = { graphs: {}, properties: {}, name: this.name };
+        const data = {
+            graphs: {},
+            properties: {},
+            custom: this.custom
+        };
         
         for(const [uuid, graph] of graphs) {
             const exportData = graph.export();

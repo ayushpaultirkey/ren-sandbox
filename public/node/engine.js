@@ -22,7 +22,7 @@ class IEngine extends IObject {
         return this.#graphSets;
     }
     
-    addGraphSet(graphSetUUID, graphSetData = { name: null, properties: {}, graphs: {} }) {
+    addGraphSet(graphSetUUID, graphSetData = { properties: {}, graphs: {}, custom: {} }) {
         try {
 
             const uuid = graphSetUUID || crypto.randomUUID();
@@ -33,7 +33,6 @@ class IEngine extends IObject {
             const graphSet = new IGraphSet({
                 uuid: uuid,
                 outer: this,
-                name: graphSetData.name
             });
             const success = graphSet.main({
                 properties: graphSetData.properties || {},

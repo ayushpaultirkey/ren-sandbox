@@ -19,8 +19,6 @@ class INode extends IObject {
 
         super({ uuid, outer });
 
-        this.value = {};
-
         /** @type {Object.<string, ISocket>} */
         this.inputs = {};
 
@@ -46,9 +44,9 @@ class INode extends IObject {
             if(custom) {
                 this.custom = custom;
             }
-            for(const name in properties) {
-                const property = properties[name];
-                this.#propertyManager.setProperty(name, property.value);
+            for(const uuid in properties) {
+                const property = properties[uuid];
+                this.#propertyManager.setProperty(uuid, property.value);
             }
             return true;
         }
@@ -57,60 +55,47 @@ class INode extends IObject {
         }
     }
     
-    setValues(values) {
-        for(const valueUUID in values) {
-
-            const value = values[valueUUID];
-
-            const valueField = this.value[valueUUID];
-            if(!valueField) continue;
-            
-            valueField.setValue(value);
-
-        }
-    }
-    
-    addInputSocket(socketUUID, socketName, socketClass) {
+    addInputSocket(uuid, name, socketClass) {
         
         if(!socketClass) return null;
-        if(this.inputs[socketUUID]) return null;
+        if(this.inputs[uuid]) return null;
 
         const socket = new socketClass({
-            uuid: socketUUID,
+            uuid: uuid,
             outer: this,
-            name: socketName,
+            name: name,
             type: ISocket.TYPES.INPUT
         });
-        this.inputs[socketUUID] = socket;
-        
+        this.inputs[uuid] = socket;
+
         return socket;
 
     }
-    addOutputSocket(socketUUID, socketName, socketClass) {
+    addOutputSocket(uuid, name, socketClass) {
 
         if(!socketClass) return null;
-        if(this.outputs[socketUUID]) return null;
+        if(this.outputs[uuid]) return null;
 
         const socket = new socketClass({
-            uuid: socketUUID,
+            uuid: uuid,
             outer: this,
-            name: socketName,
+            name: name,
             type: ISocket.TYPES.OUTPUT
         });
-        this.outputs[socketUUID] = socket;
+        this.outputs[uuid] = socket;
 
         return socket;
         
     }
 
-    getInputSocket(socketUUID) {
-        return this.inputs[socketUUID];
+    getInputSocket(uuid) {
+        return this.inputs[uuid];
     }
-    getOutputSocket(socketUUID) {
-        return this.outputs[socketUUID];
+    getOutputSocket(uuid) {
+        return this.outputs[uuid];
     }
-    getSocket(socketUUID) {
-        return this.getInputSocket(socketUUID) || this.getOutputSocket(socketUUID);
+    getSocket(uuid) {
+        return this.getInputSocket(uuid) || this.getOutputSocket(uuid);
     }
 
 

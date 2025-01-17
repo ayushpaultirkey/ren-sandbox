@@ -5,7 +5,7 @@ import { ISocket } from "./socket.js";
 
 class IGraph extends IObject {
 
-    /** @type {IObject.meta} */
+    /** @type {{ className: string, displayName: string}} */
     static meta = {
         className: "IObject.IGraph",
         displayName: "Graph"
@@ -20,7 +20,7 @@ class IGraph extends IObject {
     /** @type {[{ sourceNode: string, sourceSocket: string, targetNode: string, targetSocket: string }]} */
     #links = [];
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = null } = {}) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "Graph" } = {}) {
 
         super({ uuid, outer, name });
         this.custom = {};
@@ -40,19 +40,10 @@ class IGraph extends IObject {
 
     main({ properties = {}, nodes = {}, links = [], custom = {} } = {}) {
 
-        if(custom) {
-            this.custom = custom;
-        }
+        this.custom = custom || {};
+        this.custom.name = custom.name || this.name;
 
-        for(const name in properties) {
-            const property = properties[name];
-
-            const type = property.type;
-            const value = property.value;
-            const custom = property.custom;
-
-            this.#propertyManager.addProperty(name, type, value, custom);
-        }
+        this.#propertyManager.main(properties);
 
         for(const uuid in nodes) {
             const node = nodes[uuid];
@@ -240,7 +231,13 @@ class IGraph extends IObject {
     }
 
     getEntryNode() {
-        return Object.values(this.nodes).find(node => node.isEntry === true);
+        let node = null;
+        this.#nodes.forEach((value) => {
+            if(value.isEntry) {
+                node = value;
+            }
+        });
+        return node;
     }
 
     customExport() { return {}; }
@@ -253,7 +250,7 @@ class IGraph extends IObject {
             nodes: {},
             links: [],
             properties: this.#propertyManager.export(),
-            custom: this.custom
+            custom: this.custom,
         };
 
         for(const [uuid, node] of this.#nodes) {

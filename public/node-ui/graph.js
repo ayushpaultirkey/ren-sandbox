@@ -1,15 +1,15 @@
 import H12 from "@library/h12.js";
-import { dispatcher } from "./dispatcher.js";
+import { dispatcher } from "../editor/dispatcher.js";
 
 import { IGraph } from "../node/graph.js";
 //import { INode } from "../node/node.js";
 //import { UINode } from "./node.js";
 //import { Link } from "./link.js";
-import VIEWPORT from "./viewport.js";
-import Drag from "./drag.js";
+import VIEWPORT from "../editor/viewport.js";
+//import Drag from "./drag.js";
 import { UINode } from "./node.js";
-import { ZoomHandler } from "./handler/zoom-handler.js";
-import { DragHandler } from "./handler/drag-handler.js";
+import { ZoomHandler } from "../editor/handler/zoom-handler.js";
+import { DragHandler } from "../editor/handler/drag-handler.js";
 import { UISocket } from "./socket.js";
 import { Link } from "./link.js";
 

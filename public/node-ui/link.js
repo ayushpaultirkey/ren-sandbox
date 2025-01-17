@@ -1,4 +1,4 @@
-import VIEWPORT from "./viewport";
+import VIEWPORT from "../editor/viewport";
 
 class Link {
     constructor({ source, target, graph } = {}) {

@@ -1,6 +1,6 @@
 import "@style/main.css";
 import H12 from "@library/h12";
-import { dispatcher } from "./dispatcher.js";
+import { dispatcher } from "../editor/dispatcher.js";
 
 import { ISocket } from "../node/socket";
 

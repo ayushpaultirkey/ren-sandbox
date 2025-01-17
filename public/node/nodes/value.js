@@ -18,7 +18,7 @@ class MakeFloat extends INode {
     main(args) {
 
         this.addOutputSocket("value0", "value", FloatSocket);
-        this.propertyManager.addProperty("value", PRIMITIVE_TYPES.FLOAT, 0);
+        this.propertyManager.addProperty("value0", "value", PRIMITIVE_TYPES.FLOAT, 0);
 
         super.main(args);
 

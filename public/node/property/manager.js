@@ -19,14 +19,17 @@ class IPropertyManager extends IObject {
 
     main(properties = {}) {
         try {
-            for(const name in properties) {
-                const property = properties[name];
+            for(const uuid in properties) {
+
+                const property = properties[uuid];
 
                 const type = property.type;
+                const name = property.name;
                 const value = property.value;
                 const custom = property.custom;
                 
-                this.addProperty(name, type, value, custom);
+                this.addProperty(uuid, name, type, value, custom);
+
             }
         }
         catch(error) {
@@ -38,8 +41,10 @@ class IPropertyManager extends IObject {
         return this.#properties;
     }
 
-    addProperty(name, type, value = null, custom = {}) {
+    addProperty(uuid, name, type, value = null, custom = {}) {
         try {
+
+            const newUUID = uuid || crypto.randomUUID();
 
             if(!name) {
                 throw new Error(`PropertyManager: Property name is required`);
@@ -54,14 +59,14 @@ class IPropertyManager extends IObject {
             }
     
             const property = new IProperty({
-                uuid: name,
+                uuid: newUUID,
                 outer: this,
                 name: name,
                 type: finalType,
                 value: value,
                 custom: custom
             });
-            this.#properties.set(name, property);
+            this.#properties.set(newUUID, property);
 
             this.dispatcher.emit("propertyAdded", property);
 
@@ -71,30 +76,30 @@ class IPropertyManager extends IObject {
         };
 
     }
-    removeProperty(name) {
-        if(this.#properties.delete(name)) {
-            this.dispatcher.emit("propertyRemoved", name);
+    removeProperty(uuid) {
+        if(this.#properties.delete(uuid)) {
+            this.dispatcher.emit("propertyRemoved", uuid);
             return true;
         }
         return false;
     }
-    getProperty(name) {
+    getProperty(uuid) {
         try {
-            if(!this.#properties.has(name)) {
-                throw new Error(`PropertyManager: Property "${name}" does not exist`);
+            if(!this.#properties.has(uuid)) {
+                throw new Error(`PropertyManager: Property "${uuid}" does not exist`);
             }
-            return this.#properties.get(name);
+            return this.#properties.get(uuid);
         }
         catch(error) {
             console.error(error);
         };
     }
-    setProperty(name, value, addIfNotExist = false) {
+    setProperty(uuid, value) {
         try {
-            if(!this.#properties.has(name)) {
-                throw new Error(`PropertyManager: Property "${name}" does not exist`);
+            if(!this.#properties.has(uuid)) {
+                throw new Error(`PropertyManager: Property "${uuid}" does not exist`);
             }
-            const property = this.getProperty(name);
+            const property = this.getProperty(uuid);
             property.value = value;
         }
         catch(error) {

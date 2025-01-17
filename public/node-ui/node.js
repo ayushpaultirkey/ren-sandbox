@@ -1,11 +1,11 @@
 import H12 from "@library/h12.js";
-import { dispatcher } from "./dispatcher.js";
-import Drag from "./drag";
+import { dispatcher } from "../editor/dispatcher.js";
+//import Drag from "./drag";
 
 import { INode } from "../node/node";
 import { ISocket } from "../node/socket";
 import { UISocket } from "./socket";
-import { DragHandler } from "./handler/drag-handler.js";
+import { DragHandler } from "../editor/handler/drag-handler.js";
 import { UIProperty, PROPERTY_REGISTRY } from "./property.js";
 
 class UINode extends H12 {
@@ -126,7 +126,7 @@ class UINode extends H12 {
             if(!propertyClass) continue;
 
             uiProperties(<>
-                <property args alias={ propertyClass } iobject={ property }></property>
+                <property args id={ uuid } alias={ propertyClass } iobject={ property }></property>
             </>, "x++");
 
         }

@@ -1,8 +1,8 @@
 import H12 from "@library/h12.js";
-import { dispatcher } from "./dispatcher.js";
+import { dispatcher } from "../editor/dispatcher.js";
 
 import { NODES_REGISTRY } from "../node/node.js";
-import VIEWPORT from "./viewport.js";
+import VIEWPORT from "../editor/viewport.js";
 
 class Category extends H12 {
 
