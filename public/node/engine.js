@@ -22,27 +22,27 @@ class IEngine extends IObject {
         return this.#graphSets;
     }
     
-    addGraphSet(graphSetUUID, graphSetData = { properties: {}, graphs: {}, custom: {} }) {
+    addGraphSet(uuid, data = { properties: {}, graphs: {}, custom: {} }) {
         try {
 
-            const uuid = graphSetUUID || crypto.randomUUID();
-            if(this.#graphSets.has(uuid)) {
-                throw new Error(`Graph set "${uuid}" already exists`);
+            const newUUID = uuid || crypto.randomUUID();
+            if(this.#graphSets.has(newUUID)) {
+                throw new Error(`Graph set "${newUUID}" already exists`);
             }
 
             const graphSet = new IGraphSet({
-                uuid: uuid,
+                uuid: newUUID,
                 outer: this,
             });
             const success = graphSet.main({
-                properties: graphSetData.properties || {},
-                graphs: graphSetData.graphs || {}
+                properties: data.properties || {},
+                graphs: data.graphs || {}
             });
             if(!success) {
-                throw new Error(`Graph set "${uuid}" could not be created`);
+                throw new Error(`Graph set "${newUUID}" could not be created`);
             };
 
-            this.#graphSets.set(uuid, graphSet);
+            this.#graphSets.set(newUUID, graphSet);
 
             this.dispatcher.emit("graphSetAdded", graphSet);
 

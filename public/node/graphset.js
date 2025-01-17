@@ -104,8 +104,11 @@ class IGraphSet extends IObject {
             console.error(error);
         }
     }
-    removeGraph(graphUUID) {
-        if(this.#graphs.delete(graphUUID)) {
+    removeGraph(uuid) {
+        const graph = this.#graphs.get(uuid);
+        if(graph) {
+            graph.destroy();
+            this.#graphs.delete(uuid);
             this.dispatcher.emit("graphRemoved");
             return true;
         }

@@ -25,8 +25,6 @@ class INode extends IObject {
         /** @type {Object.<string, ISocket>} */
         this.outputs = {};
         
-        /** @type {Object.<string, IProperty>} */
-        this.properties = {};
         this.custom = {};
 
         this.isEntry = false;
@@ -55,7 +53,7 @@ class INode extends IObject {
         }
     }
     
-    addInputSocket(uuid, name, socketClass) {
+    addInput(uuid, name, socketClass) {
         
         if(!socketClass) return null;
         if(this.inputs[uuid]) return null;
@@ -71,7 +69,7 @@ class INode extends IObject {
         return socket;
 
     }
-    addOutputSocket(uuid, name, socketClass) {
+    addOutput(uuid, name, socketClass) {
 
         if(!socketClass) return null;
         if(this.outputs[uuid]) return null;
@@ -88,14 +86,14 @@ class INode extends IObject {
         
     }
 
-    getInputSocket(uuid) {
+    getInput(uuid) {
         return this.inputs[uuid];
     }
-    getOutputSocket(uuid) {
+    getOutput(uuid) {
         return this.outputs[uuid];
     }
     getSocket(uuid) {
-        return this.getInputSocket(uuid) || this.getOutputSocket(uuid);
+        return this.getInput(uuid) || this.getOutput(uuid);
     }
 
 

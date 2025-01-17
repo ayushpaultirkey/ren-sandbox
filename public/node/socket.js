@@ -1,3 +1,4 @@
+import { INode } from "./node.js";
 import { IObject } from "./object.js";
 
 class ISocket extends IObject {
@@ -88,7 +89,7 @@ class ISocket extends IObject {
         this.#value = value;
     }
 
-
+    /** @returns {INode} */
     getNode() {
         return this.outer;
     }

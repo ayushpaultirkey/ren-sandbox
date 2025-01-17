@@ -47,6 +47,8 @@ class Link {
 
         const { source, target, graph, fOnMouseDown } = this;
 
+        console.log(source, target)
+
         source.addLink(this);
         target.addLink(this);
 

@@ -99,8 +99,18 @@ class UIGraph extends H12 {
         const uiSourceNode = this.child[link.sourceNode];
         const uiTargetNode = this.child[link.targetNode];
 
+        if(!uiSourceNode || !uiTargetNode) {
+            console.error("Invalid source or target nodes");
+            return;
+        };
+
         const uiSourceSocket = uiSourceNode.child[link.sourceSocket];
         const uiTargetSocket = uiTargetNode.child[link.targetSocket];
+
+        if(!uiSourceSocket || !uiTargetSocket) {
+            console.error("Invalid source or target socket");
+            return;
+        };
 
         const uiLink = new Link({ source: uiSourceSocket, target: uiTargetSocket, graph: this });
         const uiLine = uiLink.create();
@@ -385,7 +395,7 @@ class UIGraph extends H12 {
 
         dispatcher.on("createSourceSocket", (socket) => {
             this.sourceSocket = socket;
-            console.warn(`Source socket set to ${socket.id}`);
+            console.log("Source socket set to:", socket);
         });
         dispatcher.on("clearSourceSocket", (socket) => {
 
@@ -432,13 +442,13 @@ class UIGraph extends H12 {
         dispatcher.on("createTargetSocket", (socket) => {
             if(this.sourceSocket) {
                 this.targetSocket = socket;
-                console.log(`Target socket set to ${socket.id}`);
+                console.log("Target socket set to:", socket);
             }
         });
         dispatcher.on("clearTargetSocket", (socket) => {
             if(this.sourceSocket) {
                 this.targetSocket = null;
-                console.log(`Target socket cleared`);
+                console.log("Target socket cleared");
             }
         });
     }

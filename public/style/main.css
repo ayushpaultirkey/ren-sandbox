@@ -50,3 +50,50 @@ input::-webkit-inner-spin-button {
 input[type=number] {
   -moz-appearance: textfield;
 }
+
+
+
+.project-grid {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    grid-template-rows: auto 1fr;
+    grid-template-areas: 
+        "project-navigator project-actionbar"
+        "project-navigator project-viewport"
+        ;
+}
+.project-actionbar {
+    grid-area: project-actionbar;
+}
+.project-navigator {
+    grid-area: project-navigator;
+}
+.project-viewport {
+    grid-area: project-viewport;
+}
+
+.menu {
+    position: relative;
+}
+.menu > div {
+    position: absolute;
+    display: none;
+    min-width: 100px;
+    left: 0px;
+    top: 100%;
+}
+.menu:hover > div {
+    display: block;
+}
+.menu-hover {
+    position: relative;
+}
+.menu-hover:hover > div {
+    display: block;
+}
+.menu-hover > div {
+    position: absolute;
+    display: none;
+    top: 0px;
+    left: 100%;
+}

@@ -51,6 +51,18 @@ class Label extends Control {
         this.set("{value}", value);
     }
 }
+class Button extends Control {
+    constructor() {
+        super();
+    }
+
+    render() {
+        const title =  this.args.title || "Title";
+        return <>
+            <button onclick={ this.args.onclick } class="bg-zinc-700 border border-zinc-900 border-opacity-70 hover:bg-zinc-600 active:bg-zinc-700 text-xs rounded-sm px-2 py-1 font-semibold text-zinc-400">{ title }</button>
+        </>;
+    }
+}
 
 class InputBox extends Control {
     constructor() {
@@ -61,7 +73,7 @@ class InputBox extends Control {
         const type = this.args.type || this.getProperty("type") || "text";
 
         return <>
-            <input id="textbox" type={ type } class={ `-mt-[1px] w-full text-xs bg-zinc-700 py-1 px-2 text-zinc-400 rounded-sm` } oninput={ this.onUpdate } />
+            <input id="textbox" type={ type } class={ `w-full text-xs bg-zinc-700 py-[2px] px-2 text-zinc-400 rounded-sm` } oninput={ this.onUpdate } />
         </>
 
     }
@@ -82,9 +94,9 @@ class MultilineTextBox extends InputBox {
     }
     control() {
         return <>
-            <textarea id="textbox" rows="1" cols="10" class={ `-mt-[1px] w-full text-xs bg-zinc-700 py-1 px-2 text-zinc-400 rounded-sm` } oninput={ this.onUpdate }></textarea>
+            <textarea id="textbox" rows="1" cols="10" class={ `w-full text-xs bg-zinc-700 py-1 px-2 text-zinc-400 rounded-sm` } oninput={ this.onUpdate }></textarea>
         </>
     }
 }
 
-export { Control, Label, InputBox, MultilineTextBox };
+export { Control, Label, Button, InputBox, MultilineTextBox };

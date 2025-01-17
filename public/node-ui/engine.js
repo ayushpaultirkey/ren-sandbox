@@ -143,20 +143,27 @@ class UIEngine extends H12 {
                 setName(this.#igraphset.custom.name || "no name");
                 setGraph(this.#igraphset.graphs.size);
                 setProps(this.#igraphset.propertyManager.properties.size);
+
+                const _template = (uuid, name) => {
+                    return <>
+                        <div class="flex">
+                            <button onclick={ () => { this.openGraph(uuid) } } class="w-full text-left p-1 hover:bg-zinc-300 hover:bg-opacity-20 rounded-sm">
+                                <label>: { name }</label>
+                            </button>
+                            <button onclick={ () => { this.removeGraph(uuid) } } class="text-rose-500 px-2 text-left p-1 hover:bg-rose-300 hover:bg-opacity-20 rounded-sm">&times;</button>
+                        </div>
+                    </>
+                }
                 
                 if(!graph) {
                     uiGraphs("");
                     const graphs = this.#igraphset.graphs;
                     for(const [uuid, graph] of graphs) {
-                        uiGraphs(<>
-                            <button onclick={ () => { this.openGraph(uuid) } }>{ graph.custom.name || "no name" }</button>
-                        </>, "x++");
+                        uiGraphs(_template(uuid, graph.custom.name || "no name"), "x++");
                     };
                 }
                 else {
-                    uiGraphs(<>
-                        <button onclick={ () => { this.openGraph(graph.uuid) } }>{ graph.custom.name || "no name" }</button>
-                    </>, "x++");
+                    uiGraphs(_template(uuid, graph.custom.name || "no name"), "x++");
                 }
 
             }
@@ -175,6 +182,26 @@ class UIEngine extends H12 {
         }
     }
 
+    removeGraph(uuid) {
+        try {
+            
+            if(!this.#igraphset) {
+                throw new Error("Graph set not found");
+            }
+
+            this.#igraphset.removeGraph(uuid);
+            console.warn("Graph removed");
+
+            this.set("{graph}", "");
+            if(this.child.graph) {
+                this.child.graph.destroy();
+            }
+
+        }
+        catch(error) {
+            console.error(error || "Error adding graph");
+        }
+    }
     addGraph() {
         try {
             if(!this.#igraphset) {

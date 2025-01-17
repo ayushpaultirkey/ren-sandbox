@@ -21,8 +21,8 @@ class Begin extends INode {
         this.isEntry = true;
     }
     main(args) {
-        this.addOutputSocket("out0", "out", ExecutionSocket);
-        this.addOutputSocket("args0", "args", ObjectSocket);
+        this.addOutput("out0", "out", ExecutionSocket);
+        this.addOutput("args0", "args", ObjectSocket);
         super.main(args);
     }
 
@@ -46,16 +46,16 @@ class Log extends INode {
         super({ uuid, outer });
     }
     main(args) {
-        this.addInputSocket("in0", "in", ExecutionSocket);
-        this.addInputSocket("value1", "value", StringSocket);
-        this.addOutputSocket("out0", "out", ExecutionSocket);
+        this.addInput("in0", "in", ExecutionSocket);
+        this.addInput("value1", "value", StringSocket);
+        this.addOutput("out0", "out", ExecutionSocket);
         super.main(args);
     }
     execute() {        
 
-        let val = this.inputs.value1.getValue();
+        let value = this.getInput("value1").getValue();
 
-        console.log("log", val);
+        console.log("log", value);
         this.executeLinkedNode("out0", 0);
 
     }
@@ -75,8 +75,8 @@ class Return extends INode {
         super({ uuid, outer });
     }
     main(args) {
-        this.addInputSocket("in0", "in", ExecutionSocket);
-        this.addInputSocket("args0", "args", ObjectSocket);
+        this.addInput("in0", "in", ExecutionSocket);
+        this.addInput("args0", "args", ObjectSocket);
         super.main(args);
     }
     execute() {

@@ -126,7 +126,7 @@ class UINode extends H12 {
             if(!propertyClass) continue;
 
             uiProperties(<>
-                <property args id={ uuid } alias={ propertyClass } iobject={ property }></property>
+                <property args alias={ propertyClass } iobject={ property }></property>
             </>, "x++");
 
         }

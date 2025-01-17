@@ -177,8 +177,8 @@ class IGraph extends IObject {
             return;
         }
 
-        const sourceSocket = sourceNode.getOutputSocket(sourceSocketUUID);
-        const targetSocket = targetNode.getInputSocket(targetSocketUUID);
+        const sourceSocket = sourceNode.getOutput(sourceSocketUUID);
+        const targetSocket = targetNode.getInput(targetSocketUUID);
 
         return this.linkSockets(sourceSocket, targetSocket);
         
