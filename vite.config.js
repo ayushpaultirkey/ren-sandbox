@@ -23,6 +23,7 @@ export default defineConfig({
             { find: "@library", replacement: fileURLToPath(new URL("./public/library", import.meta.url)) },
             { find: "@script", replacement: fileURLToPath(new URL("./public/script", import.meta.url)) },
             { find: "@style", replacement: fileURLToPath(new URL("./public/style", import.meta.url)) },
+            { find: "@vm", replacement: fileURLToPath(new URL("./public/node", import.meta.url)) },
         ]
     },
     css: {

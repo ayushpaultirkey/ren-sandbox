@@ -42,7 +42,7 @@ class Menu extends H12 {
         }
 
         return <>
-            <div class="py-1 rounded-sm bg-zinc-800 border-2 border-zinc-700 z-20">{ ... items }</div>
+            <div class="py-1 rounded-sm bg-zinc-800 border-2 border-zinc-900 z-20">{ ... items }</div>
         </>;
 
     }
@@ -63,7 +63,8 @@ class Menu extends H12 {
             },
             "Import": {
                 "Graph Set": () => { console.log("Open Graph Set"); },
-            }
+            },
+            "Context Explorer": () => { console.log("Open Graph Set"); },
         };
         
         return <>

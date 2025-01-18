@@ -2,6 +2,7 @@ import H12 from "@library/h12.js";
 import { dispatcher } from "@script/dispatcher.js";
 import VIEWPORT from "../../../../../editor/viewport.js";
 import { NODES_REGISTRY } from "../../../../../node/node.js";
+import { getWorkplace } from "@script/library/workplace.js";
 
 class Category extends H12 {
 
@@ -10,11 +11,13 @@ class Category extends H12 {
         this.staticFieldCreated = false;
         this.staticFields = {};
         this.items = [];
+        this.workplace = null;
     }
     main(args) {
         if(args && args.auto) {
             this.createCategory();
         }
+        //this.workplace = getWorkplace(this);
     }
     render() {
         return <>
@@ -69,7 +72,9 @@ class Category extends H12 {
     }
 
     addNode(className) {
-        dispatcher.emit("addNode", className);
+        if(this.workplace) {
+            this.workplace.dispatcher.emit("addNode", className);
+        }
     }
     
     createCategory() {

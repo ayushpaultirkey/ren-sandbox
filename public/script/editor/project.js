@@ -2,7 +2,7 @@ import "@style/main.css";
 import H12 from "@library/h12";
 import { dispatcher } from "@script/dispatcher.js";
 
-import { UIEngine } from "./project/asset/engine";
+import { UIEngine } from "./project/workspace/engine";
 import { ActionBar } from "./project/actionbar";
 
 class Project extends H12 {

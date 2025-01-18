@@ -102,13 +102,13 @@ export default class H12 {
     #bind(key, data) {
 
         if (!this.key[key]) {
-            const name = key.split("{")[1].split("}")[0];
+            const name = key.replace(/{|}/g, "");
             this.key[name] = (value, position) => this.set(position ? position.replace(/\w+/gm, key) : key, value);
         }
         const bind = this.#binding;
         if (!bind[key]) bind[key] = { element: [], data: "" };
         bind[key].element.push(data);
-
+        
     }
 
     /**
@@ -147,18 +147,6 @@ export default class H12 {
     }
 
     /**
-        * This function is called after the component is rendered. 
-        * It only works on the root component; child components do not call this function.
-        * To use this, you can register a dispatcher event.
-        *
-        * @example
-        * async finally(args = {}) {
-        *   console.log(this.id, "loaded!");
-        * }
-    */
-    finally() {}
-
-    /**
         * Prepares the component for rendering and initializes the values.
         * 
         * @param {string} element - The query selector of the element.
@@ -166,26 +154,14 @@ export default class H12 {
         * @returns {Element|null} A promise that resolves to the initialized element or `null` if initialization fails.
         * 
         * @example
-        * const app = new App();
-        * app.pre(".root");
+        * document.body.appendChild(new App().init());
     */
-    init(element = null) {
-
+    init() {
         try {
 
             this.root = this.render();
             this.#unique("id", this.element);
-
-            if (this.args.child instanceof Element) {
-                this.set("{child}", this.args.child);
-            }
-
             this.main(this.args);
-
-            if (element) {
-                document.querySelector(element).appendChild(this.root);
-                this.finally();
-            }
 
             return this.root;
             
@@ -193,7 +169,6 @@ export default class H12 {
         catch(error) {
             console.error(error);
         }
-
     }
 
     /**
@@ -242,7 +217,7 @@ export default class H12 {
     
             if (typeof value === "function") {
                 const fname = attribute.slice(2);
-                attribute.startsWith("on") ? element.addEventListener(fname, this.#addEvent(element, fname, value).f) : element.setAttribute(attribute, value());
+                attribute.startsWith("on") ? element.addEventListener(fname, this.#addEvent(element, fname, value)) : element.setAttribute(attribute, value());
             }
             else {
                 element.setAttribute(attribute, value);
@@ -255,21 +230,29 @@ export default class H12 {
     }
 
     destroy() {
-        for(const event in this.#events) {
-            const { e: element, f: method, n: name } = this.#events[event];
-            element.removeEventListener(name, method);
-            delete this.#events[event];
-        };
-        Object.values(this.child).forEach(child => {
-            child.destroy();
-        });
+        this.#gc();
+        Object.values(this.child).forEach(child => child.destroy());
         delete this.parent.child[this.id];
         this.root.remove();
     }
 
-    #events = {};
+    #events = new Map();
+    #gc(force = false) {
+        for(const [element, data] of this.#events) {
+            if(element.isConnected && !force) continue;
+            data.forEach(([n, f]) => element.removeEventListener(n, f));
+            this.#events.delete(element);
+        }
+    }
     #addEvent(element, name, method) {
-        return this.#events[method.name] = { f: method.bind(this), n: name, e: element };
+
+        let bindedMethod = method.bind(this);
+        let data = this.#events.get(element) || [];
+        data.push([name, bindedMethod]);
+        this.#events.set(element, data);
+
+        return bindedMethod;
+
     }
 
     /**
@@ -294,7 +277,7 @@ export default class H12 {
             component.parent = this;
 
             this.child[component.id] = component;
-            return component.init(null);
+            return component.init();
 
         }
     }
@@ -343,7 +326,6 @@ export default class H12 {
         key = key.replace("++", "");
         
         const mapping = this.#binding[key];
-
         if (!mapping) return;
 
         const fValue = typeof(value) === "function" ? value() : value;
@@ -367,13 +349,6 @@ export default class H12 {
             else if(element.type == 1) {
                 if (value instanceof Element) {
                     if (index !== -1) {
-                        // if(index > 0) {
-                        //     parent.append(fValue);
-                        // }
-                        // else {
-                        //     parent.insertBefore(fValue, node);
-                        // }
-                        // parent.append(fValue);
                         parent.insertAdjacentElement((index == 0) ? "afterbegin" : "beforeend", fValue);
                         element.clone.push(fValue);
                         return;
@@ -393,6 +368,8 @@ export default class H12 {
                     x.remove();
                 });
                 element.clone = [];
+                node.remove();
+                this.#gc();
             }
             else if(element.type == 2 && this.#isValidType(value)) {
                 let elementMapping = element.map;

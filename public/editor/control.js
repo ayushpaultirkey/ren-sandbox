@@ -73,7 +73,7 @@ class InputBox extends Control {
         const type = this.args.type || this.getProperty("type") || "text";
 
         return <>
-            <input id="textbox" type={ type } class={ `w-full text-xs bg-zinc-700 py-[2px] px-2 text-zinc-400 rounded-sm` } oninput={ this.onUpdate } />
+            <input id="textbox" type={ type } class={ `primary-input w-full` } oninput={ this.onUpdate } />
         </>
 
     }

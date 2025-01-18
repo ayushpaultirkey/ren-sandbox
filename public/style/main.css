@@ -1,7 +1,3 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
-
 html, body {
     padding: 0;
     margin: 0;
@@ -20,6 +16,54 @@ html, body {
 ::-webkit-scrollbar-thumb {
     background: #888;
 }
+
+.primary-btn,
+.primary-input,
+.primary-select {
+    @apply bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-700;
+    @apply border-2 rounded-sm border-zinc-800;
+    @apply text-xs font-semibold text-zinc-400;
+    @apply px-[6px] py-[2px];
+}
+.primary-input,
+.primary-select {
+    @apply bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-200;
+    @apply text-zinc-700;
+}
+.primary-select {
+    @apply px-[2px];
+}
+
+
+.navigator-container {
+    @apply min-w-[250px] max-w-[250px];
+    @apply border-2 border-zinc-950;
+    @apply p-2;
+    @apply text-zinc-400;
+}
+.navigator-tab {
+    @apply space-y-2;
+}
+
+.navigator-panel {
+    @apply flex flex-col;
+    @apply space-y-1;
+}
+.navigator-panel > label {
+    @apply text-xs font-semibold;
+}
+
+.seperator {
+    @apply bg-zinc-500 bg-opacity-50 rounded-lg;
+    height: 3px;
+}
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
 .path {
     stroke-dasharray: 5;
     animation: dash 5s infinite linear;
