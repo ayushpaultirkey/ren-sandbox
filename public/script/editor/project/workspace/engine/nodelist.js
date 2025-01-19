@@ -17,7 +17,7 @@ class Category extends H12 {
         if(args && args.auto) {
             this.createCategory();
         }
-        //this.workplace = getWorkplace(this);
+        this.workplace = getWorkplace(this);
     }
     render() {
         return <>

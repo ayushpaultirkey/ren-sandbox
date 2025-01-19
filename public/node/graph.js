@@ -78,10 +78,13 @@ class IGraph extends IObject {
                 throw new Error(`Graph: Node class "${nodeData.class}" is not registered`);
             };
     
+            /** @type {INode} */
             const node = new nodeClass({ uuid: uuid , outer: this });
             node.main({
                 properties: nodeData.properties,
-                custom: nodeData.custom
+                custom: nodeData.custom || {},
+                inputs: nodeData.inputs || {},
+                outputs: nodeData.outputs || {},
             });
             this.#nodes.set(uuid, node);
 

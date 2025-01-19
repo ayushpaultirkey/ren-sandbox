@@ -2,6 +2,7 @@ import { IObject } from "./object.js";
 import { ISocket } from "./socket.js";
 import { IPropertyManager } from "./property/manager.js";
 import { IProperty } from "./property.js";
+import { StringSocket } from "./sockets/primitive.js";
 
 class INode extends IObject {
 
@@ -37,15 +38,30 @@ class INode extends IObject {
         return this.#propertyManager;
     }
 
-    main({ properties = {}, custom = {} } = {}) {
+    main({ properties = {}, custom = {}, inputs = {}, outputs = {} } = {}) {
         try {
+
             if(custom) {
                 this.custom = custom;
-            }
+            };
+
+            for(const uuid in inputs) {
+                const socket = inputs[uuid];
+                const socketClass = StringSocket;
+                this.addInput(uuid, socket.name, socketClass, true);
+            };
+            for(const uuid in outputs) {
+                const socket = outputs[uuid];
+                const socketClass = StringSocket;
+                this.addOutput(uuid, socket.name, socketClass, true);
+            };
+            
+
             for(const uuid in properties) {
                 const property = properties[uuid];
                 this.#propertyManager.setProperty(uuid, property.value);
-            }
+            };
+
             return true;
         }
         catch(error) {
@@ -53,7 +69,7 @@ class INode extends IObject {
         }
     }
     
-    addInput(uuid, name, socketClass) {
+    addInput(uuid, name, socketClass, isRuntime = false) {
         
         if(!socketClass) return null;
         if(this.inputs[uuid]) return null;
@@ -62,28 +78,56 @@ class INode extends IObject {
             uuid: uuid,
             outer: this,
             name: name,
-            type: ISocket.TYPES.INPUT
+            type: ISocket.TYPES.INPUT,
+            isRuntime: isRuntime
         });
         this.inputs[uuid] = socket;
 
         return socket;
 
     }
-    addOutput(uuid, name, socketClass) {
+    removeInput(uuid) {
+        const socket = this.inputs[uuid];
+        if(socket.isRuntime) {
+            delete this.inputs[uuid];
+            return true;
+        }
+        else {
+            console.error("Cannot remove static socket");
+        }
+    }
+    addOutput(uuid, name, socketClass, isRuntime = false) {
 
-        if(!socketClass) return null;
-        if(this.outputs[uuid]) return null;
+        if(!socketClass) {
+            console.error("Invalid socket class");
+            return;
+        };
+        if(this.outputs[uuid]) {
+            console.error("Socket already exists");
+            return;
+        };
 
         const socket = new socketClass({
             uuid: uuid,
             outer: this,
             name: name,
-            type: ISocket.TYPES.OUTPUT
+            type: ISocket.TYPES.OUTPUT,
+            isRuntime: isRuntime
         });
         this.outputs[uuid] = socket;
 
         return socket;
         
+    }
+    removeOutput(uuid) {
+        const socket = this.outputs[uuid];
+        if(socket.isRuntime) {
+            delete this.outputs[uuid];
+            return true;
+        }
+        else {
+            console.error("Cannot remove static socket");
+        }
     }
 
     getInput(uuid) {
@@ -116,22 +160,37 @@ class INode extends IObject {
     export() {
         
         const data = {
-            data: {
-                class: this.meta.className,
-                properties: this.#propertyManager.export(),
-                custom: this.custom
-            },
-            links: []
+            class: this.meta.className,
+            properties: this.#propertyManager.export(),
+            custom: this.custom || {},
+            inputs: {},
+            outputs: {},
+        };
+
+        for(const uuid in this.inputs) {
+            const socket = this.inputs[uuid];
+            if(!socket.isRuntime) continue;
+            data.inputs[uuid] = {
+                name: socket.name || "in",
+                type: socket.subType,
+            };
+        };
+        for(const uuid in this.outputs) {
+            const socket = this.outputs[uuid];
+            if(!socket.isRuntime) continue;
+            data.outputs[uuid] = {
+                name: socket.name || "out",
+                type: socket.subType,
+            };
         };
 
         let links = [];
         for(const uuid in this.outputs) {
             const socket = this.outputs[uuid];
             links = links.concat(socket.export());   
-        }
-        data.links = links;
+        };
 
-        return data;
+        return { data: data, links: links };
 
     }
 

@@ -23,14 +23,19 @@ class ISocket extends IObject {
         return this.#type;
     }
 
+    #isRuntime = false;
+    get isRuntime() {
+        return this.#isRuntime;
+    }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null } = {}) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null, isRuntime = false } = {}) {
 
         super({ uuid, outer, name });
 
         this.#value = value;
         this.#type = type;
         this.#links = [];
+        this.#isRuntime = isRuntime;
 
         this.subType = -1;
         this.validSubTypes = new Set([]);

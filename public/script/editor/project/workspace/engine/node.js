@@ -5,6 +5,7 @@ import { ISocket } from "@vm/socket";
 import { UISocket } from "./socket";
 import { DragHandler } from "../../../../../editor/handler/drag-handler";
 import { PROPERTY_REGISTRY, UIProperty } from "./property";
+import { FloatSocket, StringSocket } from "@vm/sockets/primitive";
 
 
 class UINode extends H12 {
@@ -29,7 +30,7 @@ class UINode extends H12 {
         this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
         this.#dragHandler.register();
 
-        this.renderSockets();
+        this.#displaySockets();
         this.renderProperties();
 
         // if(this.inode) {
@@ -132,7 +133,7 @@ class UINode extends H12 {
 
     }
 
-    renderSockets() {
+    #displaySockets() {
 
         const { inputs, outputs } = this.key;
         const inSockets = this.#inode.inputs;
@@ -140,22 +141,44 @@ class UINode extends H12 {
         
         inputs("");
         for(const uuid in inSockets) {
-            const socket = inSockets[uuid];
-            inputs(<>
-                <pin args alias={ UISocket } id={ socket.uuid } iobject={ socket }></pin>
-            </>, "x++");
-        }
+            this.#displaySocket(inputs, inSockets[uuid]);
+        };
 
         outputs("");
         for(const uuid in outSockets) {
-            const socket = outSockets[uuid];
-            outputs(<>
-                <pin args alias={ UISocket } id={ socket.uuid } iobject={ socket }></pin>
-            </>, "x++");
-        }
+            this.#displaySocket(outputs, outSockets[uuid]);
+        };
 
     }
+    #displaySocket(uiSocket, socket) {
+        uiSocket(<>
+            <socket args alias={ UISocket } id={ socket.uuid } iobject={ socket }></socket>
+        </>, "x++");
+    }
 
+    addOutputSocket(uuid) {
+
+        const node = this.#inode;
+        const socket = node.addOutput(uuid, "out", StringSocket, true);
+        
+        const { outputs } = this.key;
+        this.#displaySocket(outputs, socket);
+
+    }
+    
+    removeSocket(isocket) {
+
+        const uuid = isocket.uuid;
+
+        if(isocket.type == ISocket.TYPES.INPUT) {
+            this.#inode.removeInput(uuid);
+        }
+        else {
+            this.#inode.removeOutput(uuid);
+        };
+        this.child[uuid].destroy();
+
+    }
 
     // getINode() {
     //     return this.inode;

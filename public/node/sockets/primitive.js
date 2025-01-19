@@ -10,9 +10,9 @@ class WildcardSocket extends ISocket {
         displayColor: "#e5e7eb",
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null, isRuntime = false }) {
 
-        super({ uuid, outer, name, type });
+        super({ uuid, outer, name, type, isRuntime });
 
         this.subType = PRIMITIVE_TYPES.WILDCARD;
         this.validSubTypes = new Set([
@@ -39,9 +39,9 @@ class FloatSocket extends ISocket {
         displayColor: "#059669"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null, isRuntime = false }) {
 
-        super({ uuid, outer, name, type });
+        super({ uuid, outer, name, type, isRuntime });
 
         this.subType = PRIMITIVE_TYPES.FLOAT;
         this.validSubTypes = new Set([
@@ -64,9 +64,9 @@ class StringSocket extends ISocket {
         displayColor: "#d946ef"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "string", type = null }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "string", type = null, isRuntime = false }) {
 
-        super({ uuid, outer, name, type });
+        super({ uuid, outer, name, type, isRuntime });
 
         this.subType = PRIMITIVE_TYPES.STRING;
         this.validSubTypes = new Set([

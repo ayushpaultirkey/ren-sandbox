@@ -5,29 +5,38 @@ import { getWorkplace } from "@script/library/workplace.js";
 
 
 class Navigator extends H12 {
+
+    /** @type {import("@vm/graphset").IGraphSet} */
+    #igraphset = null;
+
+    /** @type {import("@script/editor/project/workspace.js").Workspace} */
+    #workspace = null;
+
     constructor() {
         super();
-        this.workplace = null;
     }
-    main() {
 
-        this.workplace = getWorkplace(this);
+    main(args) {
+
+        this.#workspace = getWorkplace(this);
 
     }
+
     render() {
 
         return <>
             <div class="flex flex-row h-full">
                 <div>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tab_node") }>nodes</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tab_properties") }>properties</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tab_graph") }>graph</button>
+                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabNode") }>nodes</button>
+                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabProperties") }>properties</button>
+                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabGraph") }>graph</button>
                     <button class="w-full border-2 border-zinc-900">stats</button>
                     <button class="w-full border-2 border-zinc-900">run</button>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.debug() }>debug</button>
+                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.export() }>export</button>
                 </div>
                 <div id="tabs" class="navigator-container">
-                    <div id="tab_properties" class="navigator-tab">
+                    <div id="tabProperties" class="navigator-tab">
 
                         <div class="navigator-panel">
                             <label>Graphs Set</label>
@@ -38,7 +47,7 @@ class Navigator extends H12 {
                         <div class="navigator-panel">
                             <label>Graphs:</label>
                             <div class="flex flex-row">
-                                <input class="primary-input w-full border-r-0 rounded-r-none" placeholder="Name" id="graph_name" />
+                                <input class="primary-input w-full border-r-0 rounded-r-none" placeholder="Name" id="graphName" />
                                 <button class="primary-btn rounded-l-none" onclick={ this.#addGraph }>Add</button>
                             </div>
                             <div class="space-y-1">
@@ -54,7 +63,7 @@ class Navigator extends H12 {
                         </div>
                         
                     </div>
-                    <div id="tab_graph" class="navigator-tab hidden">
+                    <div id="tabGraph" class="navigator-tab hidden">
 
                         <div class="navigator-panel">
                             <label>Graphs Properties:</label>
@@ -62,15 +71,16 @@ class Navigator extends H12 {
                         </div>
 
                     </div>
-                    <div id="tab_node" class="flex-col hidden">
+                    <div id="tabNode" class="flex-col hidden">
                         <label class="text-sm font-semibold border-b-2 border-zinc-500">Nodes:</label>
                         <Category args id="category" auto="true"></Category>
                     </div>
                 </div>
             </div>
-        </>
+        </>;
 
     }
+
     changeTab(element) {
 
         const { tabs } = this.element;
@@ -81,12 +91,9 @@ class Navigator extends H12 {
         const target = this.element[element];
         if(target) {
             target.classList.remove("hidden");
-        }
+        };
 
     }
-
-    /** @type {import("@vm/graphset").IGraphSet} */
-    #igraphset = null;
 
     refreshGraphSet(igraphset) {
 
@@ -108,7 +115,7 @@ class Navigator extends H12 {
         if(!igraph) {
             console.error("No graph provided");
             return;
-        }
+        };
         this.child.graphProperties.refresh(igraph.propertyManager);
     }
 
@@ -125,33 +132,51 @@ class Navigator extends H12 {
                     <button class="primary-btn m-1" onclick={ () => this.#removeGraph(uuid) }>&times;</button>
                 </div>
             </>, "x++");
-        }
+        };
 
     }
+
     #openGraph(uuid) {
-        if(this.workplace) {
-            console.log("S")
-            this.workplace.dispatcher.emit("openGraph", uuid);
+        if(this.#workspace) {
+            this.#workspace.dispatcher.emit("openGraph", uuid);
         }
     }
+
     #addGraph() {
         
-        const { graph_name } = this.element;
-        if(!graph_name || !graph_name.value) {
+        const { graphName } = this.element;
+        if(!graphName || !graphName.value) {
             alert("Please enter a name for the graph");
             return;
         };
 
-        const name = graph_name.value || "no name";
-        graph_name.value = "";
-
-        this.#igraphset.addGraph(null, { nodes: {}, links: [], properties: {}, custom: { name: name } });
+        this.#igraphset.addGraph(null, {
+            nodes: {},
+            links: [],
+            properties: {},
+            custom: {
+                name: graphName.value || "no name"
+            }
+        });
+        graphName.value = "";
         console.warn("Graph added");
 
     }
+
     #removeGraph(uuid) {
         this.#igraphset.removeGraph(uuid);
         console.warn("Graph removed");
+    }
+
+    destroy() {
+        if(this.#workspace) {
+            this.#workspace.dispatcher.clear("openGraph");
+        };
+        if(this.#igraphset) {
+            this.#igraphset.dispatcher.clear("graphAdded");
+            this.#igraphset.dispatcher.clear("graphRemoved");
+        };
+        super.destroy();
     }
 
 }

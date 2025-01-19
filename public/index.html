@@ -10,18 +10,8 @@
 </head>
 <body>
 
-    <label class="absolute right-0 top-0 z-50" id="pos"></label>
     <div class="app h-full relative overflow-hidden"></div>
 
 </body>
 </html>
 <script type="module" src="./script/app.js"></script>
-<script>
-
-    const pos = document.getElementById("pos");
-    function mousePosition(event) {
-        pos.innerText = `${event.clientX}, ${event.clientY}`
-    }
-    window.addEventListener("mousemove", mousePosition);
-
-</script>

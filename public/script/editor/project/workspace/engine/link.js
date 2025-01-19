@@ -49,19 +49,17 @@ class Link {
 
         const { source, target, graph, fOnMouseDown } = this;
 
-        console.log(source, target)
-
         source.addLink(this);
         target.addLink(this);
 
-        const scale = VIEWPORT.zoom;
+        const scale = VIEWPORT.zoom || 1;
         const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
 
-        const o = source.getPinElement().getBoundingClientRect();
+        const o = source.getSocketElement().getBoundingClientRect();
         const x1 = (o.left - parentX + o.width / 2.5) / scale;
         const y1 = (o.top - parentY + o.height / 2.5) / scale;
 
-        const i = target.getPinElement().getBoundingClientRect();
+        const i = target.getSocketElement().getBoundingClientRect();
         const x2 = (i.left - parentX + i.width / 2.5) / scale;
         const y2 = (i.top - parentY + i.height / 2.5) / scale;
 
@@ -76,17 +74,17 @@ class Link {
     onMouseDown(event) {
         
         const { source, target, graph, line } = this;
-        const scale = VIEWPORT.zoom;
+        const scale = VIEWPORT.zoom || 1;
 
         const onDragMove = (e) => {
 
             const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
     
-            const o = source.getPinElement().getBoundingClientRect();
+            const o = source.getSocketElement().getBoundingClientRect();
             const x1 = (o.left - parentX + o.width / 2.5) / scale;
             const y1 = (o.top - parentY + o.height / 2.5) / scale;
     
-            const i = target.getPinElement().getBoundingClientRect();
+            const i = target.getSocketElement().getBoundingClientRect();
             const x2 = (i.left - parentX + i.width / 2.5) / scale;
             const y2 = (i.top - parentY + i.height / 2.5) / scale;
 

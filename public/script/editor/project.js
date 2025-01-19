@@ -1,9 +1,8 @@
 import "@style/main.css";
 import H12 from "@library/h12";
 import { dispatcher } from "@script/dispatcher.js";
-
-import { UIEngine } from "./project/workspace/engine";
 import { ActionBar } from "./project/actionbar";
+import { StatusBar } from "./project/statusbar";
 
 class Project extends H12 {
     constructor() {
@@ -28,25 +27,36 @@ class Project extends H12 {
                     <actionbar args alias={ ActionBar }></actionbar>
                 </div>
                 <div class="w-full h-full">
-                    <engine id="en1" args alias={ UIEngine }></engine>
+                    {engine}
                 </div>
                 <div>
-                    status
+                    <statusbar args alias={ StatusBar }></statusbar>
                 </div>
             </div>
         </>;
     }
-    load() {
+    async load() {
+        try {
 
-        if(this.isLoaded) {
-            console.error("Project already loaded");
-            alert("Project already loaded");
-            return;
+            if(this.isLoaded) {
+                throw new Error("Project already loaded");
+            }
+
+            const { UIEngine } = await import("./project/workspace/engine");
+
+            this.set("{engine}", <>
+                <engine args alias={ UIEngine }></engine>
+            </>);
+
+            this.root.classList.remove("hidden");
+            this.root.classList.add("flex");
+            this.isLoaded = true;
+
         }
-
-        this.root.classList.remove("hidden");
-        this.root.classList.add("flex");
-        this.isLoaded = true;
+        catch(error) {
+            alert("Failed to load project");
+            console.error(error);
+        }
 
     }
     unload() {

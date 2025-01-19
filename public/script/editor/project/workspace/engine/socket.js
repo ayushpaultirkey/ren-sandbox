@@ -1,6 +1,5 @@
 import H12 from "@library/h12";
 import { ISocket } from "@vm/socket.js";
-import { dispatcher } from "@script/dispatcher";
 import { getWorkplace } from "@script/library/workplace";
 
 
@@ -10,17 +9,26 @@ class UISocket extends H12 {
     /** @type {ISocket} */
     #isocket = null;
 
+    /** @type {import("@script/editor/project/workspace").Workspace} */
+    #workspace = null;
+
+    /** @type {Link[]} */
+    #links = [];
+
     constructor() {
-        
         super();
-
-        this.links = [];
-        this.workplace = null;
-
     }
+
     main() {
-        //this.workplace = getWorkplace(this);
+
+        if(!this.#isocket) {
+            console.error("Invalid socket");
+            return;
+        };
+        this.#workspace = getWorkplace(this);
+
     }
+
     render() {
         
         if(!this.args.iobject) return <><label>Invalid socket</label></>;
@@ -31,8 +39,11 @@ class UISocket extends H12 {
         const color = meta.displayColor || "gray";
         const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
+        const runtimeTemplate = this.#isocket.isRuntime ? <><button class="text-xs font-semibold text-rose-500 mr-1" onclick={ this.#clearAllInputLinks }>&times;</button></> : "";
+
         return <>
             <div class="px-[8px] relative" onmouseover={ this.#createTargetSocket } onmouseleave={ this.#clearTargetSocket }>
+                { runtimeTemplate }
                 <label style="font-size: 10px;">{ name }</label>
                 <button
                     id="btn"
@@ -48,64 +59,65 @@ class UISocket extends H12 {
 
     #clearAllInputLinks() {
 
-        if(this.#isocket.type != ISocket.TYPES.INPUT) return;
-        dispatcher.emit("clearAllInputLinks", this);
+        if(this.#isocket.isRuntime) {
+            this.#workspace.dispatcher.emit("clearAllInputLinks", this);
+            this.parent.removeSocket(this.#isocket);
+            return;
+        };
+        if(this.#isocket.type != ISocket.TYPES.INPUT || !this.#workspace) {
+            console.error("Invalid socket or workspace");
+            return;
+        };
+        this.#workspace.dispatcher.emit("clearAllInputLinks", this);
         
     }
 
     clearLinks() {
-        this.links.forEach(link => {
+
+        this.#links.forEach(link => {
             link.remove();
         });
-        this.links = [];
+        this.#links = [];
+        
     }
 
-    getPinElement() {
-        return this.element.btn;
-    }
 
     get isocket() {
         return this.#isocket;
     }
 
-    getUINode() {
-        return this.parent;
+    getSocketElement() {
+        return this.element.btn;
     }
-
-    getISocket() {
-        return this.#isocket;
-    }
-    getIUUID() {
-        return this.#isocket.uuid;
-    }
-    
     addLink(link) {
-        this.links.push(link);
+        this.#links.push(link);
     }
 
 
     #createTargetSocket() {
         if(this.#isocket.type == ISocket.TYPES.INPUT) {
-            dispatcher.emit("createTargetSocket", this);
-        }
+            this.#workspace.dispatcher.emit("createTargetSocket", this);
+        };
     }
     #clearTargetSocket() {
         if(this.#isocket.type == ISocket.TYPES.INPUT) {
-            dispatcher.emit("clearTargetSocket", this);
-        }
+            this.#workspace.dispatcher.emit("clearTargetSocket", this);
+        };
     }
+
     #createSourceSocket(event) {
 
-        if(this.#isocket.type !== ISocket.TYPES.OUTPUT) {
+        if(this.#isocket.type !== ISocket.TYPES.OUTPUT || !this.#workspace) {
             return;
-        }
+        };
 
         event.stopPropagation();
         event.preventDefault();
 
+        const dispatcher = this.#workspace.dispatcher;
         const reference = this;
         const socket = this.root;
-        const pin = this.getPinElement();
+        const element = this.getSocketElement();
 
         if(socket) {
 
@@ -122,7 +134,7 @@ class UISocket extends H12 {
 
                 dispatcher.emit("updateSocketHelper", {
                     socketId: reference.id,
-                    socketPin: pin,
+                    socketElement: element,
                     x: event.clientX,
                     y: event.clientY
                 });
@@ -146,7 +158,10 @@ class UISocket extends H12 {
 
     }
 
-
+    destroy() {
+        this.clearLinks();
+        super.destroy();
+    }
 
 }
 

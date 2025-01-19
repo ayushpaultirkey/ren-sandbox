@@ -10,9 +10,9 @@ class ExecutionSocket extends ISocket {
         displayColor: "#94a3b8"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "exec", type = null }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "exec", type = null, isRuntime = false }) {
 
-        super({ uuid, outer, name, type });
+        super({ uuid, outer, name, type, isRuntime });
 
         this.subType = DERIVED_TYPES.FUNCTION;
         this.validSubTypes = new Set([ DERIVED_TYPES.FUNCTION ]);

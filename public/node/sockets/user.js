@@ -10,9 +10,9 @@ class ObjectSocket extends ISocket {
         displayColor: "#14b8a6"
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "object", type = null, value = null }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "object", type = null, value = null, isRuntime = false }) {
 
-        super({ uuid, outer, name, type, value });
+        super({ uuid, outer, name, type, value, isRuntime });
 
         this.subType = USER_DEFINED_TYPES.OBJECT;
         this.validSubTypes = new Set([ USER_DEFINED_TYPES.OBJECT ]);
