@@ -1,0 +1,1 @@
+const n=window.localStorage;function l(e){return n.getItem(e)}function c(e,t){return n.setItem(e,t),!0}function a(){const e=[];for(let t=0,i=window.localStorage.length;t<i;t++){const o=window.localStorage.key(t);o.indexOf(".")!==-1&&e.push({name:o,type:"file"})}return e}export{a as readDirectory,l as readFile,c as writeFile};
