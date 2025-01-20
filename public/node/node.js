@@ -16,20 +16,24 @@ class INode extends IObject {
     /** @type {IPropertyManager} */
     #propertyManager = null;
 
+    /** @type {Object.<string, ISocket>} */
+    #inputs = {};
+    get inputs() {
+        return this.#inputs;
+    }
+
+    /** @type {Object.<string, ISocket>} */
+    #outputs = {};
+    get outputs() {
+        return this.#outputs;
+    }
+
     constructor({ uuid = crypto.randomUUID(), outer = null } = {}) {
 
         super({ uuid, outer });
 
-        /** @type {Object.<string, ISocket>} */
-        this.inputs = {};
-
-        /** @type {Object.<string, ISocket>} */
-        this.outputs = {};
-        
         this.custom = {};
-
         this.isEntry = false;
-
         this.#propertyManager = new IPropertyManager({ outer: this });
 
     }
@@ -72,7 +76,7 @@ class INode extends IObject {
     addInput(uuid, name, socketClass, isRuntime = false) {
         
         if(!socketClass) return null;
-        if(this.inputs[uuid]) return null;
+        if(this.#inputs[uuid]) return null;
 
         const socket = new socketClass({
             uuid: uuid,
@@ -81,15 +85,15 @@ class INode extends IObject {
             type: ISocket.TYPES.INPUT,
             isRuntime: isRuntime
         });
-        this.inputs[uuid] = socket;
+        this.#inputs[uuid] = socket;
 
         return socket;
 
     }
     removeInput(uuid) {
-        const socket = this.inputs[uuid];
+        const socket = this.#inputs[uuid];
         if(socket.isRuntime) {
-            delete this.inputs[uuid];
+            delete this.#inputs[uuid];
             return true;
         }
         else {
@@ -102,7 +106,7 @@ class INode extends IObject {
             console.error("Invalid socket class");
             return;
         };
-        if(this.outputs[uuid]) {
+        if(this.#outputs[uuid]) {
             console.error("Socket already exists");
             return;
         };
@@ -114,15 +118,15 @@ class INode extends IObject {
             type: ISocket.TYPES.OUTPUT,
             isRuntime: isRuntime
         });
-        this.outputs[uuid] = socket;
+        this.#outputs[uuid] = socket;
 
         return socket;
         
     }
     removeOutput(uuid) {
-        const socket = this.outputs[uuid];
+        const socket = this.#outputs[uuid];
         if(socket.isRuntime) {
-            delete this.outputs[uuid];
+            delete this.#outputs[uuid];
             return true;
         }
         else {
@@ -131,10 +135,10 @@ class INode extends IObject {
     }
 
     getInput(uuid) {
-        return this.inputs[uuid];
+        return this.#inputs[uuid];
     }
     getOutput(uuid) {
-        return this.outputs[uuid];
+        return this.#outputs[uuid];
     }
     getSocket(uuid) {
         return this.getInput(uuid) || this.getOutput(uuid);
@@ -142,12 +146,12 @@ class INode extends IObject {
 
 
     execute() {}
-    executeLinkedNode(socketUUID, linkIndex = 0) {
+    executeLinkedNode(uuid, index = 0) {
 
-        const socket = this.getSocket(socketUUID);
+        const socket = this.getSocket(uuid);
 
-        if(socket && socket.isLinked(linkIndex)) {
-            const node = socket.getLinkedNode(linkIndex);
+        if(socket && socket.isLinked(index)) {
+            const node = socket.getLinkedNode(index);
             if(node) {
                 node.execute();
             }
@@ -167,16 +171,16 @@ class INode extends IObject {
             outputs: {},
         };
 
-        for(const uuid in this.inputs) {
-            const socket = this.inputs[uuid];
+        for(const uuid in this.#inputs) {
+            const socket = this.#inputs[uuid];
             if(!socket.isRuntime) continue;
             data.inputs[uuid] = {
                 name: socket.name || "in",
                 type: socket.subType,
             };
         };
-        for(const uuid in this.outputs) {
-            const socket = this.outputs[uuid];
+        for(const uuid in this.#outputs) {
+            const socket = this.#outputs[uuid];
             if(!socket.isRuntime) continue;
             data.outputs[uuid] = {
                 name: socket.name || "out",
@@ -185,8 +189,8 @@ class INode extends IObject {
         };
 
         let links = [];
-        for(const uuid in this.outputs) {
-            const socket = this.outputs[uuid];
+        for(const uuid in this.#outputs) {
+            const socket = this.#outputs[uuid];
             links = links.concat(socket.export());   
         };
 

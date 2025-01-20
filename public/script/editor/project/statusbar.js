@@ -17,7 +17,7 @@ class StatusBar extends H12 {
     render() {
 
         return <>
-            <div class="border-2 border-zinc-900 text-xs text-zinc-400 font-semibold flex flex-row justify-end select-none">
+            <div class="text-xs text-zinc-400 font-semibold flex flex-row justify-end select-none">
                 <label class="p-1 px-2 hover:bg-zinc-600">{position}</label>
             </div>
         </>

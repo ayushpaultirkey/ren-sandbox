@@ -2,6 +2,7 @@ import { IObject } from "./object.js";
 import { INode, NODES_REGISTRY } from "./node.js";
 import { IPropertyManager } from "./property/manager.js";
 import { ISocket } from "./socket.js";
+import { PRIMITIVE_TYPES } from "./types/default.js";
 
 class IGraph extends IObject {
 
@@ -13,37 +14,52 @@ class IGraph extends IObject {
 
     /** @type {Map<string, INode>} */
     #nodes = new Map();
+    get nodes() {
+        return this.#nodes;
+    }
 
     /** @type {IPropertyManager} */
     #propertyManager = null;
+    get propertyManager() {
+        return this.#propertyManager;
+    }
 
     /** @type {[{ sourceNode: string, sourceSocket: string, targetNode: string, targetSocket: string }]} */
     #links = [];
+    get links() {
+        return this.#links;
+    }
+
+    /** @type {IPropertyManager} */
+    #inputs = null;
+    get inputs() {
+        return this.#inputs;
+    }
+
+    /** @type {IPropertyManager} */
+    #outputs = null;
+    get outputs() {
+        return this.#outputs;
+    }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "Graph" } = {}) {
 
         super({ uuid, outer, name });
         this.custom = {};
+        // this.#inputs = new IPropertyManager({ outer: this });
+        // this.#outputs = new IPropertyManager({ outer: this });
         this.#propertyManager = new IPropertyManager({ outer: this });
-        
+
     }
 
-    get links() {
-        return this.#links;
-    }
-    get nodes() {
-        return this.#nodes;
-    }
-    get propertyManager() {
-        return this.#propertyManager;
-    }
-
-    main({ properties = {}, nodes = {}, links = [], custom = {} } = {}) {
+    main({ properties = {}, nodes = {}, links = [], custom = {}, inputs = {}, outputs = {} } = {}) {
 
         this.custom = custom || {};
         this.custom.name = custom.name || this.name;
 
-        this.#propertyManager.main(properties);
+        // this.#inputs.main(inputs || {});
+        // this.#outputs.main(outputs || {});
+        this.#propertyManager.main(properties || {});
 
         for(const uuid in nodes) {
             const node = nodes[uuid];
@@ -58,6 +74,23 @@ class IGraph extends IObject {
 
         return true;
 
+    }
+
+    addOutput(uuid, name, type) {
+        
+        const newUUID = uuid || crypto.randomUUID();
+
+        if(this.outputs[newUUID]) return;
+        this.outputs[newUUID] = {
+            name: name,
+            type: type
+        };
+
+        return newUUID;
+
+    }
+    getOutputs() {
+        return this.outputs;
     }
 
     addNode(nodeUUID, nodeData = { class: null, properties: {}, custom: {} }) {
@@ -253,6 +286,8 @@ class IGraph extends IObject {
             nodes: {},
             links: [],
             properties: this.#propertyManager.export(),
+            // inputs: this.#inputs.export(),
+            // outputs: this.#outputs.export(),
             custom: this.custom,
         };
 

@@ -67,15 +67,15 @@ class StringValue extends UIProperty {
         super();
         this.control = InputBox;
     }
-    main() {
-        if(!this.iproperty) return;
-        const { control } = this.child;
-        control.setValue(this.iproperty.value);
-        control.dispatcher.on("onUpdated", (value) => {
-            this.parent.addOutputSocket(crypto.randomUUID(), "dyn");
-            this.iproperty.value = value;
-        });
-    }
+    // main() {
+    //     if(!this.iproperty) return;
+    //     const { control } = this.child;
+    //     control.setValue(this.iproperty.value);
+    //     control.dispatcher.on("onUpdated", (value) => {
+    //         this.parent.addOutputSocket(crypto.randomUUID(), "dyn");
+    //         this.iproperty.value = value;
+    //     });
+    // }
 }
 
 

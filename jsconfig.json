@@ -5,6 +5,11 @@
             "@script/*": ["./public/script/*"],
             "@style/*": ["./public/style/*"],
             "@vm/*": ["./public/node/*"],
+            "@editor/*": ["./public/script/editor/*"],
+            "@project/*": ["./public/script/editor/project/*"],
+            "@adapter/*": ["./public/adapter/*"],
+            "@handler/*": ["./public/handler/*"],
+            "@config/*": ["./public/config/*"],
         }
     }
 }

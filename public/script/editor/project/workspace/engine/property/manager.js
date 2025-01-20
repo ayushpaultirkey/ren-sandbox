@@ -7,6 +7,10 @@ class UIPropertyManager extends H12 {
         super();
     }
     
+    main() {
+        this.reset();
+    }
+
     render() {
 
         return <>
@@ -33,6 +37,13 @@ class UIPropertyManager extends H12 {
 
     /** @type {import("@vm/property/manager").IPropertyManager} */
     #ipropertyManager;
+
+    reset() {
+        if(this.#ipropertyManager) {
+            this.#ipropertyManager.dispatcher.clearAll();
+        }
+        this.set("{properties}", "No Property Manager Found");
+    }
 
     refresh(ipropertyManager) {
         if(this.#ipropertyManager) {

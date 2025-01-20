@@ -29,7 +29,6 @@ class Navigator extends H12 {
                 <div>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabNode") }>nodes</button>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabProperties") }>properties</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabGraph") }>graph</button>
                     <button class="w-full border-2 border-zinc-900">stats</button>
                     <button class="w-full border-2 border-zinc-900">run</button>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.debug() }>debug</button>
@@ -62,14 +61,6 @@ class Navigator extends H12 {
                             <Property args alias={ UIPropertyManager } id="graphsetProperties"></Property>
                         </div>
                         
-                    </div>
-                    <div id="tabGraph" class="navigator-tab hidden">
-
-                        <div class="navigator-panel">
-                            <label>Graphs Properties:</label>
-                            <Property args alias={ UIPropertyManager } id="graphProperties"></Property>
-                        </div>
-
                     </div>
                     <div id="tabNode" class="flex-col hidden">
                         <label class="text-sm font-semibold border-b-2 border-zinc-500">Nodes:</label>
@@ -111,14 +102,6 @@ class Navigator extends H12 {
         
     }
 
-    refreshGraph(igraph) {
-        if(!igraph) {
-            console.error("No graph provided");
-            return;
-        };
-        this.child.graphProperties.refresh(igraph.propertyManager);
-    }
-
     #refreshGraphs() {
         
         const { graphs: uiGraphs } = this.key;
@@ -156,7 +139,9 @@ class Navigator extends H12 {
             properties: {},
             custom: {
                 name: graphName.value || "no name"
-            }
+            },
+            inputs: {},
+            outputs: {}
         });
         graphName.value = "";
         console.warn("Graph added");

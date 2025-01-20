@@ -274,7 +274,7 @@ class UIGraph extends H12 {
             }
 
         });
-        dispatcher.on("clearAllInputLinks", (socket) => {
+        dispatcher.on("clearAllSocketLinks", (socket) => {
 
             if(!socket) return;
 

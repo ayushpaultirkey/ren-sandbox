@@ -39,7 +39,7 @@ class UISocket extends H12 {
         const color = meta.displayColor || "gray";
         const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
-        const runtimeTemplate = this.#isocket.isRuntime ? <><button class="text-xs font-semibold text-rose-500 mr-1" onclick={ this.#clearAllInputLinks }>&times;</button></> : "";
+        const runtimeTemplate = this.#isocket.isRuntime ? <><button class="text-xs font-semibold text-rose-500 mr-1" onclick={ this.#removeSocket }>&times;</button></> : "";
 
         return <>
             <div class="px-[8px] relative" onmouseover={ this.#createTargetSocket } onmouseleave={ this.#clearTargetSocket }>
@@ -49,7 +49,7 @@ class UISocket extends H12 {
                     id="btn"
                     style={ `background-color: ${color};` } 
                     class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` }
-                    onclick={ this.#clearAllInputLinks }
+                    onclick={ this.#clearAllSocketLinks }
                     onmousedown={ this.#createSourceSocket }>
                 </button>
             </div>
@@ -57,18 +57,20 @@ class UISocket extends H12 {
 
     }
 
-    #clearAllInputLinks() {
-
+    #removeSocket() {
         if(this.#isocket.isRuntime) {
-            this.#workspace.dispatcher.emit("clearAllInputLinks", this);
+            this.#workspace.dispatcher.emit("clearAllSocketLinks", this);
             this.parent.removeSocket(this.#isocket);
-            return;
         };
+    }
+
+    #clearAllSocketLinks() {
+
         if(this.#isocket.type != ISocket.TYPES.INPUT || !this.#workspace) {
             console.error("Invalid socket or workspace");
             return;
         };
-        this.#workspace.dispatcher.emit("clearAllInputLinks", this);
+        this.#workspace.dispatcher.emit("clearAllSocketLinks", this);
         
     }
 

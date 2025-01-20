@@ -1,9 +1,9 @@
-import { Workspace } from "@script/editor/project/workspace";
+import { Workspace } from "@project/workspace";
 
 /**
     * 
     * @param {import("@library/h12").default} component 
-    * @returns {import("@script/editor/project/workspace").Workspace}
+    * @returns {Workspace}
 */
 function getWorkplace(component) {
 

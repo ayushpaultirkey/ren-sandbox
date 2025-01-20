@@ -1,9 +1,9 @@
 import { Workspace } from "@project/workspace";
 import { IEngine } from "@vm/engine";
 
-import { Navigator } from "./engine/navigator";
-import { UIGraph } from "./engine/graph";
-import { GraphProperty } from "./engine/graph-property";
+import { Navigator } from "@project/workspace/engine/navigator";
+import { UIGraph } from "@project/workspace/engine/graph";
+import { GraphProperty } from "@project/workspace/engine/graph-property";
 
 class UIEngine extends Workspace {
 

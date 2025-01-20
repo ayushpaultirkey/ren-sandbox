@@ -74,7 +74,7 @@ class IGraphSet extends IObject {
         }
     }
 
-    addGraph(graphUUID, graphData = { nodes: {}, links: [], properties: {}, custom: {} }) {
+    addGraph(graphUUID, graphData = { nodes: {}, links: [], properties: {}, custom: {}, inputs: {}, outputs: {} }) {
         try {
 
             const uuid = graphUUID || crypto.randomUUID();
@@ -92,6 +92,8 @@ class IGraphSet extends IObject {
                 links: graphData.links,
                 properties: graphData.properties,
                 custom: graphData.custom,
+                inputs: graphData.inputs,
+                outputs: graphData.outputs
             });
             this.#graphs.set(uuid, graph);
 

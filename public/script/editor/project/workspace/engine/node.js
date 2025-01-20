@@ -75,6 +75,8 @@ class UINode extends H12 {
         const name = this.#inode.name || meta.displayName || "Node";
 
         const canCache = meta.canCache ? "" : "";
+        const isEntry = this.#inode.isEntry ? <><button onclick={ () => { this.#inode.execute() } }>(run)</button></> : "";
+
 
         return <>
             <div class={ `bg-zinc-800 rounded-sm text-zinc-500 border-2 ${meta.canCache ? "border-sky-800" : "border-teal-800"} text-xs absolute font-semibold select-none py-1` } style={ `top: ${y}px; left: ${x}px; min-width: 100px;` }>
@@ -82,6 +84,7 @@ class UINode extends H12 {
                 <div id="header" class="flex flex-row text-zinc-400 px-2 space-x-2">
                     <div class={ `flex-grow flex items-center space-x-1 ${meta.canCache ? "text-sky-600" : "text-teal-600"}` }>
                         <label id="handle">{ name }</label>
+                        { isEntry }
                     </div>
                     <button class="text-rose-700 font-extrabold hidden" onclick={ this.removeNode }>&times;</button>
                 </div>

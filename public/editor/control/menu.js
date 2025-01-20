@@ -2,14 +2,13 @@ import "@style/main.css";
 import H12 from "@library/h12";
 import { dispatcher } from "@script/dispatcher";
 
-class Menu extends H12 {
+class MenuItem extends H12 {
+
     constructor() {
         super();
     }
-    main(args) {
-        
-    }
-    build(options) {
+
+    #build(options) {
 
         const items = [];
         
@@ -20,7 +19,7 @@ class Menu extends H12 {
             const option = options[title];
 
             if(typeof(option) === "object") {
-                nested = this.build(option);
+                nested = this.#build(option);
                 button = <>
                     <button>{ title }</button>
                 </>;
@@ -48,7 +47,23 @@ class Menu extends H12 {
     }
     render() {
 
-        const options = {
+        return <>
+            <div class="text-zinc-500 text-xs font-semibold px-2 py-1 rounded-md hover:bg-zinc-600 hover:bg-opacity-40 menu">
+                <label>{ this.args.title || "Title" }</label>
+                { this.#build(this.args.options || {}) }
+            </div>
+        </>;
+
+    }
+}
+
+class Menu extends H12 {
+    constructor() {
+        super();
+    }
+    main(args) {
+
+        const fileOptions = {
             "Open": {
                 "Project": () => { console.log("Open Graph Set"); },
             },
@@ -66,17 +81,38 @@ class Menu extends H12 {
             },
             "Context Explorer": () => { console.log("Open Graph Set"); },
         };
+        this.set("{menu}", <>
+            <><item args alias={ MenuItem } title="File" options={ fileOptions }></item></>
+        </>);
+
+
+
+        dispatcher.on("add-menu", (id, title, options = {}) => {
+            if(this.child[id]) return;
+            this.set("{menu}++", <>
+                <><item args alias={ MenuItem } id={ id } title={ title } options={ options }></item></>
+            </>);
+        });
+        dispatcher.on("remove-menu", (id) => {
+            this.child[id].destroy();
+        });
         
+    }
+    
+    render() {
         return <>
             <div class="flex flex-row p-1 relative z-20 bg-zinc-800">
-                <div class="text-zinc-500 text-xs font-semibold px-2 py-1 rounded-md hover:bg-zinc-600 hover:bg-opacity-40 menu">
-                    <label>File</label>
-                    { this.build(options) }
-                </div>
+                {menu}
             </div>
         </>;
-
     }
+
+    destroy() {
+        dispatcher.clear("add-menu");
+        dispatcher.clear("remove-menu");
+        super.destroy();
+    }
+
 };
 
 export { Menu };

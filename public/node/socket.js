@@ -16,8 +16,6 @@ class ISocket extends IObject {
         return this.#links;
     }
 
-    #value = null;
-
     #type = null;
     get type() {
         return this.#type;
@@ -28,11 +26,10 @@ class ISocket extends IObject {
         return this.#isRuntime;
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, value = null, isRuntime = false } = {}) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = null, type = null, isRuntime = false } = {}) {
 
         super({ uuid, outer, name });
 
-        this.#value = value;
         this.#type = type;
         this.#links = [];
         this.#isRuntime = isRuntime;
@@ -44,6 +41,7 @@ class ISocket extends IObject {
 
     }
 
+    #value = null;
     getValue() {
         if(this.#type == ISocket.TYPES.INPUT) {
 

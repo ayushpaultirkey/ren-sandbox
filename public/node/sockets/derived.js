@@ -22,5 +22,25 @@ class ExecutionSocket extends ISocket {
     }
 
 }
+class EventSocket extends ISocket {
 
-export { ExecutionSocket };
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "ISocket.EventSocket",
+        displayName: "Event",
+        displayColor: "#f43f5e"
+    }
+
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "event", type = null, isRuntime = false }) {
+
+        super({ uuid, outer, name, type, isRuntime });
+
+        this.subType = DERIVED_TYPES.EVENT;
+        this.validSubTypes = new Set([ DERIVED_TYPES.EVENT ]);
+        this.maxLinks = 1;
+
+    }
+
+}
+
+export { ExecutionSocket, EventSocket };

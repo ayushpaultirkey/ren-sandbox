@@ -8,17 +8,30 @@ class ActionBar extends H12 {
     }
     main() {
 
+        this.set("{tabs}", "");
+
     }
     render() {
 
         return <>
             <div class="p-1 px-2">
-                <control args alias={ Button } title="main.ren"></control>
+                {tabs}
             </div>
         </>
 
     }
+    addTab(uuid, title) {
 
+        this.set("{tabs}++", <>
+            <button class="primary-btn">{ title }</button>
+        </>);
+
+    }
+    removeTab(uuid) {
+        
+        this.child[uuid].destroy();
+
+    }
 }
 
 export { ActionBar };

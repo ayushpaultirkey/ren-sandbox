@@ -3,7 +3,7 @@ import { PRIMITIVE_TYPES } from "../types/default.js";
 
 import { ObjectSocket } from "../sockets/user.js";
 import { FloatSocket, StringSocket, WildcardSocket } from "../sockets/primitive.js";
-import { ExecutionSocket } from "../sockets/derived.js";
+import { EventSocket, ExecutionSocket } from "../sockets/derived.js";
 import { ISocket } from "../socket.js";
 
 
@@ -20,9 +20,10 @@ class Begin extends INode {
         super({ uuid, outer });
         this.isEntry = true;
     }
+    
     main(args) {
         this.addOutput("out0", "out", ExecutionSocket);
-        this.addOutput("args0", "args", ObjectSocket);
+        this.addOutput("args0", "args?", ObjectSocket);
         super.main(args);
     }
 
@@ -76,7 +77,7 @@ class Return extends INode {
     }
     main(args) {
         this.addInput("in0", "in", ExecutionSocket);
-        this.addInput("args0", "args", ObjectSocket);
+        this.addInput("args0", "args?", ObjectSocket);
         super.main(args);
     }
     execute() {
