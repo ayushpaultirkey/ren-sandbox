@@ -9,4 +9,23 @@ function writeFile(path, data) {
     return true;
 }
 
-export { readFile, writeFile };
+function readDirectory() {
+    
+    const files = [];
+
+    for(let i = 0, len = window.localStorage.length; i < len; i++) {
+        const key = window.localStorage.key(i);
+        const isFile = key.indexOf(".") !== -1;
+        if(isFile) {
+            files.push({
+                name: key,
+                type: "file"
+            })
+        }
+    }
+
+    return files;
+
+}
+
+export { readFile, writeFile, readDirectory };

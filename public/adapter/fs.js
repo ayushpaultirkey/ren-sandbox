@@ -3,8 +3,8 @@ import { getHandler } from "@handler/manager";
 
 async function readFile() {
     try {
-        const { readFile } = await getHandler(FS_HANDLER);
-        return readFile( ... arguments );
+        const { readFile: hReadFile } = await getHandler(FS_HANDLER);
+        return hReadFile( ... arguments );
     }
     catch(error) {
         console.error(error);
@@ -13,12 +13,22 @@ async function readFile() {
 
 async function writeFile() {
     try {
-        const { writeFile } = await getHandler(FS_HANDLER);
-        return writeFile( ... arguments );
+        const { writeFile: hWriteFile } = await getHandler(FS_HANDLER);
+        return hWriteFile( ... arguments );
     }
     catch(error) {
         console.error(error);
     };
 };
 
-export { readFile, writeFile };
+async function readDirectory() {
+    try {
+        const { readDirectory: hReadDirectory } = await getHandler(FS_HANDLER);
+        return hReadDirectory( ... arguments );
+    }
+    catch(error) {
+        console.error(error);
+    };
+};
+
+export { readFile, writeFile, readDirectory };

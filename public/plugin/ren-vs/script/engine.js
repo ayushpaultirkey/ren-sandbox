@@ -4,6 +4,7 @@ import { IEngine } from "@vm/engine";
 import { Navigator } from "@project/workspace/engine/navigator";
 import { UIGraph } from "@project/workspace/engine/graph";
 import { GraphProperty } from "@project/workspace/engine/graph-property";
+import { readFile, writeFile } from "@adapter/fs";
 
 class UIEngine extends Workspace {
 
@@ -19,8 +20,26 @@ class UIEngine extends Workspace {
     }
     main(args) {
 
-        const data = args.data;
-        const uuid = Object.keys(data)[0];
+        this.load();
+
+    }
+    async load() {
+
+        const path = this.args.path;
+        let data = await readFile(path);
+
+        if(!data) {
+            alert("Failed to load file");
+            return;
+        };
+
+
+        data = JSON.parse(data);
+
+        let uuid = Object.keys(data)[0];
+        if(!uuid || uuid.length < 5) {
+            uuid = crypto.randomUUID();
+        };
 
         this.createEngine();
         this.createGraphSet(uuid, data[uuid]);
@@ -29,7 +48,7 @@ class UIEngine extends Workspace {
         uiGraph(<><label class="text-zinc-500 text-xs font-semibold ml-2">No graph selected</label></>);
 
         this.dispatcher.on("openGraph", (uuid) => this.openGraph(uuid));
-        
+
     }
     render() {
 
@@ -50,6 +69,14 @@ class UIEngine extends Workspace {
         const data = this.#igraphset.export();
         console.log(data);
         console.log(JSON.stringify(data));
+    }
+    async save() {
+
+        const data = this.#igraphset.export();
+        const path = this.args.path;
+        await writeFile(path, JSON.stringify(data));
+        alert("Saved");
+
     }
     debug() {
         console.log(this.#iengine);

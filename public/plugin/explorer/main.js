@@ -1,17 +1,27 @@
+import { WorkspaceRegistry } from "@config/registry";
 import { dispatcher } from "@script/dispatcher";
+import { Explorer } from "./script/explorer";
+import { readDirectory } from "@adapter/fs";
 
 function register() {
 
-    console.warn("registered");
+    WorkspaceRegistry.set(".*", Explorer);
     dispatcher.emit("add-menu", "explorer-menu", "Explorer", {
-        "Open": () => { console.log("Open Graph Set"); },
+        "Open": () => {
+            dispatcher.emit("open-workspace", "Explorer", ".*");
+        },
     });
+
+    console.warn("registered");
+    
 
 }
 function unregister() {
     
-    console.warn("unregistered");
+    WorkspaceRegistry.delete(".*");
     dispatcher.emit("remove-menu", "explorer-menu");
+
+    console.warn("unregistered");
 
 }
 

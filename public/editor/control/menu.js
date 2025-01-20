@@ -31,7 +31,7 @@ class MenuItem extends H12 {
             }
 
             const template = <>
-                <div class="menu-hover py-1 px-2 min-w-32 hover:bg-zinc-600 hover:bg-opacity-40">
+                <div class="menu-nested py-1 px-2 min-w-32 hover:bg-zinc-600 hover:bg-opacity-40">
                     { button }
                     { nested }
                 </div>
@@ -63,29 +63,7 @@ class Menu extends H12 {
     }
     main(args) {
 
-        const fileOptions = {
-            "Open": {
-                "Project": () => { console.log("Open Graph Set"); },
-            },
-            "New Project": () => {
-                dispatcher.emit("show-creator");
-            },
-            "New File": {
-                "Graph Set": () => { console.log("Open Graph Set"); },
-            },
-            "Export": {
-                "Graph Set": () => { console.log("Open Graph Set"); },
-            },
-            "Import": {
-                "Graph Set": () => { console.log("Open Graph Set"); },
-            },
-            "Context Explorer": () => { console.log("Open Graph Set"); },
-        };
-        this.set("{menu}", <>
-            <><item args alias={ MenuItem } title="File" options={ fileOptions }></item></>
-        </>);
-
-
+        this.set("{menu}", "");
 
         dispatcher.on("add-menu", (id, title, options = {}) => {
             if(this.child[id]) return;

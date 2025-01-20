@@ -7,15 +7,14 @@ class ZoomHandler {
 
     constructor(target) {
         this.#target = target;
-        this.#handler = this.zoom.bind(this);
+        this.#handler = this.#zoom.bind(this);
     }
     register() {
 
         if(!this.#target) {
             console.error("ZoomHandler: Invalid target element");
             return;
-        }
-
+        };
         this.#target.addEventListener("mousewheel", this.#handler);
 
     }
@@ -24,12 +23,14 @@ class ZoomHandler {
         if(!this.#target) {
             console.error("ZoomHandler: Invalid target element");
             return;
-        }
+        };
         this.#target.removeEventListener("mousewheel", this.#handler);
 
     }
+    onZoom() {}
+    #zoom(event) {
 
-    zoom(event) {
+        event.stopPropagation();
         event.preventDefault();
     
         const root = this.#target;
@@ -57,16 +58,8 @@ class ZoomHandler {
         VIEWPORT.zoom = newZoom;
     
         //dispatcher.call("onZoom", VIEWPORT.zoom);
-    }
-    zoomIn() {
-        VIEWPORT.zoom = (VIEWPORT.zoom + 0.1) > VIEWPORT.zoomMax ? VIEWPORT.zoomMax : VIEWPORT.zoom + 0.05;
-        this.#target.style.transform = `scale(${VIEWPORT.zoom})`;
-        //dispatcher.call("onZoom", VIEWPORT.zoom);
-    }
-    zoomOut() {
-        VIEWPORT.zoom -= (VIEWPORT.zoom - 0.1) < VIEWPORT.zoomMin ? 0 : 0.05;
-        this.#target.style.transform = `scale(${VIEWPORT.zoom})`;
-        //dispatcher.call("onZoom", VIEWPORT.zoom);
+        this.onZoom();
+
     }
 }
 

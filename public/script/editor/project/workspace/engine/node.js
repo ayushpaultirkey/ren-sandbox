@@ -28,6 +28,15 @@ class UINode extends H12 {
         // Drag(this.root, this.root, this.parent.root, false);
        
         this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
+        this.#dragHandler.onDragEnd = () => {
+
+            const x = this.root.style.left.replace("px", "");
+            const y = this.root.style.top.replace("px", "");
+    
+            this.#inode.custom["x"] = Math.round(x) || 5;
+            this.#inode.custom["y"] = Math.round(y) || 5;
+
+        };
         this.#dragHandler.register();
 
         this.#displaySockets();
@@ -194,6 +203,7 @@ class UINode extends H12 {
     destroy() {
 
         if(this.#dragHandler) {
+
             const x = this.root.style.left.replace("px", "");
             const y = this.root.style.top.replace("px", "");
     

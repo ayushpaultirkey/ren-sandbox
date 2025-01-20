@@ -164,11 +164,23 @@ class UIGraph extends H12 {
     #registerHandlers() {
 
         this.#zoomHandler = new ZoomHandler(this.root);
+        this.#zoomHandler.onZoom = () => {
+            this.#igraph.custom.z = VIEWPORT.zoom;
+        };
         this.#zoomHandler.register();
 
         this.#dragHandler = new DragHandler(this.root, this.parent.element.viewport, this.parent.element.viewport);
         this.#dragHandler.isFrame = true;
         this.#dragHandler.gridSize = 1;
+        this.#dragHandler.onDragEnd = () => {
+
+            const x = this.root.style.left.replace("px", "");
+            const y = this.root.style.top.replace("px", "");
+    
+            this.#igraph.custom["x"] = Math.round(x);
+            this.#igraph.custom["y"] = Math.round(y);
+
+        };
         this.#dragHandler.register();
 
     }

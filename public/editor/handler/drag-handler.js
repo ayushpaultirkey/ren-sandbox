@@ -51,6 +51,8 @@ class DragHandler {
         }
     }
 
+    onDragEnd() {}
+
     #onDragStart(event) {
 
         event.stopPropagation();
@@ -99,6 +101,8 @@ class DragHandler {
 
             this.#targetBound = target.getBoundingClientRect();
             this.#parentBound = parent.getBoundingClientRect();
+
+            this.onDragEnd();
 
         }
 

@@ -1,24 +1,25 @@
 import { WorkspaceRegistry } from "@config/registry";
 import { UIEngine } from "./script/engine";
 import { dispatcher } from "@script/dispatcher";
+import { Creator } from "./script/creator";
 
 function register() {
 
     WorkspaceRegistry.set(".ren", UIEngine);
-    console.log("registered");
-    
-    dispatcher.emit("add-menu", "ren-menu", "Graph", {
-        "Open": {
-            "Project": () => { console.log("Open Graph Set"); },
+    dispatcher.emit("add-menu", "ren-menu", "Ren", {
+        "New": {
+            "Graph Set": async () => {
+                dispatcher.emit("add-overlay", Creator);
+            },
         },
-        "Context Explorer": () => { console.log("Open Graph Set"); },
     });
+
+    console.warn("registered");
 
 }
 function unregister() {
     
     WorkspaceRegistry.delete(".ren");
-
     dispatcher.emit("remove-menu", "ren-menu");
 
     console.log("unregistered");

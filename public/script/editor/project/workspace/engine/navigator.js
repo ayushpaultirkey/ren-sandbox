@@ -33,6 +33,7 @@ class Navigator extends H12 {
                     <button class="w-full border-2 border-zinc-900">run</button>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.debug() }>debug</button>
                     <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.export() }>export</button>
+                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.save() }>save</button>
                 </div>
                 <div id="tabs" class="navigator-container">
                     <div id="tabProperties" class="navigator-tab">
