@@ -11,7 +11,7 @@ class Icon extends H12 {
         const path = this.args.path;
 
         return <>
-            <svg style={ `width: ${w}; height: ${h};` } viewBox="0 0 24 24">
+            <svg style={ `width: ${w}; height: ${h};` } viewBox="0 0 24 24" class={ this.args.class || "" }>
                 <path svg d={ path } />
             </svg>
         </>;

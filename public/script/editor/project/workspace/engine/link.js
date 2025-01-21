@@ -42,7 +42,7 @@ class Link {
         line.setAttributeNS(null, "x2", x2);
         line.setAttributeNS(null, "y2", y2);
         line.setAttributeNS(null, "style", `stroke:${color};stroke-width:2`);
-        line.setAttributeNS(null, "class", "path");
+        line.setAttributeNS(null, "class", "socket-link");
         return line;
 
     }

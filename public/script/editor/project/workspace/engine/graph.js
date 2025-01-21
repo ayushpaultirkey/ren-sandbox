@@ -227,7 +227,7 @@ class UIGraph extends H12 {
                 }
             }
     
-            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style={ `stroke:${color};stroke-width:2;` } class="path"></line></>;
+            const line = <><line svg x1={ 0 } y1={ 0 } x2={ 0 } y2={ 0 } style={ `stroke:${color};stroke-width:2;` } class="socket-link"></line></>;
         
             topGraph.append(line);
             this.helperLinks.set(socketID, line);

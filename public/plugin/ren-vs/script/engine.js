@@ -65,9 +65,21 @@ class UIEngine extends Workspace {
 
     }
     export() {
+
         const data = this.#igraphset.export();
+        const exportData = JSON.stringify(data);
+
         console.log(data);
-        console.log(JSON.stringify(data));
+        console.log(exportData);
+
+        const blob = new Blob([ exportData ], { type: "text/plain" });
+        const a = document.createElement("a");
+        const url = URL.createObjectURL(blob);
+        a.href = url;
+        a.download = (this.#igraphset.custom.name || "graphset") + ".ren";
+        a.click();
+        URL.revokeObjectURL(url);
+
     }
     async save() {
 
@@ -126,7 +138,6 @@ class UIEngine extends Workspace {
                 throw new Error(`Graph ${uuid} not found`);
             };
             this.activeGraphUUID = uuid;
-            //this.child.navigator.refreshGraph(graph);
             this.child.graphProperty.refresh(graph);
 
             uiGraph(<>

@@ -46,7 +46,9 @@ class UIPropertyManager extends H12 {
         if(this.#ipropertyManager) {
             this.#ipropertyManager.dispatcher.clearAll();
         }
-        this.set("{properties}", "No Property Manager Found");
+        this.set("{properties}", <>
+            <label class="text-xs">No Property Manager Found</label>
+        </>);
     }
 
     refresh(ipropertyManager) {
@@ -79,7 +81,7 @@ class UIPropertyManager extends H12 {
 
             uiProperties(<>
                 <div class="flex flex-col">
-                    <label class="text-xs">{ property.name }:</label>
+                    <label class="text-xs font-semibold">{ property.name }</label>
                     <div class="w-full flex flex-row space-x-1">
                         <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
                         <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } }>

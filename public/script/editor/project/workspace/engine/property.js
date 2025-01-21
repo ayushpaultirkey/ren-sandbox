@@ -59,7 +59,7 @@ class StringValue extends UIProperty {
     }
     template() {
         return <>
-            <input id="textbox" type="text" class="primary-input w-full h-full" oninput={ this.updateValue } />
+            <input id="textbox" type="text" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
     setValue(value) {
@@ -78,7 +78,7 @@ class FloatValue extends StringValue {
     }
     template() {
         return <>
-            <input id="textbox" type="number" class="primary-input w-full h-full" oninput={ this.updateValue } />
+        <input id="textbox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
 }

@@ -3,6 +3,8 @@ import { dispatcher } from "@script/dispatcher.js";
 import VIEWPORT from "../../../../../editor/viewport.js";
 import { NODES_REGISTRY } from "../../../../../node/node.js";
 import { getWorkplace } from "@script/library/workplace.js";
+import { mdiCardBulletedOutline } from "@mdi/js";
+import { Icon } from "../../../../../editor/control/icon.js";
 
 class Category extends H12 {
 
@@ -46,7 +48,7 @@ class Category extends H12 {
 
                 const field = <>
                     <details class="space-y-1" open>
-                        <summary class="text-sm font-semibold">{ current }</summary>
+                        <summary class="text-xs">{ current }</summary>
                         <div class="pl-4 flex flex-col space-y-1"></div>
                     </details>
                 </>;
@@ -62,9 +64,16 @@ class Category extends H12 {
             }
             
             if(isLast) {
+
+                const canCache = nodeClass.meta.canCache;
+
                 this.staticFields[current].children[1].appendChild(<>
-                    <button onclick={ () => { this.addNode(category); } } class="text-left italic hover:font-semibold hover:underline">{ name }</button>
+                    <button onclick={ () => { this.addNode(category); } } class="text-xs font-semibold text-left italic hover:font-semibold hover:underline flex space-x-1 items-center">
+                        <Icon args width="16" height="16" path={ mdiCardBulletedOutline } class={ canCache ? "fill-blue-600" : "fill-teal-600" }></Icon>
+                        <label>{ name }</label>
+                    </button>
                 </>);
+
             }
 
         }

@@ -22,7 +22,7 @@ class GraphProperty extends H12 {
     render() {
         return <>
             <div class="property-container border-l border-zinc-700">
-                <div class="property p-2">
+                <div class="property">
                     <label class="mb-2">Graphs Properties:</label>
                     <div>
                         <property args alias={ UIPropertyManager } id="graphProperties"></property>

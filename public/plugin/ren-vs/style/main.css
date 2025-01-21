@@ -1,15 +1,3 @@
-.path {
-    stroke-dasharray: 5;
-    animation: dash 5s infinite linear;
-}
-
-
-@keyframes dash {
-    to {
-        stroke-dashoffset: -50;
-    }
-}
-
 .viewport {
     @apply w-full relative overflow-hidden;
     background-color: #e5e5f7;
@@ -22,4 +10,82 @@
 
 .frame {
     outline: 10000px solid rgba(0, 0, 0, 0.5);
+}
+
+.node {
+    @apply py-1;
+    @apply bg-zinc-800;
+    @apply border-2 rounded-sm;
+    @apply text-zinc-500;
+    @apply absolute select-none;
+}
+.node.cache {
+    @apply border-sky-800;
+}
+.node.non-cache {
+    @apply border-teal-800;
+}
+.node-title {
+    @apply px-2;
+    @apply flex flex-row space-x-2;
+    @apply text-xs font-semibold text-zinc-400;
+}
+.node-title > div {
+    @apply flex-grow flex items-center;
+    @apply space-x-1;
+}
+.node-title > div.cache {
+    @apply text-sky-600;
+}
+.node-title > div.non-cache {
+    @apply text-teal-600;
+}
+.node-close {
+    @apply text-rose-700 font-extrabold;
+    @apply hidden;
+}
+
+.node-socket {
+    @apply flex flex-row;
+    @apply w-full;
+    @apply text-xs font-semibold;
+}
+.node-socket > .input,
+.node-socket > .output {
+    @apply w-full;
+    @apply relative;
+}
+.node-socket > .output {
+    @apply text-right;
+}
+.node-socket > .input > .pin-holder,
+.node-socket > .output > .pin-holder {
+    @apply px-[8px];
+    @apply relative;
+}
+.pin-holder > .pin {
+    @apply absolute;
+    @apply w-3 h-3;
+    @apply top-[4px];
+    @apply rounded border-2 border-zinc-800;
+}
+.pin-holder > .pin.left {
+    @apply -left-[6px];
+}
+.pin-holder > .pin.right {
+    @apply -right-[6px];
+}
+
+.node-property {
+    @apply px-1;
+}
+
+.socket-link {
+    stroke-dasharray: 5;
+    animation: dash 5s infinite linear;
+}
+@keyframes dash {
+    to {
+        stroke-dashoffset: -50;
+    }
 }

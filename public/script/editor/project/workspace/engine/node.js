@@ -83,31 +83,31 @@ class UINode extends H12 {
         const meta = this.#inode.meta;
         const name = this.#inode.name || meta.displayName || "Node";
 
-        const canCache = meta.canCache ? "" : "";
+        const canCache = meta.canCache ? "cache" : "non-cache";
         const isEntry = this.#inode.isEntry ? <><button onclick={ () => { this.#inode.execute() } }>(run)</button></> : "";
 
 
         return <>
-            <div class={ `bg-zinc-800 rounded-sm text-zinc-500 border-2 ${meta.canCache ? "border-sky-800" : "border-teal-800"} text-xs absolute font-semibold select-none py-1` } style={ `top: ${y}px; left: ${x}px; min-width: 100px;` }>
+            <div class={ `node ${canCache}` } style={ `top: ${y}px; left: ${x}px; min-width: 100px;` }>
                 
-                <div id="header" class="flex flex-row text-zinc-400 px-2 space-x-2">
-                    <div class={ `flex-grow flex items-center space-x-1 ${meta.canCache ? "text-sky-600" : "text-teal-600"}` }>
+                <div id="header" class="node-title">
+                    <div class={ `${canCache}` }>
                         <label id="handle">{ name }</label>
                         { isEntry }
                     </div>
-                    <button class="text-rose-700 font-extrabold hidden" onclick={ this.removeNode }>&times;</button>
+                    <button class="node-close" onclick={ this.removeNode }>&times;</button>
                 </div>
 
-                <div id="socket" class="flex flex-row w-full">
-                    <div class="w-full relative">
+                <div id="socket" class="node-socket">
+                    <div class="input">
                         {inputs}
                     </div>
-                    <div class="w-full relative text-right">
+                    <div class="output">
                         {outputs}
                     </div>
                 </div>
 
-                <div id="values" class="px-1" onmousedown={ (e) => e.stopPropagation() }>
+                <div id="values" class="node-property" onmousedown={ (e) => e.stopPropagation() }>
                     {properties}
                 </div>
 

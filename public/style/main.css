@@ -94,7 +94,7 @@ input::-webkit-inner-spin-button {
 }
 
 .seperator {
-    @apply bg-zinc-500 bg-opacity-50 rounded-lg;
+    @apply bg-zinc-600 bg-opacity-50 rounded-lg;
     height: 3px;
 }
 

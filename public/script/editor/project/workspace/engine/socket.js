@@ -44,7 +44,7 @@ class UISocket extends H12 {
         const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
         return <>
-            <div class="px-[8px] relative"
+            <div class="pin-holder"
                 onmouseover={ this.#createTargetSocket }
                 onmouseleave={ this.#clearTargetSocket }
                 socketuuid={ this.#isocket.uuid }
@@ -59,7 +59,7 @@ class UISocket extends H12 {
                     ontouchstart={ this.#createSourceSocket }
                     onmousedown={ this.#createSourceSocket }
                     style={ `background-color: ${color};` }
-                    class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` }>
+                    class={ `pin ${isOutput ? "right" : "left"}` }>
                 </button>
             </div>
         </>;

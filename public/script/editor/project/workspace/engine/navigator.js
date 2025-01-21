@@ -2,7 +2,7 @@ import H12 from "@library/h12.js";
 import { Category } from "./nodelist.js";
 import { UIPropertyManager } from "./property/manager.js";
 import { getWorkplace } from "@script/library/workplace.js";
-import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlus } from "@mdi/js";
+import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiClose, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlus } from "@mdi/js";
 import { Icon } from "../../../../../editor/control/icon.js";
 
 class Navigator extends H12 {
@@ -30,22 +30,22 @@ class Navigator extends H12 {
                 <div class="side-menu">
 
                     <button onclick={ () => this.changeTab("tabNode") } title="Node List">
-                        <Icon args width="24px" height="24px" path={ mdiCardBulletedOutline }></Icon>
+                        <Icon args path={ mdiCardBulletedOutline }></Icon>
                     </button>
                     <button onclick={ () => this.changeTab("tabProperties") } title="Properties">
-                        <Icon args width="24px" height="24px" path={ mdiAbacus }></Icon>
+                        <Icon args path={ mdiAbacus }></Icon>
                     </button>
                     <button title="Run">
-                        <Icon args width="24px" height="24px" path={ mdiPlay }></Icon>
+                        <Icon args path={ mdiPlay }></Icon>
                     </button>
-                    <button nclick={ () => this.parent.debug() } title="Debug">
-                        <Icon args width="24px" height="24px" path={ mdiBug }></Icon>
+                    <button onclick={ () => this.parent.debug() } title="Debug">
+                        <Icon args path={ mdiBug }></Icon>
                     </button>
                     <button onclick={ () => this.parent.export() } title="Export">
-                        <Icon args width="24px" height="24px" path={ mdiPackageUp }></Icon>
+                        <Icon args path={ mdiPackageUp }></Icon>
                     </button>
                     <button onclick={ () => this.parent.save() } title="Save">
-                        <Icon args width="24px" height="24px" path={ mdiContentSave }></Icon>
+                        <Icon args path={ mdiContentSave }></Icon>
                     </button>
 
                 </div>
@@ -138,9 +138,14 @@ class Navigator extends H12 {
         const graphs = this.#igraphset.graphs;
         for(const [uuid, graph] of graphs) {
             uiGraphs(<>
-                <div class="flex flex-row items-center bg-zinc-600 rounded-sm font-semibold select-none">
-                    <label class="w-full text-xs p-1 pl-2" onclick={ () => this.#openGraph(uuid) }>{ graph.custom.name }</label>
-                    <button class="primary-btn m-1" onclick={ () => this.#removeGraph(uuid) }>&times;</button>
+                <div class="primary-input bg-opacity-50 flex flex-row items-center pr-1" onclick={ () => this.#openGraph(uuid) }>
+                    <label class="w-full text-xs font-semibold">{ graph.custom.name }</label>
+                    <button class="primary-btn" onclick={ (e) => {
+                        e.stopPropagation();
+                        this.#removeGraph(uuid);
+                    } }>
+                        <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
+                    </button>
                 </div>
             </>, "x++");
         };
