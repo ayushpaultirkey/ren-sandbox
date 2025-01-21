@@ -9,8 +9,7 @@ import { UISocket } from "./socket.js";
 import { Link } from "./link.js";
 import { getWorkplace } from "@script/library/workplace.js";
 
-//import { UINode } from "./node.js";
-
+// import { UINode } from "./node.js";
 // import { UISocket } from "./socket.js";
 // import { Link } from "./link.js";
 
@@ -76,7 +75,7 @@ class UIGraph extends H12 {
 
         return <>
             <div class="absolute" style={ `left: ${x}px; top: ${y}px; transform: scale(${z});` }>
-                <div id="frame" class="frame border-2 border-zinc-500 absolute">
+                <div id="frame" class="frame absolute">
                     { this.#createSVG("backGraph") }
                     <div>
                         {nodes}
@@ -244,8 +243,8 @@ class UIGraph extends H12 {
                 const { x: parentX, y: parentY } = this.root.getBoundingClientRect();
                 const { x: socketX, y: socketY, width, height } = socketElement.getBoundingClientRect();
     
-                const x1 = (socketX - parentX + width / 2.5) / scale;
-                const y1 = (socketY - parentY + height / 2.5) / scale;
+                const x1 = (socketX - parentX + width / 2) / scale;
+                const y1 = (socketY - parentY + height / 2) / scale;
                 const x2 = (x - parentX) / scale;
                 const y2 = (y - parentY) / scale;
 

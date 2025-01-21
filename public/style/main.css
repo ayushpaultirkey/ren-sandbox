@@ -9,48 +9,88 @@ html, body {
 }
 ::-webkit-scrollbar {
     width: 5px;
+    height: 5px;
 }
 ::-webkit-scrollbar-track {
     background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background: #888;
+    @apply bg-zinc-300;
 }
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+
+
+.side-menu {
+    @apply p-1;
+    @apply space-y-1;
+    @apply bg-zinc-700;
+    @apply border-r border-zinc-600;
+}
+.side-menu > button {
+    @apply bg-zinc-200 bg-opacity-0 hover:bg-opacity-20 active:bg-opacity-30;
+    @apply p-2;
+    @apply rounded-sm;
+}
+.side-menu > button > svg {
+    @apply w-6 h-6 max-w-6 max-h-6;
+    @apply fill-zinc-400;
+}
+.side-menu > button:hover svg {
+    @apply fill-zinc-100;
+}
+
+
+
+.property-container {
+    @apply min-w-[275px] max-w-[275px];
+    @apply p-2 px-3;
+    @apply text-zinc-400;
+}
+.property-tab {
+    @apply space-y-2;
+}
+.property {
+    @apply flex flex-col;
+}
+.property > div {
+    @apply space-y-1;
+}
+.property > label {
+    @apply text-xs;
+}
+
+
 
 .primary-btn,
 .primary-input,
 .primary-select {
     @apply bg-zinc-700 hover:bg-zinc-600 active:bg-zinc-700;
-    @apply border-2 rounded-sm border-zinc-800;
-    @apply text-xs font-semibold text-zinc-400;
-    @apply px-[6px] py-[2px];
+    @apply rounded-sm;
+    @apply border border-zinc-600 border-opacity-50;
+    @apply hover:border-zinc-500 focus:border-blue-600 focus:border-opacity-60;
+    @apply text-xs text-zinc-400;
+    @apply px-2 py-1;
 }
 .primary-input,
 .primary-select {
-    @apply bg-zinc-200 hover:bg-zinc-300 active:bg-zinc-200;
+    @apply bg-zinc-900 hover:bg-zinc-800 active:bg-zinc-900;
+    @apply text-zinc-400;
+}
+.primary-input::placeholder {
     @apply text-zinc-700;
 }
 .primary-select {
     @apply px-[2px];
 }
 
-
-.navigator-container {
-    @apply min-w-[250px] max-w-[250px];
-    @apply border-2 border-zinc-950;
-    @apply p-2;
-    @apply text-zinc-400;
-}
-.navigator-tab {
-    @apply space-y-2;
-}
-
-.navigator-panel {
-    @apply flex flex-col;
-    @apply space-y-1;
-}
-.navigator-panel > label {
-    @apply text-xs font-semibold;
+.primary-btn > svg {
+    @apply fill-zinc-400;
+    @apply w-4 h-4 max-w-4 max-h-4;
 }
 
 .seperator {
@@ -59,71 +99,28 @@ html, body {
 }
 
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
 
-
-.path {
-    stroke-dasharray: 5;
-    animation: dash 5s infinite linear;
-}
-
-@keyframes dash {
-    to {
-        stroke-dashoffset: -50;
-    }
-}
-
-.viewport {
-    background-color: #e5e5f7;
-    opacity: 1;
-    background-image: radial-gradient(rgb(60, 60, 60) 0.8px, rgb(40, 40, 40) 0.8px);
-    background-size: 32px 32px;
-}
-.frame {
-    outline: 10000px solid rgba(0, 0, 0, 0.5);
-}
-
-input::-webkit-outer-spin-button,
-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-input[type=number] {
-  -moz-appearance: textfield;
+.editor {
+    @apply w-full h-full overflow-hidden relative;
+    @apply bg-zinc-800;
 }
 
 
 
-.project-grid {
-    display: grid;
-    grid-template-columns: auto 1fr;
-    grid-template-rows: auto 1fr;
-    grid-template-areas: 
-        "project-navigator project-actionbar"
-        "project-navigator project-viewport"
-        ;
+.editor-container {
+    @apply w-full h-full flex flex-col;
 }
-.project-actionbar {
-    grid-area: project-actionbar;
+.editor-menu {
+    @apply flex flex-row p-1 relative z-20;
+    @apply bg-zinc-900;
 }
-.project-navigator {
-    grid-area: project-navigator;
-}
-.project-viewport {
-    grid-area: project-viewport;
-}
-
 .menu,
 .menu-nested {
-    position: relative;
+    @apply relative;
 }
 .menu > div,
 .menu-nested > div {
-    position: absolute;
-    display: none;
+    @apply absolute hidden;
     min-width: 100px;
     left: 0px;
     top: 100%;
@@ -132,7 +129,6 @@ input[type=number] {
 .menu-nested:hover > div {
     display: block;
 }
-
 .menu-nested > div {
     top: 0px;
     left: 100%;
@@ -143,6 +139,74 @@ input[type=number] {
     text-align: left;
 }
 
-.active {
-    @apply border-rose-700;
+
+
+.editor-overlay {
+    
 }
+
+
+
+.project {
+    @apply w-full h-full flex flex-col;
+    @apply overflow-hidden;
+}
+
+
+
+.project-area-tab {
+    @apply overflow-x-auto;
+    @apply h-9;
+}
+.tab-container {
+    @apply px-2 pt-2;
+    @apply flex flex-row;
+    @apply h-full;
+}
+.tab-container > .tab {
+    @apply cursor-pointer;
+    @apply flex flex-row;
+    @apply text-xs font-semibold;
+    @apply border border-zinc-300 border-opacity-10 border-b-0;
+    @apply rounded-tl-sm rounded-tr-sm;
+    @apply bg-zinc-300 bg-opacity-5;
+}
+.tab-container > .tab > button:first-child {
+    @apply text-zinc-400;
+    @apply p-1 px-3;
+}
+.tab-container > .tab > button:nth-child(2) {
+    @apply invisible;
+    @apply text-sm text-zinc-200;
+    @apply px-2 pl-0;
+    padding-bottom: 2px;
+}
+.tab-container > .tab.active {
+    @apply bg-opacity-25;
+}
+.tab-container > .tab.active > button:nth-child(2),
+.tab-container > .tab:hover > button:nth-child(2)  {
+    @apply visible;
+}
+
+
+
+.project-area-workspace {
+    @apply w-full h-full;
+    @apply border-y border-zinc-700;
+}
+.project-workspace {
+    @apply w-full h-full flex flex-row;
+}
+
+
+
+.project-area-status {
+
+}
+
+
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

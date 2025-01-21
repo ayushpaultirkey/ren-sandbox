@@ -2,7 +2,8 @@ import H12 from "@library/h12.js";
 import { Category } from "./nodelist.js";
 import { UIPropertyManager } from "./property/manager.js";
 import { getWorkplace } from "@script/library/workplace.js";
-
+import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlus } from "@mdi/js";
+import { Icon } from "../../../../../editor/control/icon.js";
 
 class Navigator extends H12 {
 
@@ -19,53 +20,79 @@ class Navigator extends H12 {
     main(args) {
 
         this.#workspace = getWorkplace(this);
-
+        
     }
 
     render() {
 
         return <>
             <div class="flex flex-row h-full">
-                <div>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabNode") }>nodes</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.changeTab("tabProperties") }>properties</button>
-                    <button class="w-full border-2 border-zinc-900">stats</button>
-                    <button class="w-full border-2 border-zinc-900">run</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.debug() }>debug</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.export() }>export</button>
-                    <button class="w-full border-2 border-zinc-900" onclick={ () => this.parent.save() }>save</button>
+                <div class="side-menu">
+
+                    <button onclick={ () => this.changeTab("tabNode") } title="Node List">
+                        <Icon args width="24px" height="24px" path={ mdiCardBulletedOutline }></Icon>
+                    </button>
+                    <button onclick={ () => this.changeTab("tabProperties") } title="Properties">
+                        <Icon args width="24px" height="24px" path={ mdiAbacus }></Icon>
+                    </button>
+                    <button title="Run">
+                        <Icon args width="24px" height="24px" path={ mdiPlay }></Icon>
+                    </button>
+                    <button nclick={ () => this.parent.debug() } title="Debug">
+                        <Icon args width="24px" height="24px" path={ mdiBug }></Icon>
+                    </button>
+                    <button onclick={ () => this.parent.export() } title="Export">
+                        <Icon args width="24px" height="24px" path={ mdiPackageUp }></Icon>
+                    </button>
+                    <button onclick={ () => this.parent.save() } title="Save">
+                        <Icon args width="24px" height="24px" path={ mdiContentSave }></Icon>
+                    </button>
+
                 </div>
-                <div id="tabs" class="navigator-container">
-                    <div id="tabProperties" class="navigator-tab">
+                <div id="tabs" class="property-container border-r border-zinc-700">
+                    <div id="tabProperties" class="property-tab">
 
-                        <div class="navigator-panel">
-                            <label>Graphs Set</label>
+                        <div class="property text-2xl">
+                            <label class="!text-sm !font-normal">Graphs Set</label>
                         </div>
 
                         <div class="seperator"></div>
 
-                        <div class="navigator-panel">
+                        <div class="property">
                             <label>Graphs:</label>
-                            <div class="flex flex-row">
-                                <input class="primary-input w-full border-r-0 rounded-r-none" placeholder="Name" id="graphName" />
-                                <button class="primary-btn rounded-l-none" onclick={ this.#addGraph }>Add</button>
-                            </div>
-                            <div class="space-y-1">
-                                {graphs}
+                            <div>
+                                <div class="flex flex-row space-x-1">
+                                    <input class="primary-input w-full" placeholder="Name" id="graphName" />
+                                    <button class="primary-btn" onclick={ this.#addGraph }>
+                                        <Icon args path={ mdiPlus }></Icon>
+                                    </button>
+                                </div>
+                                <div class="space-y-1">
+                                    {graphs}
+                                </div>
                             </div>
                         </div>
 
                         <div class="seperator"></div>
 
-                        <div class="navigator-panel">
+                        <div class="property">
                             <label>Graphs Set Properties:</label>
-                            <Property args alias={ UIPropertyManager } id="graphsetProperties"></Property>
+                            <div>
+                                <Property args alias={ UIPropertyManager } id="graphsetProperties"></Property>
+                            </div>
                         </div>
                         
                     </div>
-                    <div id="tabNode" class="flex-col hidden">
-                        <label class="text-sm font-semibold border-b-2 border-zinc-500">Nodes:</label>
+                    <div id="tabNode" class="property-tab hidden">
+
+                        <div class="property text-2xl">
+                            <label class="!text-sm !font-normal">Nodes:</label>
+                        </div>
+
+                        <div class="seperator"></div>
+
                         <Category args id="category" auto="true"></Category>
+
                     </div>
                 </div>
             </div>

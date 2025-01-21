@@ -31,12 +31,12 @@ class Editor extends H12 {
 
     render() {
         return <>
-            <div class="w-full h-full overflow-hidden bg-zinc-700 relative">
-                <div class="w-full h-full flex flex-col">
+            <div class="editor">
+                <div class="editor-container">
                     <Menu args></Menu>
                     <Project args id="project"></Project>
                 </div>
-                <div>
+                <div class="editor-overlay">
                     {overlay}
                 </div>
             </div>
@@ -59,7 +59,7 @@ class Editor extends H12 {
         const path = await getArguments();
         if(!path || !path[0]) {
             return;
-        }
+        };
 
         await this.child.project.load(path[0]);
 

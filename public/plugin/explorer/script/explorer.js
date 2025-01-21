@@ -20,7 +20,7 @@ class Explorer extends Workspace {
     render() {
 
         return <>
-            <div class="w-full h-full flex flex-row">
+            <div class="project-workspace">
                 <div class="bg-zinc-800 p-2 w-full relative overflow-hidden border-2 border-zinc-950 flex flex-col">
                     {files}
                 </div>

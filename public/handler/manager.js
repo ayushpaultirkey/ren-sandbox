@@ -5,9 +5,9 @@ async function getHandler(handler) {
         return handlers.get(handler);
     }
     else {
-        const module = await import(`../handler/${handler}`);
+        const module = await import(`../handler/${handler.path}/${handler.file}.js`);
         handlers.set(handler, module);
-        console.warn(`Handler ${handler} loaded`);
+        console.warn(`Handler ${JSON.stringify(handler)} loaded`);
         return module;
     };
 };

@@ -79,7 +79,7 @@ class Menu extends H12 {
     
     render() {
         return <>
-            <div class="flex flex-row p-1 relative z-20 bg-zinc-800">
+            <div class="editor-menu">
                 {menu}
             </div>
         </>;

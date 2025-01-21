@@ -20,12 +20,13 @@ class UIProperty extends H12 {
     main() {
 
         if(!this.#iproperty) return;
+        this.setValue(this.#iproperty.value);
 
-        const { control } = this.child;
-        control.setValue(this.#iproperty.value);
-        control.dispatcher.on("onUpdated", (value) => {
-            this.#iproperty.value = value;
-        });
+        // const { control } = this.child;
+        // control.setValue(this.#iproperty.value);
+        // control.dispatcher.on("onUpdated", (value) => {
+        //     this.#iproperty.value = value;
+        // });
 
     }
     render() {
@@ -33,50 +34,55 @@ class UIProperty extends H12 {
         if(!this.args.iobject) return <><label>Invalid property</label></>;
         this.#iproperty = this.args.iobject;
 
-        const title = this.#iproperty.name || this.#iproperty.meta.displayName;
-
         return <>
-            <control args property={ this.controlProperties } alias={ this.control } title={ title } id="control">
-                { this.args.child || "" }
-            </control>
+            <div class={ this.args.class || "" }>
+                { this.template() }
+            </div>
         </>;
 
     }
-}
-
-
-class FloatValue extends UIProperty {
-    constructor() {
-        super();
-        this.control = InputBox;
-        this.controlProperties = { type: "number" };
+    template() {
+        return "";
     }
-    // main() {
-    //     if(!this.iproperty) return;
-    //     const { control } = this.child;
-    //     control.setValue(this.iproperty.value);
-    //     control.dispatcher.on("onUpdated", (value) => {
-    //         this.parent.addOutputSocket(crypto.randomUUID(), "dyn");
-    //         this.iproperty.value = value;
-    //     });
-    // }
+    updateValue() {
+        this.#iproperty.value = value;
+    }
+    setValue(value) {
+
+    }
 }
+
 
 class StringValue extends UIProperty {
     constructor() {
         super();
-        this.control = InputBox;
     }
-    // main() {
-    //     if(!this.iproperty) return;
-    //     const { control } = this.child;
-    //     control.setValue(this.iproperty.value);
-    //     control.dispatcher.on("onUpdated", (value) => {
-    //         this.parent.addOutputSocket(crypto.randomUUID(), "dyn");
-    //         this.iproperty.value = value;
-    //     });
-    // }
+    template() {
+        return <>
+            <input id="textbox" type="text" class="primary-input w-full h-full" oninput={ this.updateValue } />
+        </>;
+    }
+    setValue(value) {
+        const { textbox } = this.element;
+        textbox.value = value;
+    }
+    updateValue() {
+        const { textbox } = this.element;
+        this.iproperty.value = textbox.value;
+    }
 }
+
+class FloatValue extends StringValue {
+    constructor() {
+        super();
+    }
+    template() {
+        return <>
+            <input id="textbox" type="number" class="primary-input w-full h-full" oninput={ this.updateValue } />
+        </>;
+    }
+}
+
 
 
 

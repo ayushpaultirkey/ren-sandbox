@@ -12,6 +12,7 @@ class Link {
 
         this.line = null;
         this.fOnMouseDown = this.onMouseDown.bind(this);
+        this.fOnTouchStart = this.onTouchStart.bind(this);
 
     }
     remove() {
@@ -47,7 +48,7 @@ class Link {
     }
     create() {
 
-        const { source, target, graph, fOnMouseDown } = this;
+        const { source, target, graph, fOnMouseDown, fOnTouchStart } = this;
 
         source.addLink(this);
         target.addLink(this);
@@ -56,15 +57,18 @@ class Link {
         const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
 
         const o = source.getSocketElement().getBoundingClientRect();
-        const x1 = (o.left - parentX + o.width / 2.5) / scale;
-        const y1 = (o.top - parentY + o.height / 2.5) / scale;
+        const x1 = (o.left - parentX + o.width / 2) / scale;
+        const y1 = (o.top - parentY + o.height / 2) / scale;
 
         const i = target.getSocketElement().getBoundingClientRect();
-        const x2 = (i.left - parentX + i.width / 2.5) / scale;
-        const y2 = (i.top - parentY + i.height / 2.5) / scale;
+        const x2 = (i.left - parentX + i.width / 2) / scale;
+        const y2 = (i.top - parentY + i.height / 2) / scale;
 
         source.parent.root.addEventListener("mousedown", fOnMouseDown);
         target.parent.root.addEventListener("mousedown", fOnMouseDown);
+
+        source.parent.root.addEventListener("touchstart", fOnTouchStart);
+        target.parent.root.addEventListener("touchstart", fOnTouchStart);
 
         this.line = this.#createLine(x1, y1, x2, y2);
 
@@ -81,12 +85,12 @@ class Link {
             const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
     
             const o = source.getSocketElement().getBoundingClientRect();
-            const x1 = (o.left - parentX + o.width / 2.5) / scale;
-            const y1 = (o.top - parentY + o.height / 2.5) / scale;
+            const x1 = (o.left - parentX + o.width / 2) / scale;
+            const y1 = (o.top - parentY + o.height / 2) / scale;
     
             const i = target.getSocketElement().getBoundingClientRect();
-            const x2 = (i.left - parentX + i.width / 2.5) / scale;
-            const y2 = (i.top - parentY + i.height / 2.5) / scale;
+            const x2 = (i.left - parentX + i.width / 2) / scale;
+            const y2 = (i.top - parentY + i.height / 2) / scale;
 
             line.setAttributeNS(null, "x1", x1);
             line.setAttributeNS(null, "y1", y1);
@@ -103,6 +107,39 @@ class Link {
         window.addEventListener("mousemove", onDragMove);
         window.addEventListener("mouseup", onDragStop);
         
+    }
+    onTouchStart(event) {
+
+        const { source, target, graph, line } = this;
+        const scale = VIEWPORT.zoom || 1;
+
+        const onTouchMove = (e) => {
+
+            const { x: parentX, y: parentY } = graph.root.getBoundingClientRect();
+    
+            const o = source.getSocketElement().getBoundingClientRect();
+            const x1 = (o.left - parentX + o.width / 2) / scale;
+            const y1 = (o.top - parentY + o.height / 2) / scale;
+    
+            const i = target.getSocketElement().getBoundingClientRect();
+            const x2 = (i.left - parentX + i.width / 2) / scale;
+            const y2 = (i.top - parentY + i.height / 2) / scale;
+
+            line.setAttributeNS(null, "x1", x1);
+            line.setAttributeNS(null, "y1", y1);
+            line.setAttributeNS(null, "x2", x2);
+            line.setAttributeNS(null, "y2", y2);
+
+        };
+
+        const onTouchStop = () => {
+            window.removeEventListener("touchmove", onTouchMove);
+            window.removeEventListener("touchend", onTouchStop);
+        };
+
+        window.addEventListener("touchmove", onTouchMove);
+        window.addEventListener("touchend", onTouchStop);
+
     }
 }
 

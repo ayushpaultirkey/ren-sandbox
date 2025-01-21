@@ -1,3 +1,4 @@
+import "./../style/main.css";
 import { Workspace } from "@project/workspace";
 import { IEngine } from "@vm/engine";
 
@@ -45,7 +46,7 @@ class UIEngine extends Workspace {
         this.createGraphSet(uuid, data[uuid]);
 
         const { graph: uiGraph } = this.key;
-        uiGraph(<><label class="text-zinc-500 text-xs font-semibold ml-2">No graph selected</label></>);
+        uiGraph(<><label class="message">No graph selected</label></>);
 
         this.dispatcher.on("openGraph", (uuid) => this.openGraph(uuid));
 
@@ -53,14 +54,12 @@ class UIEngine extends Workspace {
     render() {
 
         return <>
-            <div class="w-full h-full flex flex-row">
+            <div class="project-workspace">
                 <Navigator args id="navigator" workspace={ this }></Navigator>
-                <div id="viewport" class="viewport w-full relative overflow-hidden border-2 border-zinc-950">
+                <div id="viewport" class="viewport">
                     {graph}
                 </div>
-                <div class="border-2 min-w-[250px] max-w-[250px] border-zinc-950">
-                    <property args id="graphProperty" alias={ GraphProperty } workspace={ this }></property>
-                </div>
+                <property args id="graphProperty" alias={ GraphProperty } workspace={ this }></property>
             </div>
         </>
 

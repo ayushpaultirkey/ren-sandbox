@@ -1,5 +1,7 @@
 import H12 from "@library/h12";
 import { PROPERTY_REGISTRY, UIProperty } from "../property.js";
+import { Icon } from "../../../../../../editor/control/icon.js";
+import { mdiAbacus, mdiClose, mdiCross, mdiPlus } from "@mdi/js";
 
 class UIPropertyManager extends H12 {
 
@@ -15,9 +17,9 @@ class UIPropertyManager extends H12 {
 
         return <>
             <div>
-                <div class="flex flex-row">
-                    <input id="prop_name" class="primary-input w-full border-r-0 rounded-r-none" placeholder="Name" />
-                    <select id="prop_type" class="primary-select border-r-0 rounded-r-none rounded-l-none">
+                <div class="flex flex-row space-x-1">
+                    <input id="propertyName" class="primary-input w-full" placeholder="Name" />
+                    <select id="propertyType" class="primary-select">
                         {
                             ...
                             Object.keys(PROPERTY_REGISTRY).map(key => {
@@ -25,9 +27,11 @@ class UIPropertyManager extends H12 {
                             })
                         }
                     </select>
-                    <button class="primary-btn rounded-l-none" onclick={ this.#addProperty }>Add</button>
+                    <button class="primary-btn" onclick={ this.#addProperty }>
+                        <Icon args path={ mdiPlus }></Icon>
+                    </button>
                 </div>
-                <div class="flex flex-col">
+                <div class="flex flex-col space-y-1 mt-1">
                     {properties}
                 </div>
             </div>
@@ -56,12 +60,16 @@ class UIPropertyManager extends H12 {
     }
 
     #refreshProperties() {
+
         const { properties: uiProperties } = this.key;
 
         uiProperties("");
-        for(const child in this.child) {
-            this.child[child].destroy();
-        }
+        for(const id in this.child) {
+            const child = this.child[id];
+            if(child instanceof UIProperty) {
+                child.destroy();
+            };
+        };
 
         const properties = this.#ipropertyManager.properties;
         for(const [uuid, property] of properties) {
@@ -70,10 +78,14 @@ class UIPropertyManager extends H12 {
             if(!propertyClass) continue;
 
             uiProperties(<>
-                <div class="flex flex-row">
-                    <property args alias={ propertyClass } id={ uuid } iobject={ property }>
-                        <button class="primary-btn" onclick={ () => { this.#removeProperty(uuid) } }>&times;</button>
-                    </property>
+                <div class="flex flex-col">
+                    <label class="text-xs">{ property.name }:</label>
+                    <div class="w-full flex flex-row space-x-1">
+                        <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
+                        <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } }>
+                            <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
+                        </button>
+                    </div>
                 </div>
             </>, "x++");
 
@@ -97,10 +109,10 @@ class UIPropertyManager extends H12 {
             return;
         }
 
-        const { prop_name, prop_type } = this.element;
+        const { propertyName, propertyType } = this.element;
         
-        this.#ipropertyManager.addProperty(null, prop_name.value, prop_type.value);
-        prop_name.value = "";
+        this.#ipropertyManager.addProperty(null, propertyName.value, propertyType.value);
+        propertyName.value = "";
 
     }
 

@@ -8,9 +8,17 @@ class Tab extends H12 {
     }
     render() {
         return <>
-            <div class="primary-btn">
-                <button class="h-full" onclick={ () => { this.parent.setActive(this.id); } }>{ this.args.title }</button>
-                <button class="text-rose-500" onclick={ () => { this.parent.closeTab(this.id); } }>&times;</button>
+            <div class="tab" onclick={
+                (e) => {
+                        this.parent.setActive(this.id);
+                    }
+                }>
+                <button class="h-full">{ this.args.title }</button>
+                <button class="text-rose-500" onclick={ (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    this.parent.closeTab(this.id);
+                }}>&times;</button>
             </div>
         </>;
     }
@@ -28,7 +36,7 @@ class ActionBar extends H12 {
     render() {
 
         return <>
-            <div class="p-1 px-2 flex flex-row">
+            <div class="tab-container">
                 {tabs}
             </div>
         </>

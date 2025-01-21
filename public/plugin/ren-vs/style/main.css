@@ -1,0 +1,25 @@
+.path {
+    stroke-dasharray: 5;
+    animation: dash 5s infinite linear;
+}
+
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -50;
+    }
+}
+
+.viewport {
+    @apply w-full relative overflow-hidden;
+    background-color: #e5e5f7;
+    background-image: radial-gradient(rgb(60, 60, 60) 0.8px, rgb(40, 40, 40) 0.8px);
+    background-size: 32px 32px;
+}
+.viewport .message {
+    @apply text-zinc-500 text-xs font-semibold block m-6;
+}
+
+.frame {
+    outline: 10000px solid rgba(0, 0, 0, 0.5);
+}

@@ -6,6 +6,7 @@ import autoprefixer from "autoprefixer";
 import h12vite from "./plugin/h12.vite";
 
 export default defineConfig({
+    base: "/ren-sandbox/",
     root: join(__dirname, "/public"),
     build: {
         outDir: "../dist"
@@ -39,4 +40,7 @@ export default defineConfig({
             ],
         },
     },
+    assetsInclude: [
+        "/public/plugin/**/*"
+    ]
 })

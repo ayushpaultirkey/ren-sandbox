@@ -1,7 +1,6 @@
 import { WorkspaceRegistry } from "@config/registry";
 import { dispatcher } from "@script/dispatcher";
 import { Explorer } from "./script/explorer";
-import { readDirectory } from "@adapter/fs";
 
 function register() {
 
@@ -14,7 +13,6 @@ function register() {
 
     console.warn("registered");
     
-
 }
 function unregister() {
     

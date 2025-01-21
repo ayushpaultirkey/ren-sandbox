@@ -3,11 +3,17 @@ const HANDLERS = {
 };
 
 const FS_HANDLERS = {
-    WEB: "fs/web.js",
+    WEB: {
+        path: "fs",
+        file: "web"
+    },
 };
 
 const ARGV_HANDLERS = {
-    WEB: "argv/web.js",
+    WEB: {
+        path: "argv",
+        file: "web"
+    }
 }
 
 export {

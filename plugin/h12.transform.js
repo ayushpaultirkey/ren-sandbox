@@ -52,7 +52,7 @@ function preFormatBrackets(text = "") {
 
         if(bracket.match(/\s/gm)) {
 
-            const id = `{${PLACEHOLDER_CODE}${index}}`;
+            const id = `{${PLACEHOLDER_CODE}${index}__}`;
 
             text = text.replace(`{${bracket}}`, id);
 
@@ -103,10 +103,14 @@ function pharseText(element = document.body) {
                     textList.push(part.replace(/\{|\}/g, ""));
                 }
                 else {
+
                     textList.push(`\`${part}\``);
-                }
-                if(part.match(/\{[^{}\s]*\}/gm)) {
-                    keyList.push(part);
+
+                    // Only push keys if they are not placeholders
+                    if(part.match(/\{[^{}\s]*\}/gm)) {
+                        keyList.push(part);
+                    }
+
                 }
             }
         }
@@ -118,12 +122,16 @@ function pharseText(element = document.body) {
             textList.push(value.replace(/\{|\}/g, ""));
         }
         else {
+            
             textList.push(`\`${value}\``);
-        }
 
-        if(value.match(/\{[^{}\s]*\}/gm)) {
-            keyList.push(value);
-        }
+            // Only push keys if they are not placeholders
+            if(value.match(/\{[^{}\s]*\}/gm)) {
+                keyList.push(value);
+            };
+
+        };
+
 
     }
 

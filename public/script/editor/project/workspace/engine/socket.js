@@ -2,8 +2,6 @@ import H12 from "@library/h12";
 import { ISocket } from "@vm/socket.js";
 import { getWorkplace } from "@script/library/workplace";
 
-
-
 class UISocket extends H12 {
 
     /** @type {ISocket} */
@@ -14,6 +12,8 @@ class UISocket extends H12 {
 
     /** @type {Link[]} */
     #links = [];
+
+    #lastTouch = null;
 
     constructor() {
         super();
@@ -29,6 +29,10 @@ class UISocket extends H12 {
 
     }
 
+    removeButton() {
+        return this.#isocket.isRuntime ? <><button class="text-xs font-semibold text-rose-500 mr-1" onclick={ this.#removeSocket }>&times;</button></> : "";
+    }
+
     render() {
         
         if(!this.args.iobject) return <><label>Invalid socket</label></>;
@@ -39,18 +43,23 @@ class UISocket extends H12 {
         const color = meta.displayColor || "gray";
         const isOutput = this.#isocket.type == ISocket.TYPES.OUTPUT;
 
-        const runtimeTemplate = this.#isocket.isRuntime ? <><button class="text-xs font-semibold text-rose-500 mr-1" onclick={ this.#removeSocket }>&times;</button></> : "";
-
         return <>
-            <div class="px-[8px] relative" onmouseover={ this.#createTargetSocket } onmouseleave={ this.#clearTargetSocket }>
-                { runtimeTemplate }
-                <label style="font-size: 10px;">{ name }</label>
+            <div class="px-[8px] relative"
+                onmouseover={ this.#createTargetSocket }
+                onmouseleave={ this.#clearTargetSocket }
+                socketuuid={ this.#isocket.uuid }
+                nodeuuid={ this.#isocket.outer.uuid }>
+                <span>
+                    { ... this.removeButton() }
+                </span>
+                <label>{ name }</label>
                 <button
                     id="btn"
-                    style={ `background-color: ${color};` } 
-                    class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` }
                     onclick={ this.#clearAllSocketLinks }
-                    onmousedown={ this.#createSourceSocket }>
+                    ontouchstart={ this.#createSourceSocket }
+                    onmousedown={ this.#createSourceSocket }
+                    style={ `background-color: ${color};` }
+                    class={ `absolute w-3 h-3 ${isOutput ? "-right-[6px]" : "-left-[6px]"} top-[4px] rounded border-2 border-zinc-800` }>
                 </button>
             </div>
         </>;
@@ -121,13 +130,25 @@ class UISocket extends H12 {
         const socket = this.root;
         const element = this.getSocketElement();
 
+        if (event.type === "touchstart") {
+            if (event.touches.length === 1) {
+                this.#lastTouch = { x: event.touches[0].clientX, y: event.touches[0].clientY };
+            }
+        }
+
         if(socket) {
 
             dispatcher.emit("createSocketHelper", reference);
             dispatcher.emit("createSourceSocket", reference);
     
-            window.addEventListener("mousemove", onDragMove);
-            window.addEventListener("mouseup", onDragStop);
+            if (event.type === "mousedown") {
+                window.addEventListener("mousemove", onDragMove);
+                window.addEventListener("mouseup", onDragStop);
+            }
+            else if (event.type === "touchstart") {
+                window.addEventListener("touchmove", onTouchMove);
+                window.addEventListener("touchend", onTouchStop);
+            }
 
             function onDragMove(event) {
 
@@ -142,6 +163,28 @@ class UISocket extends H12 {
                 });
         
             };
+
+            function onTouchMove(event) {
+
+                if (event.touches.length === 1) {
+                    const touch = event.touches[0];
+                    const deltaX = touch.clientX - reference.#lastTouch.x;
+                    const deltaY = touch.clientY - reference.#lastTouch.y;
+
+                    dispatcher.emit("updateSocketHelper", {
+                        socketId: reference.id,
+                        socketElement: element,
+                        x: touch.clientX,
+                        y: touch.clientY
+                    });
+
+                    reference.#lastTouch = { x: touch.clientX, y: touch.clientY };
+                }
+
+                event.stopPropagation();
+                event.preventDefault();
+
+            };
     
             function onDragStop(event) {
 
@@ -154,6 +197,30 @@ class UISocket extends H12 {
                 dispatcher.emit("clearSocketHelper", reference.id);
                 dispatcher.emit("clearSourceSocket", reference);
         
+            };
+
+            function onTouchStop(event) {
+
+                event.stopPropagation();
+                event.preventDefault();
+
+                window.removeEventListener("touchmove", onTouchMove);
+                window.removeEventListener("touchend", onTouchStop);
+
+                dispatcher.emit("clearSocketHelper", reference.id);
+                dispatcher.emit("clearSourceSocket", reference);
+
+                const x = reference.#lastTouch.x;
+                const y = reference.#lastTouch.y;
+                const ele = document.elementsFromPoint(x, y);
+
+                ele.forEach(el => {
+                    if(el.hasAttribute("socketuuid") && el.hasAttribute("nodeuuid")) {
+                        console.log(el.getAttribute("socketuuid"), el.getAttribute("nodeuuid"));
+                        return;
+                    }
+                });
+
             };
     
         }

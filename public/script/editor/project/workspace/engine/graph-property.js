@@ -2,6 +2,8 @@ import H12 from "@library/h12.js";
 import { Category } from "./nodelist.js";
 import { UIPropertyManager } from "./property/manager.js";
 import { getWorkplace } from "@script/library/workplace.js";
+import { Icon } from "../../../../../editor/control/icon.js";
+import { mdiAbacus } from "@mdi/js";
 
 
 class GraphProperty extends H12 {
@@ -19,21 +21,13 @@ class GraphProperty extends H12 {
 
     render() {
         return <>
-            <div>
-                <div class="navigator-panel p-2">
-                    <label>Graphs Properties:</label>
-                    <property args alias={ UIPropertyManager } id="graphProperties"></property>
-                </div>
-                {
-                    /* <div class="navigator-panel p-2">
-                        <label>Input:</label>
-                        <property args alias={ UIPropertyManager } id="inputProperties"></property>
+            <div class="property-container border-l border-zinc-700">
+                <div class="property p-2">
+                    <label class="mb-2">Graphs Properties:</label>
+                    <div>
+                        <property args alias={ UIPropertyManager } id="graphProperties"></property>
                     </div>
-                    <div class="navigator-panel p-2">
-                        <label>Output:</label>
-                        <property args alias={ UIPropertyManager } id="outputProperties"></property>
-                    </div> */
-                }
+                </div>
             </div>
         </>;
     }
