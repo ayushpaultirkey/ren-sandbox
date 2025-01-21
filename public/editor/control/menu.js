@@ -48,7 +48,7 @@ class MenuItem extends H12 {
     render() {
 
         return <>
-            <div class="text-zinc-500 text-xs font-semibold px-2 py-1 rounded-md hover:bg-zinc-600 hover:bg-opacity-40 menu">
+            <div class="text-zinc-400 text-xs font-semibold px-2 py-1 rounded-md hover:bg-zinc-600 hover:bg-opacity-40 menu">
                 <label>{ this.args.title || "Title" }</label>
                 { this.#build(this.args.options || {}) }
             </div>

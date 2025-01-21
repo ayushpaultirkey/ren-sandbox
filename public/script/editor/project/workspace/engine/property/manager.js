@@ -19,7 +19,7 @@ class UIPropertyManager extends H12 {
             <div>
                 <div class="flex flex-row space-x-1">
                     <input id="propertyName" class="primary-input w-full" placeholder="Name" />
-                    <select id="propertyType" class="primary-select">
+                    <select id="propertyType" class="primary-select" aria-label="Property Type">
                         {
                             ...
                             Object.keys(PROPERTY_REGISTRY).map(key => {
@@ -27,7 +27,7 @@ class UIPropertyManager extends H12 {
                             })
                         }
                     </select>
-                    <button class="primary-btn" onclick={ this.#addProperty }>
+                    <button class="primary-btn" onclick={ this.#addProperty } aria-label="Add Property">
                         <Icon args path={ mdiPlus }></Icon>
                     </button>
                 </div>
@@ -84,7 +84,7 @@ class UIPropertyManager extends H12 {
                     <label class="text-xs font-semibold">{ property.name }</label>
                     <div class="w-full flex flex-row space-x-1">
                         <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
-                        <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } }>
+                        <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } } aria-label="Remove">
                             <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
                         </button>
                     </div>

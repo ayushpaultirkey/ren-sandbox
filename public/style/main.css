@@ -169,16 +169,16 @@ input::-webkit-inner-spin-button {
     @apply text-xs font-semibold;
     @apply border border-zinc-300 border-opacity-10 border-b-0;
     @apply rounded-tl-sm rounded-tr-sm;
-    @apply bg-zinc-300 bg-opacity-5;
+    @apply bg-zinc-400 bg-opacity-5;
 }
 .tab-container > .tab > button:first-child {
-    @apply text-zinc-400;
+    @apply text-zinc-300;
     @apply p-1 px-3;
 }
 .tab-container > .tab > button:nth-child(2) {
     @apply invisible;
     @apply text-sm text-zinc-200;
-    @apply px-2 pl-0;
+    @apply px-2;
     padding-bottom: 2px;
 }
 .tab-container > .tab.active {

@@ -63,7 +63,7 @@ class Navigator extends H12 {
                             <div>
                                 <div class="flex flex-row space-x-1">
                                     <input class="primary-input w-full" placeholder="Name" id="graphName" />
-                                    <button class="primary-btn" onclick={ this.#addGraph }>
+                                    <button class="primary-btn" onclick={ this.#addGraph } aria-label="Add Graph">
                                         <Icon args path={ mdiPlus }></Icon>
                                     </button>
                                 </div>
@@ -143,7 +143,7 @@ class Navigator extends H12 {
                     <button class="primary-btn" onclick={ (e) => {
                         e.stopPropagation();
                         this.#removeGraph(uuid);
-                    } }>
+                    } } aria-label="Remove Graph">
                         <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
                     </button>
                 </div>
