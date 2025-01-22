@@ -69,8 +69,8 @@ class Category extends H12 {
 
                 this.staticFields[current].children[1].appendChild(<>
                     <button onclick={ () => { this.addNode(category); } } class="text-xs font-semibold text-left italic hover:font-semibold hover:underline flex space-x-1 items-center">
-                        <Icon args width="16" height="16" path={ mdiCardBulletedOutline } class={ canCache ? "fill-blue-600" : "fill-teal-600" }></Icon>
-                        <label>{ name }</label>
+                        <Icon args width="16" height="16" path={ mdiCardBulletedOutline } class={ `pointer-events-none ${canCache ? "fill-sky-600" : "fill-teal-600"}` }></Icon>
+                        <label class="pointer-events-none">{ name }</label>
                     </button>
                 </>);
 

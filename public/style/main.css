@@ -51,6 +51,7 @@ input::-webkit-inner-spin-button {
     @apply p-2 px-3;
     @apply text-zinc-400;
     @apply bg-zinc-800;
+    @apply overflow-auto;
 }
 .property-tab {
     @apply space-y-2;

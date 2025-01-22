@@ -14,6 +14,9 @@ class UINode extends H12 {
 
     /** @type {INode} */
     #inode = null;
+    get inode() {
+        return this.#inode;
+    }
 
     /** @type {DragHandler} */
     #dragHandler = null;
@@ -94,9 +97,9 @@ class UINode extends H12 {
 
     }
     
-    // removeNode() {
-    //     this.parent.removeUINode(this);
-    // }
+    removeNode() {
+        this.parent.removeNode(this);
+    }
 
     renderProperties() {
 
@@ -148,6 +151,7 @@ class UINode extends H12 {
         };
 
     }
+
     #displaySocket(uiSocket, socket) {
         uiSocket(<>
             <socket args alias={ UISocket } id={ socket.uuid } iobject={ socket }></socket>
@@ -189,6 +193,7 @@ class UINode extends H12 {
             this.#inode.custom["y"] = Math.round(y) || 5;
     
             this.#dragHandler.unregister();
+            
         }
 
         super.destroy();

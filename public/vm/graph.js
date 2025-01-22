@@ -144,15 +144,17 @@ class IGraph extends IObject {
         for(const socketUUID in inSockets) {
             const socket = inSockets[socketUUID];
             this.clearAllSocketLinks(socket);
-        }
+        };
 
         const outSockets = node.outputs;
         for(const socketUUID in outSockets) {
             const socket = outSockets[socketUUID];
             this.clearAllSocketLinks(socket);
-        }
+        };
 
         this.#nodes.delete(node.uuid);
+
+        this.dispatcher.emit("nodeRemoved", node);
 
         return true;
 

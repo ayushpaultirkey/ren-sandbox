@@ -375,104 +375,24 @@ class UIGraph extends H12 {
 
     }
 
+    removeNode(uiNode) {
 
-    
-    // recenter() {
-    //     const parent = this.root.parentElement;
-    //     const frame = this.element.frame;
-    //     const parentRect = parent.getBoundingClientRect();
-    //     const frameRect = frame.getBoundingClientRect();
-    //     this.root.style.left = ((parentRect.width / 2) - (frameRect.width / 2)) + "px";
-    //     this.root.style.top = ((parentRect.height / 2) - (frameRect.height / 2)) + "px"; 
-    // }
+        if(!uiNode || !uiNode.inode) {
+            console.error("Invalid node");
+            return;
+        };
 
-    // addUINode(nodeClass, nodeUUID, nodeValue, x = 20, y = 20) {
-
-    //     const node = this.igraph.addNode(nodeClass, nodeUUID, nodeValue);
-    //     if(!node) {
-    //         console.error("Failed to add node");
-    //         return false;
-    //     };
+        if(!this.#igraph.removeNode(uiNode.inode)) {
+            console.error("Failed to remove node");
+            return;
+        };
         
-    //     const { nodes } = this.key;
-    //     nodes(<><node args id={ node.getUUID() } x={ x } y={ y } iobject={ node } alias={ UINode }></node></>, "x++");
+        uiNode.destroy();
+        console.warn("removed node");
 
-    // }
+        return true;
 
-    // getIGraph() {
-    //     return this.igraph;
-    // }
-    // getIGraphUUID() {
-    //     return this.igraph.getUUID();
-    // }
-    // getIGraphEntryNode() {
-    //     return this.igraph.getEntryNode();
-    // }
-
-    // getUINode(nodeUUID) {
-    //     return this.child[nodeUUID];
-    // }
-
-    // linkUINodes(uiSourceNode, uiSourceSocket, uiTargetNode, uiTargetSocket) {
-
-    //     const iNodeA = uiSourceNode.getINode();
-    //     const iNodeB = uiTargetNode.getINode();
-    //     const iSocketAUUID = uiSourceSocket.getIUUID();
-    //     const iSocketBUUID = uiTargetSocket.getIUUID();
-
-    //     if(!iNodeA || !iNodeB || !iSocketAUUID || !iSocketBUUID) return false;
-
-    //     const success = this.igraph.linkSocketsByUUID(iNodeA, iSocketAUUID, iNodeB, iSocketBUUID);
-    //     if(!success) {
-    //         console.error("Failed to link nodes");
-    //         return false;
-    //     };
-        
-    //     const link = new Link({ source: uiSourceSocket, target: uiTargetSocket, graph: this });
-    //     const line = link.create();
-
-    //     this.helperLinks[link.uuid] = line;
-
-    //     this.element.backGraph.append(line);
-
-    //     console.warn("connected");
-
-    //     return true;
-
-    // }
-
-
-    // removeUINode(uiNode) {
-
-    //     if(!uiNode) return false;
-    //     const inode = uiNode.getINode();
-
-    //     if(!inode) return false;
-
-    //     const inSockets = inode.input;
-    //     const outSockets = inode.output;
-
-    //     for(const socketUUID in inSockets) {
-    //         console.log(uiNode.child[socketUUID]);
-    //         uiNode.child[socketUUID].removeLinks()
-    //     };
-    //     for(const socketUUID in outSockets) {
-    //         console.warn(uiNode.child[socketUUID]);
-    //         uiNode.child[socketUUID].removeLinks();
-    //     };
-
-    //     const success = this.igraph.removeNode(inode);
-    //     if(!success) {
-    //         console.error("Failed to remove node");
-    //         return false;
-    //     };
-
-    //     console.log("removed node");
-    //     uiNode.destroy();
-
-    //     return true;
-
-    // }
+    }
 
 
 }
