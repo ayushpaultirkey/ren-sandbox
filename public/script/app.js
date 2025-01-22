@@ -1,6 +1,6 @@
 import "@style/main.css";
 import H12 from "@library/h12";
-import { Editor } from "./editor";
+import { Editor } from "./app/editor";
 
 class App extends H12 {
     constructor() {

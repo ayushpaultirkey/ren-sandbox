@@ -1,15 +1,23 @@
 {
     "compilerOptions": {
         "paths": {
+
             "@library/*": ["./public/library/*"],
             "@script/*": ["./public/script/*"],
             "@style/*": ["./public/style/*"],
-            "@vm/*": ["./public/node/*"],
-            "@editor/*": ["./public/script/editor/*"],
-            "@project/*": ["./public/script/editor/project/*"],
-            "@adapter/*": ["./public/adapter/*"],
-            "@handler/*": ["./public/handler/*"],
-            "@config/*": ["./public/config/*"],
+            "@vm/*": ["./public/vm/*"],
+
+            "@app/*": ["./public/script/app/*"],
+            "@event/*": ["./public/script/event/*"],
+
+            "@adapter/*": ["./public/script/app/adapter/*"],
+            "@config/*": ["./public/script/app/config/*"],
+            "@editor/*": ["./public/script/app/editor/*"],
+            "@handler/*": ["./public/script/app/handler/*"],
+            "@plugin/*": ["./public/script/app/plugin/*"],
+
+            "@project/*": ["./public/script/app/editor/project/*"],
+
         }
     }
 }
