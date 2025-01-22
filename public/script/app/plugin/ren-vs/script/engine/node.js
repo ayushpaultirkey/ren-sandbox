@@ -6,6 +6,8 @@ import { UISocket } from "./socket";
 import { DragHandler } from "../handler/drag-handler";
 import { PROPERTY_REGISTRY, UIProperty } from "./property";
 import { FloatSocket, StringSocket } from "@vm/sockets/primitive";
+import { Icon } from "@script/app/control/icon";
+import { mdiClose, mdiPlay } from "@mdi/js";
 
 
 class UINode extends H12 {
@@ -24,8 +26,6 @@ class UINode extends H12 {
         if(!this.#inode) {
             return;
         }
-
-        // Drag(this.root, this.root, this.parent.root, false);
        
         this.#dragHandler = new DragHandler(this.root, this.root, this.parent.root);
         this.#dragHandler.onDragEnd = () => {
@@ -37,35 +37,11 @@ class UINode extends H12 {
             this.#inode.custom["y"] = Math.round(y) || 5;
 
         };
+
         this.#dragHandler.register();
 
         this.#displaySockets();
         this.renderProperties();
-
-        // if(this.inode) {
-        //     this.inode.customExport = () => {
-        //         const { x: parentX, y: parentY } = this.parent.root.getBoundingClientRect();
-        //         const { x, y } = this.root.getBoundingClientRect();
-        //         return {
-        //             x: Math.round(x - parentX),
-        //             y: Math.round(y - parentY)
-        //         };
-        //     }
-        // }
-
-        // const { header, socket, values } = this.element;
-        // dispatcher.bind("onZoom", (e, zoom) => {
-        //     if(zoom < 0.6) {
-        //         header.classList.add("invisible");
-        //         socket.classList.add("invisible");
-        //         values.classList.add("invisible");
-        //     }
-        //     else {
-        //         header.classList.remove("invisible");
-        //         socket.classList.remove("invisible");
-        //         values.classList.remove("invisible");
-        //     }
-        // })
 
     }
 
@@ -84,7 +60,7 @@ class UINode extends H12 {
         const name = this.#inode.name || meta.displayName || "Node";
 
         const canCache = meta.canCache ? "cache" : "non-cache";
-        const isEntry = this.#inode.isEntry ? <><button onclick={ () => { this.#inode.execute() } }>(run)</button></> : "";
+        const isEntry = this.#inode.isEntry ? <><button class="node-action fill-green-600" onclick={ () => { this.#inode.execute() } }><Icon args path={ mdiPlay }></Icon></button></> : "";
 
 
         return <>
@@ -95,7 +71,9 @@ class UINode extends H12 {
                         <label id="handle">{ name }</label>
                         { isEntry }
                     </div>
-                    <button class="node-close" onclick={ this.removeNode }>&times;</button>
+                    <button class="node-close" onclick={ this.removeNode }>
+                        <Icon args path={ mdiClose }></Icon>
+                    </button>
                 </div>
 
                 <div id="socket" class="node-socket">
@@ -107,7 +85,7 @@ class UINode extends H12 {
                     </div>
                 </div>
 
-                <div id="values" class="node-property" onmousedown={ (e) => e.stopPropagation() }>
+                <div id="nodeProperties" class="node-property hidden" onmousedown={ (e) => e.stopPropagation() }>
                     {properties}
                 </div>
 
@@ -122,6 +100,7 @@ class UINode extends H12 {
 
     renderProperties() {
 
+        const { nodeProperties } = this.element;
         const { properties: uiProperties } = this.key;
         const properties = this.#inode.propertyManager.properties;
 
@@ -138,10 +117,17 @@ class UINode extends H12 {
             if(!propertyClass) continue;
 
             uiProperties(<>
-                <property args alias={ propertyClass } iobject={ property }></property>
+                <div class="flex flex-col">
+                    <label class="text-xs font-semibold">{ property.custom.name || "Property" }:</label>
+                    <property args alias={ propertyClass } iobject={ property }></property>
+                </div>
             </>, "x++");
 
-        }
+        };
+    
+        if(properties.size > 0) {
+            nodeProperties.classList.remove("hidden");
+        };
 
     }
 
@@ -191,14 +177,6 @@ class UINode extends H12 {
         this.child[uuid].destroy();
 
     }
-
-    // getINode() {
-    //     return this.inode;
-    // }
-
-    // getUISocket(socketUUID) {
-    //     return this.child[socketUUID];
-    // }
 
     destroy() {
 

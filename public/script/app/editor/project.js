@@ -54,7 +54,6 @@ class Project extends H12 {
             <workspace args alias={ module } id={ uuid } path={ path }></workspace>
         </>);
 
-
         /** @type {{ tabManager: ActionBar }} */
         const { tabManager } = this.child;
         tabManager.addTab(uuid, name);
@@ -88,7 +87,7 @@ class Project extends H12 {
             };
 
             this.openWorkspace("Explorer", path);
-            this.openWorkspace("another", "main.ren");
+            //this.openWorkspace("main", "main.ren");
             
             this.root.classList.remove("hidden");
             this.#isLoaded = true;

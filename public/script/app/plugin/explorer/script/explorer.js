@@ -21,7 +21,7 @@ class Explorer extends Workspace {
 
         return <>
             <div class="project-workspace">
-                <div class="bg-zinc-800 p-2 w-full relative overflow-hidden border-2 border-zinc-950 flex flex-col space-y-1">
+                <div class="bg-zinc-800 p-2 w-full relative overflow-hidden flex flex-col space-y-1">
                     {files}
                 </div>
             </div>
@@ -46,7 +46,7 @@ class Explorer extends Workspace {
             ]
 
             uiFiles(<>
-                <div class="primary-btn flex flex-col p-2 rounded-md" onclick={ () => this.openFile(fileName, file.name) }>
+                <div class="primary-btn flex flex-col" onclick={ () => this.openFile(fileName, file.name) }>
                     {
                         ... data.map(([ title, value ]) => {
                             return <>

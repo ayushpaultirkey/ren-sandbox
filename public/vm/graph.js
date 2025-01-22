@@ -46,19 +46,15 @@ class IGraph extends IObject {
 
         super({ uuid, outer, name });
         this.custom = {};
-        // this.#inputs = new IPropertyManager({ outer: this });
-        // this.#outputs = new IPropertyManager({ outer: this });
         this.#propertyManager = new IPropertyManager({ outer: this });
 
     }
 
-    main({ properties = {}, nodes = {}, links = [], custom = {}, inputs = {}, outputs = {} } = {}) {
+    main({ properties = {}, nodes = {}, links = [], custom = {} } = {}) {
 
         this.custom = custom || {};
         this.custom.name = custom.name || this.name;
 
-        // this.#inputs.main(inputs || {});
-        // this.#outputs.main(outputs || {});
         this.#propertyManager.main(properties || {});
 
         for(const uuid in nodes) {
@@ -301,11 +297,11 @@ class IGraph extends IObject {
                 if(data.entry) {
                     success = false;
                     break;
-                }
+                };
                 data.entry = uuid;
-            }
+            };
 
-        }
+        };
 
         if(!success) {
             console.error("Multiple entry found");

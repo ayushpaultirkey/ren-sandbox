@@ -24,11 +24,10 @@ class IPropertyManager extends IObject {
                 const property = properties[uuid];
 
                 const type = property.type;
-                const name = property.name;
                 const value = property.value;
                 const custom = property.custom;
                 
-                this.addProperty(uuid, name, type, value, custom);
+                this.addProperty(uuid, type, value, custom);
 
             }
         }
@@ -41,27 +40,23 @@ class IPropertyManager extends IObject {
         return this.#properties;
     }
 
-    addProperty(uuid, name, type, value = null, custom = {}) {
+    addProperty(uuid, type, value = null, custom = {}) {
         try {
 
             const newUUID = uuid || crypto.randomUUID();
 
-            if(!name) {
-                throw new Error(`PropertyManager: Property name is required`);
-            }
-            if(this.#properties.has(name)) {
-                throw new Error(`PropertyManager: Property "${name}" already exists`);
-            }
+            if(this.#properties.has(newUUID)) {
+                throw new Error(`PropertyManager: Property "${newUUID}" already exists`);
+            };
     
             const finalType = PRIMITIVE_TYPES[type] || USER_DEFINED_TYPES[type];
             if(!finalType) {
                 throw new Error(`PropertyManager: Invalid type "${type}"`);
-            }
+            };
     
             const property = new IProperty({
                 uuid: newUUID,
                 outer: this,
-                name: name,
                 type: finalType,
                 value: value,
                 custom: custom
@@ -120,7 +115,7 @@ class IPropertyManager extends IObject {
 
             data[uuid] = exportData;
 
-        }
+        };
 
         return data;
 

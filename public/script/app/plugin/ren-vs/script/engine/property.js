@@ -77,7 +77,7 @@ class FloatValue extends StringValue {
     }
     template() {
         return <>
-        <input id="textbox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="textbox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
 }

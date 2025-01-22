@@ -18,6 +18,7 @@
     @apply border-2 rounded-sm;
     @apply text-zinc-500;
     @apply absolute select-none;
+    @apply space-y-1;
 }
 .node.cache {
     @apply border-sky-800;
@@ -40,9 +41,19 @@
 .node-title > div.non-cache {
     @apply text-teal-600;
 }
+.node-title .node-action > svg {
+    @apply w-4 h-4 max-w-4 max-h-4;
+}
 .node-close {
     @apply text-rose-700 font-extrabold;
-    @apply hidden;
+    @apply invisible;
+}
+.node-close > svg {
+    @apply w-3 h-3 max-w-3 max-h-3;
+    @apply fill-rose-600;
+}
+.node:hover .node-close {
+    @apply visible;
 }
 
 .node-socket {

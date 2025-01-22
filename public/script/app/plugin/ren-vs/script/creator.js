@@ -1,6 +1,8 @@
 import H12 from "@library/h12";
 import { writeFile } from "@adapter/fs";
 import { dispatcher } from "@event/dispatcher.js";
+import { IGraph } from "@vm/graph";
+import { IGraphSet } from "@vm/graphset";
 
 class Creator extends H12 {
     constructor() {
@@ -26,11 +28,17 @@ class Creator extends H12 {
     async #create() {
 
         const { fileName } = this.element;
-        const name = (fileName.value.trim() || "untitled") + ".ren";
-        await writeFile(name, "{}");
+        const name = (fileName.value.trim() || "untitled");
 
+        const graphSet = new IGraphSet();
+        graphSet.main({ custom: { name: name } });
+
+        const data = JSON.stringify(graphSet.export());
+        graphSet.destroy();
+
+        await writeFile(`${name}.ren`, data);
         dispatcher.emit("file-written");
-
+        
         this.destroy();
     
     }

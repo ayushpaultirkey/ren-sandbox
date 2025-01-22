@@ -34,7 +34,6 @@ class UIEngine extends Workspace {
             return;
         };
 
-
         data = JSON.parse(data);
 
         let uuid = Object.keys(data)[0];

@@ -21,7 +21,7 @@ class GraphProperty extends H12 {
 
     render() {
         return <>
-            <div class="property-container border-l border-zinc-700">
+            <div class="property-container border-l border-zinc-700 select-none">
                 <div class="property">
                     <label class="mb-2">Graphs Properties:</label>
                     <div>

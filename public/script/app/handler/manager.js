@@ -5,7 +5,7 @@ async function getHandler(handler) {
         return handlers.get(handler);
     }
     else {
-        const module = await import(`../handler/${handler.path}/${handler.file}.js`);
+        const module = await import(`@handler/${handler.path}/${handler.file}.js`);
         handlers.set(handler, module);
         console.warn(`Handler ${JSON.stringify(handler)} loaded`);
         return module;

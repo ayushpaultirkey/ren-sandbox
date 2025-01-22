@@ -50,6 +50,7 @@ input::-webkit-inner-spin-button {
     @apply min-w-[275px] max-w-[275px];
     @apply p-2 px-3;
     @apply text-zinc-400;
+    @apply bg-zinc-800;
 }
 .property-tab {
     @apply space-y-2;
@@ -102,7 +103,7 @@ input::-webkit-inner-spin-button {
 
 .editor {
     @apply w-full h-full overflow-hidden relative;
-    @apply bg-zinc-800;
+    @apply bg-zinc-900;
 }
 
 
@@ -112,7 +113,6 @@ input::-webkit-inner-spin-button {
 }
 .editor-menu {
     @apply flex flex-row p-1 relative z-20;
-    @apply bg-zinc-900;
 }
 .menu,
 .menu-nested {
@@ -155,13 +155,14 @@ input::-webkit-inner-spin-button {
 
 
 .project-area-tab {
-    @apply overflow-x-auto;
-    @apply h-9;
+    @apply h-7;
+    @apply overflow-hidden;
 }
 .tab-container {
-    @apply px-2 pt-2;
+    @apply overflow-x-auto;
+    @apply px-2;
     @apply flex flex-row;
-    @apply h-full;
+    @apply w-full h-full space-x-1;
 }
 .tab-container > .tab {
     @apply cursor-pointer;

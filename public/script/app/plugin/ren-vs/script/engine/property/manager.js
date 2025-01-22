@@ -81,7 +81,7 @@ class UIPropertyManager extends H12 {
 
             uiProperties(<>
                 <div class="flex flex-col">
-                    <label class="text-xs font-semibold">{ property.name }</label>
+                    <label class="text-xs font-semibold">{ property.custom.name || "no name" } :</label>
                     <div class="w-full flex flex-row space-x-1">
                         <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
                         <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } } aria-label="Remove">
@@ -113,7 +113,7 @@ class UIPropertyManager extends H12 {
 
         const { propertyName, propertyType } = this.element;
         
-        this.#ipropertyManager.addProperty(null, propertyName.value, propertyType.value);
+        this.#ipropertyManager.addProperty(null, propertyType.value, null, { name: propertyName.value });
         propertyName.value = "";
 
     }

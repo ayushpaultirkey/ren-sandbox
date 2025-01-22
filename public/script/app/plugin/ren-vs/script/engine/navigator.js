@@ -26,7 +26,7 @@ class Navigator extends H12 {
     render() {
 
         return <>
-            <div class="flex flex-row h-full">
+            <div class="flex flex-row h-full select-none">
                 <div class="side-menu">
 
                     <button onclick={ () => this.changeTab("tabNode") } title="Node List">
@@ -35,7 +35,7 @@ class Navigator extends H12 {
                     <button onclick={ () => this.changeTab("tabProperties") } title="Properties">
                         <Icon args path={ mdiAbacus }></Icon>
                     </button>
-                    <button title="Run">
+                    <button title="Run" class="hidden">
                         <Icon args path={ mdiPlay }></Icon>
                     </button>
                     <button onclick={ () => this.parent.debug() } title="Debug">
