@@ -6,7 +6,7 @@ import { ZoomHandler } from "../handler/zoom-handler.js";
 import { DragHandler } from "../handler/drag-handler.js";
 import { UINode } from "./node.js";
 import { UISocket } from "./socket.js";
-import { Link } from "./link.js";
+import { Link } from "../widget/graph/link.js";
 import { getWorkspace } from "@script/app/library/workspace.js";
 
 // import { UINode } from "./node.js";

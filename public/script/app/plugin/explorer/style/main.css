@@ -1,0 +1,41 @@
+.explorer-container {
+    @apply w-full h-full;
+    @apply overflow-auto;
+    @apply p-2;
+}
+
+.explorer-table {
+    @apply w-full;
+    @apply text-left text-zinc-400;
+    @apply bg-zinc-700;
+    @apply rounded-sm;
+    @apply overflow-hidden;
+}
+.explorer-table .table-fit {
+    @apply whitespace-nowrap w-[10%];
+}
+
+.explorer-table th {
+    @apply text-sm;
+    @apply px-2 py-1;
+    @apply font-normal;
+    @apply border border-zinc-600;
+}
+
+.explorer-table > thead th {
+    @apply text-sm;
+    @apply bg-zinc-800;
+}
+.explorer-table > tbody th {
+    @apply text-xs;
+}
+.explorer-table > tbody > tr {
+    @apply cursor-pointer;
+    @apply bg-zinc-500 bg-opacity-0;
+}
+.explorer-table > tbody > tr:hover {
+    @apply bg-opacity-10;
+}
+.explorer-table > tbody > tr:active {
+    @apply bg-opacity-20;
+}

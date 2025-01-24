@@ -1,10 +1,10 @@
 import H12 from "@library/h12.js";
 import { dispatcher } from "@event/dispatcher.js";
-import { TabManager } from "@project/tabbar.js";
+import { TabManager } from "@script/app/editor/project/tab/manager.js";
 import { StatusBar } from "@project/statusbar.js";
 import { Workspace } from "@project/workspace.js";
 import { WorkspaceRegistry } from "@config/registry.js";
-import { setActiveWorkspace } from "../library/workspace";
+import { getActiveWorkspace, setActiveWorkspace } from "../library/workspace";
 
 
 class Project extends H12 {
@@ -29,7 +29,7 @@ class Project extends H12 {
         return <>
             <div class="project">
                 <div class="project-area-tab">
-                    <tabs args id="tabManager" alias={ TabManager }></tabs>
+                    <tab args id="tabManager" alias={ TabManager }></tab>
                 </div>
                 <div class="project-area-workspace">
                     {workspaces}
@@ -58,7 +58,7 @@ class Project extends H12 {
 
         /** @type {{ tabManager: ActionBar }} */
         const { tabManager } = this.child;
-        tabManager.addTab(uuid, name);
+        tabManager.add(uuid, name);
         tabManager.setActive(uuid);
 
         return uuid;
@@ -74,11 +74,12 @@ class Project extends H12 {
         for(const id in this.child) {
             const workspace = this.child[id];
             if(workspace instanceof Workspace) {
-                workspace.isActive = false;
+                workspace.active = false;
             };
         };
-        this.child[uuid].isActive = true;
 
+        const workspace = this.child[uuid];
+        workspace.active = true;
 
     }
 
@@ -90,7 +91,7 @@ class Project extends H12 {
             };
 
             this.openWorkspace("Explorer", path);
-            this.openWorkspace("main", "main.ren");
+            //this.openWorkspace("main", "main.ren");
             
             this.root.classList.remove("hidden");
             this.#isLoaded = true;

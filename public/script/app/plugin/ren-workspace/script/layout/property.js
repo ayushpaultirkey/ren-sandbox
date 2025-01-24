@@ -16,7 +16,7 @@ class Property extends H12 {
         return <>
             <div class={ `property-container ${this.args.class || ""}` }>
                 { this.template() }
-                <div class="hidden">
+                <div id="dynamic" class="hidden">
                     {tabs}
                 </div>
             </div>
@@ -28,11 +28,16 @@ class Property extends H12 {
         return "";
     }
 
-    addTab(tabComponent) {
-        this.set("{tabs}++", tabComponent);
+    add(tab) {
+
+        if(!tab) return;
+        this.set("{tabs}++", tab);
+
+        this.element.dynamic.classList.remove("hidden");
+
     }
 
-    removeTab(id) {
+    remove(id) {
 
         this.child[id].destroy();
 
@@ -106,6 +111,7 @@ class PropertyMenu extends H12 {
 
     constructor() {
         super();
+        this.class = "";
     }
 
     main(args) {
@@ -120,10 +126,13 @@ class PropertyMenu extends H12 {
     }
 
     render() {
+
+        const newClass = this.args.class || this.class || "";
+
         return <>
-            <div class="side-menu">
+            <div class={ `property-menu ${newClass}` }>
                 { this.template() }
-                <div id="dynamic" class="hidden">
+                <div id="dynamic" class="!hidden">
                     {dynamic}
                 </div>
             </div>
@@ -132,6 +141,18 @@ class PropertyMenu extends H12 {
 
     template() {
         return "";
+    }
+
+    add(menu) {
+
+        if(!menu) return;
+        this.set("{dynamic}++", menu);
+
+        this.element.dynamic.classList.remove("hidden");
+
+    }
+    remove(id) {
+        this.child[id].destroy();
     }
     
 }

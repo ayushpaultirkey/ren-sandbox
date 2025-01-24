@@ -3,10 +3,8 @@ import { Workspace } from "@project/workspace";
 import { IEngine } from "@vm/engine";
 import { readFile, writeFile } from "@adapter/fs";
 
-import { Navigator } from "./engine/navigator";
 import { UIGraph } from "./engine/graph";
-import { GraphProperty } from "./engine/graph/property";
-import { MainProperty, SideMenu } from "./engine/property/property";
+import { MainProperty, SideMenu, SubProperty } from "./widget/property/section";
 
 class UIEngine extends Workspace {
 
@@ -67,17 +65,17 @@ class UIEngine extends Workspace {
     render() {
 
         return <>
-            <div class="project-workspace">
+            <div class="project-workspace ren-workspace">
 
                 <menu args alias={ SideMenu } id="sideMenu"></menu>
                 <property args alias={ MainProperty } id="mainProperty"></property>
 
-                <Navigator args id="navigator" workspace={ this }></Navigator>
                 <div id="viewport" class="viewport">
                     {graph}
                 </div>
-                <property args id="graphProperty" alias={ GraphProperty } workspace={ this }></property>
                 
+                <property args alias={ SubProperty } id="subProperty"></property>
+
             </div>
         </>
 
@@ -133,10 +131,8 @@ class UIEngine extends Workspace {
 
         this.#igraphset = this.#iengine.addGraphSet(uuid, data);
         this.dispatcher.emit("graphSetLoaded", this.#igraphset);
+        console.warn("Graph Set loaded");
 
-        this.child.navigator.refreshGraphSet(this.#igraphset);
-
-        console.warn("Graph Set added");
     }
 
     openGraph(uuid) {
@@ -163,7 +159,7 @@ class UIEngine extends Workspace {
                 throw new Error(`Graph ${uuid} not found`);
             };
             this.activeGraphUUID = uuid;
-            this.child.graphProperty.refresh(graph);
+            this.dispatcher.emit("graphOpened", graph);
             
             uiGraph(<>
                 <graph args alias={ UIGraph } iobject={ graph } id="graph"></graph>

@@ -67,7 +67,7 @@ function preFormatBrackets(text = "") {
 
 }
 
-function pharseText(element = document.body) {
+function pharseText(element) {
 
     if(!element || element.nodeType != 3) {
         return;
@@ -139,7 +139,7 @@ function pharseText(element = document.body) {
 
 }
 
-function pharseAttribute(element = document.body) {
+function pharseAttribute(element) {
     
     if(!element || element.nodeType != 1) {
         return;
@@ -182,7 +182,7 @@ function pharseAttribute(element = document.body) {
     
 }
 
-function pharseNode(element = document.body) {
+function pharseNode(element) {
     
     if(!element) {
         return;
@@ -214,7 +214,7 @@ function pharseNode(element = document.body) {
     
 }
 
-function phraseDOM(element = document.body) {
+function phraseDOM(element) {
 
     if(!element) {
         return "";

@@ -1,11 +1,17 @@
 import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlusThick } from "@mdi/js";
 import { Icon } from "@script/app/control/icon.js";
 import { Property, PropertyMenu, PropertyTab } from "../../layout/property.js";
-import { GraphSetTab, NodeListTab } from "./main-property.js";
+import { GraphSetTab, GraphTab, NodeListTab } from "./tab.js";
 
 class SideMenu extends PropertyMenu {
     constructor() {
         super();
+        this.workspace = null;
+    }
+    main() {
+
+        this.workspace = this.relay["workspace"];
+
     }
     template() {
         return <>
@@ -19,17 +25,29 @@ class SideMenu extends PropertyMenu {
                 <button title="Run" class="hidden">
                     <Icon args path={ mdiPlay }></Icon>
                 </button>
-                <button title="Debug">
+                <button title="Debug" onclick={ () => { this.debug() } }>
                     <Icon args path={ mdiBug }></Icon>
                 </button>
-                <button title="Export">
+                <button title="Export" onclick={ () => { this.export() } }>
                     <Icon args path={ mdiPackageUp }></Icon>
                 </button>
-                <button title="Save">
+                <button title="Save" onclick={ () => { this.save() } }>
                     <Icon args path={ mdiContentSave }></Icon>
                 </button>
             </div>
         </>
+    }
+    save() {
+        if(!this.workspace) return;
+        this.workspace.save();
+    }
+    debug() {
+        if(!this.workspace) return;
+        this.workspace.debug();
+    }
+    export() {
+        if(!this.workspace) return;
+        this.workspace.export();
     }
 }
 
@@ -42,7 +60,7 @@ class MainProperty extends Property {
     template() {
         return <>
             <div>
-                <node args alias={ NodeListTab } id="nodeList"></node>
+                <node args alias={ NodeListTab } id="nodeList" class="hidden"></node>
                 <graph args alias={ GraphSetTab } id="graphSet"></graph>
             </div>
         </>
@@ -57,7 +75,7 @@ class SubProperty extends Property {
     template() {
         return <>
             <div>
-                b
+                <graph args alias={ GraphTab }></graph>
             </div>
         </>
     }

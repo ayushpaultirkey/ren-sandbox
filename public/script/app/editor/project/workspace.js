@@ -1,22 +1,27 @@
 import H12 from "@library/h12.js";
 import { Dispatcher } from "@library/h12/dispatcher.js";
+import { getActiveWorkspace, setActiveWorkspace } from "@script/app/library/workspace";
 
 class Workspace extends H12 {
 
-    #isActive = false;
+    #active = false;
 
-    get isActive() {
-        return this.#isActive;
+    get active() {
+        return this.#active;
     }
     
-    set isActive(value) {
-        this.#isActive = value;
+    set active(value) {
+
+        this.#active = value;
+
         if(value) {
             this.root.classList.remove("hidden");
+            setActiveWorkspace(this);
         }
         else {
             this.root.classList.add("hidden");
-        }
+        };
+
     }
 
     constructor() {
@@ -31,6 +36,11 @@ class Workspace extends H12 {
 
     destroy() {
         this.dispatcher.clearAll();
+
+        if(getActiveWorkspace() == this) {
+            setActiveWorkspace(null);
+        }
+
         super.destroy();
     }
 }

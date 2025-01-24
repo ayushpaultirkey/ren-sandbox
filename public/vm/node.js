@@ -202,20 +202,22 @@ class INode extends IObject {
 
 const REGISTERED_NODES = new Map();
 const NODES_REGISTRY = {
-    register: function(classId, nodeClass) {
+    register: function(nodeClass) {
+        const classId = nodeClass.meta.className;
         REGISTERED_NODES.set(classId, nodeClass);
     },
-    registerMany: function(nodes = {}) {
-        for(const classId in nodes) {
-            this.register(classId, nodes[classId]);
+    registerMany: function(nodes = []) {
+        for(const node of nodes) {
+            this.register(node);
         };
     },
-    unregister: function(classId) {
+    unregister: function(nodeClass) {
+        const classId = nodeClass.meta.className;
         return REGISTERED_NODES.delete(classId);
     },
-    unregisterMany: function(nodes = {}) {
-        for(const classId in nodes) {
-            this.unregister(classId);
+    unregisterMany: function(nodes = []) {
+        for(const node of nodes) {
+            this.unregister(node);
         };
     },
     get: function(classId) {

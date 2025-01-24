@@ -1,10 +1,10 @@
 import H12 from "@library/h12.js";
 import { dispatcher } from "@event/dispatcher.js";
-import VIEWPORT from "../config/viewport.js";
+import VIEWPORT from "../../config/viewport.js";
 import { NODES_REGISTRY } from "@vm/node.js";
 import { getWorkspace } from "@script/app/library/workspace.js";
 import { mdiCardBulletedOutline } from "@mdi/js";
-import { Icon } from "../../../../control/icon.js";
+import { Icon } from "../../../../../control/icon.js";
 
 class Category extends H12 {
 

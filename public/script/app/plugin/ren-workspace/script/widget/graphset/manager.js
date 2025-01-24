@@ -1,11 +1,23 @@
 import H12 from "@library/h12.js";
 import { mdiClose, mdiPlus } from "@mdi/js";
 import { Icon } from "@script/app/control/icon.js";
-import { UIPropertyManager } from "../property/manager.js";
+import { UIPropertyManager } from "../../engine/property/manager.js";
 
 class GraphSetManager extends H12 {
+
+    /** @type {import("../../engine.js").UIEngine} */
+    #workspace = null;
+    
+    /** @type {import("@vm/graphset.js").IGraphSet} */
+    #igraphset = null;
+
+    #refreshGraphHandler = null;
+    #refreshGraphSetHandler = null;
+
     constructor() {
         super();
+        this.#refreshGraphHandler = this.#refreshGraph.bind(this);
+        this.#refreshGraphSetHandler = this.#refreshGraphSet.bind(this);
     }
     main() {
 
@@ -45,7 +57,6 @@ class GraphSetManager extends H12 {
         </>
     }
 
-    #igraphset = null;
     load() {
 
         const workspace = this.relay["workspace"];
@@ -54,38 +65,29 @@ class GraphSetManager extends H12 {
             return;
         };
 
-        workspace.dispatcher.on("graphSetLoaded", (igraphset) => {
-
-            this.refreshGraphSet(igraphset);
-
-        });
+        this.#workspace = workspace;
+        this.#workspace.dispatcher.on("graphSetLoaded", this.#refreshGraphSetHandler);
         
     }
 
-    refreshGraphSet(igraphset) {
+    #refreshGraphSet(igraphset) {
 
         if(this.#igraphset) {
             this.#igraphset.destroy();
         };
 
         this.#igraphset = igraphset;
-        this.#igraphset.dispatcher.on("graphAdded", (graph) => this.#refreshGraphs());
-        this.#igraphset.dispatcher.on("graphRemoved", (graph) => this.#refreshGraphs());
+        this.#igraphset.dispatcher.on("graphAdded", this.#refreshGraphHandler);
+        this.#igraphset.dispatcher.on("graphRemoved", this.#refreshGraphHandler);
 
         const { propertyManager } = this.child;
         propertyManager.refresh(igraphset.propertyManager);
 
-        this.#refreshGraphs();
+        this.#refreshGraph();
         
     }
 
-    #openGraph(uuid) {
-        // if(this.#workspace) {
-        //     this.#workspace.dispatcher.emit("openGraph", uuid);
-        // }
-    }
-
-    #refreshGraphs(igraphset) {
+    #refreshGraph() {
         
         const { graphs: uiGraphs } = this.key;
         uiGraphs("");
@@ -95,16 +97,19 @@ class GraphSetManager extends H12 {
             uiGraphs(<>
                 <div class="primary-input bg-opacity-50 flex flex-row items-center pr-1" onclick={ () => this.#openGraph(uuid) }>
                     <label class="w-full text-xs font-semibold">{ graph.custom.name }</label>
-                    <button class="primary-btn" onclick={ (e) => {
-                        e.stopPropagation();
-                        this.#removeGraph(uuid);
-                    } } aria-label="Remove Graph">
+                    <button class="primary-btn" onclick={ (e) => { e.stopPropagation(); this.#removeGraph(uuid); } } aria-label="Remove Graph">
                         <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
                     </button>
                 </div>
             </>, "x++");
         };
 
+    }
+
+    #openGraph(uuid) {
+        if(this.#workspace) {
+            this.#workspace.dispatcher.emit("openGraph", uuid);
+        };
     }
 
     #addGraph() {
@@ -116,15 +121,11 @@ class GraphSetManager extends H12 {
         };
 
         this.#igraphset.addGraph(null, {
-            nodes: {},
-            links: [],
-            properties: {},
             custom: {
-                name: graphName.value || "no name"
+                name: graphName.value || "Untitled"
             },
-            inputs: {},
-            outputs: {}
         });
+
         graphName.value = "";
         console.warn("Graph added");
 
@@ -135,6 +136,17 @@ class GraphSetManager extends H12 {
         this.#igraphset.removeGraph(uuid);
         console.warn("Graph removed");
 
+    }
+
+    destroy() {
+        if(!this.#igraphset) {
+            this.#igraphset.dispatcher.off("graphAdded", this.#refreshGraphHandler);
+            this.#igraphset.dispatcher.off("graphRemoved", this.#refreshGraphHandler);
+        };
+        if(!this.#workspace) {
+            this.#workspace.dispatcher.off("graphSetLoaded", this.#refreshGraphSetHandler);
+        };
+        super.destroy();
     }
 
 }

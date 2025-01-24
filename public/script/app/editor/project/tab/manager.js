@@ -6,17 +6,9 @@ class Tab extends H12 {
     }
     render() {
         return <>
-            <div class="tab" onclick={
-                (e) => {
-                        this.parent.setActive(this.id);
-                    }
-                }>
+            <div class="tab" onclick={ (e) => { this.parent.setActive(this.id); } }>
                 <button class="h-full">{ this.args.title }</button>
-                <button class="text-rose-500" onclick={ (e) => {
-                    e.stopPropagation();
-                    e.preventDefault();
-                    this.parent.closeTab(this.id);
-                }}>&times;</button>
+                <button onclick={ (e) => { e.stopPropagation(); e.preventDefault(); this.parent.closeTab(this.id); }}>&times;</button>
             </div>
         </>;
     }
@@ -27,9 +19,7 @@ class TabManager extends H12 {
         super();
     }
     main() {
-
         this.set("{tabs}", "");
-
     }
     render() {
 
@@ -40,23 +30,26 @@ class TabManager extends H12 {
         </>
 
     }
-    addTab(uuid, title) {
+
+    add(uuid, title) {
+
+        if(!uuid) return;
 
         this.set("{tabs}++", <>
             <Tab args id={ uuid } title={ title }></Tab>
         </>);
 
     }
-    removeTab(uuid) {
-        
-        this.child[uuid].destroy();
 
+    remove(uuid) {
+        this.child[uuid].destroy();
     }
+
     setActive(uuid) {
 
-        for(const id in this.child) {
+        for(const childId in this.child) {
 
-            const tab = this.child[id];
+            const tab = this.child[childId];
 
             if(tab instanceof Tab) {
                 if(tab.id === uuid) {

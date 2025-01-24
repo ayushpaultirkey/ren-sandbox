@@ -25,22 +25,27 @@ input::-webkit-inner-spin-button {
 
 
 
-.side-menu {
+.property-menu {
+    @apply flex flex-col;
+    @apply h-full;
+}
+.property-menu > div {
+    @apply flex flex-col;
+    @apply h-full;
     @apply p-1;
     @apply space-y-1;
     @apply bg-zinc-700;
-    @apply border-r border-zinc-600;
 }
-.side-menu > button {
+.property-menu > div > button {
     @apply bg-zinc-200 bg-opacity-0 hover:bg-opacity-20 active:bg-opacity-30;
     @apply p-2;
     @apply rounded-sm;
 }
-.side-menu > button > svg {
+.property-menu > div > button > svg {
     @apply w-6 h-6 max-w-6 max-h-6;
     @apply fill-zinc-400;
 }
-.side-menu > button:hover svg {
+.property-menu > div > button:hover svg {
     @apply fill-zinc-100;
 }
 
@@ -53,7 +58,8 @@ input::-webkit-inner-spin-button {
     @apply bg-zinc-800;
     @apply overflow-auto;
 }
-.property-tab {
+.property-tab,
+.property-tab > div {
     @apply space-y-2;
 }
 .property {
@@ -196,9 +202,13 @@ input::-webkit-inner-spin-button {
 .project-area-workspace {
     @apply w-full h-full;
     @apply border-y border-zinc-700;
+    @apply overflow-hidden;
 }
 .project-workspace {
     @apply w-full h-full flex flex-row;
+}
+.project-workspace {
+
 }
 
 

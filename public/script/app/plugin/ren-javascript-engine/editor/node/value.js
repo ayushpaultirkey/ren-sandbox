@@ -56,10 +56,10 @@ class MakeString extends INode {
     
 }
 
-const nodes = {
-    "INode.Value.MakeFloat": MakeFloat,
-    "INode.Value.MakeString": MakeString
-};
+const nodes = [
+    MakeFloat,
+    MakeString
+]
 
 function register() {
     NODES_REGISTRY.registerMany(nodes);

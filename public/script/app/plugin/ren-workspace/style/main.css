@@ -1,3 +1,10 @@
+.ren-workspace > div {
+    @apply border-r border-r-zinc-600;
+}
+.ren-workspace > div:last-child {
+    @apply border-none;
+}
+
 .viewport {
     @apply w-full relative overflow-hidden;
     background-color: #e5e5f7;

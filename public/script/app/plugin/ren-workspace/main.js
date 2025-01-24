@@ -1,7 +1,7 @@
 import { WorkspaceRegistry } from "@script/app/config/registry";
 import { dispatcher } from "@script/event/dispatcher";
 import { UIEngine } from "./script/engine";
-import { Creator } from "./script/creator";
+import { Creator } from "./script/widget/creator";
 
 function register() {
 

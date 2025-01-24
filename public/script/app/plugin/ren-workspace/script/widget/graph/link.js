@@ -1,4 +1,4 @@
-import VIEWPORT from "../config/viewport.js";
+import VIEWPORT from "../../config/viewport.js";
 
 
 

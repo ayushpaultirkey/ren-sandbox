@@ -70,33 +70,4 @@ class IEngine extends IObject {
 
 }
 
-
-// let engine = new IEngine();
-// engine.addGraphSet("main0", {
-//     properties: {
-//         age: { type: "INT", value: 23 }
-//     },
-//     graphs: {
-//         init0: {
-//             name: "init function",
-//             properties: {
-//                 name: { type: "STRING", value: "some name" }
-//             },
-//             nodes: {
-//                 begin0: {
-//                     class: "INode.Event.Begin",
-//                     values: {}
-//                 },
-//                 log0: {
-//                     class: "INode.Event.Log",
-//                     values: {}
-//                 }
-//             },
-//             links: [
-//                 { sourceNode: "begin0", sourceSocket: "out0", targetNode: "log0", targetSocket: "in0" }
-//             ]
-//         }
-//     }
-// });
-
 export { IEngine };

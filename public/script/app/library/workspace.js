@@ -24,7 +24,6 @@ function getActiveWorkspace() {
     return activeWorkspace;
 }
 function setActiveWorkspace(workspace) {
-    console.warn(`Active workspace set to ${workspace.id}`);
     activeWorkspace = workspace;
 }
 

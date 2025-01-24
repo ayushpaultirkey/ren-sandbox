@@ -1,8 +1,8 @@
-import { Icon } from "@script/app/control/icon.js";
 import { PropertyTab } from "../../layout/property.js";
-import { Category } from "../nodelist.js";
-import { mdiPlus } from "@mdi/js";
+
+import { Category } from "../node/list.js";
 import { GraphSetManager } from "../graphset/manager.js";
+import { GraphManager } from "../graph/manager.js";
 
 class NodeListTab extends PropertyTab {
     constructor() {
@@ -28,4 +28,16 @@ class GraphSetTab extends PropertyTab {
     }
 }
 
-export { NodeListTab, GraphSetTab };
+class GraphTab extends PropertyTab {
+    constructor() {
+        super();
+        this.title = "Graph";
+    }
+    template() {
+        return <>
+            <GraphSet args alias={ GraphManager }></GraphSet>
+        </>;
+    }
+}
+
+export { NodeListTab, GraphSetTab, GraphTab };
