@@ -24,6 +24,11 @@ class Workspace extends H12 {
         this.name = "Workspace";
         this.dispatcher = new Dispatcher();
     }
+
+    load() {
+        
+    }
+
     destroy() {
         this.dispatcher.clearAll();
         super.destroy();

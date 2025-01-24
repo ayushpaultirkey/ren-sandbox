@@ -1,6 +1,6 @@
 import H12 from "@library/h12";
 import { ISocket } from "@vm/socket.js";
-import { getWorkplace } from "@app/library/workplace.js";
+import { getWorkspace } from "@script/app/library/workspace.js";
 
 class UISocket extends H12 {
 
@@ -25,7 +25,7 @@ class UISocket extends H12 {
             console.error("Invalid socket");
             return;
         };
-        this.#workspace = getWorkplace(this);
+        this.#workspace = getWorkspace(this);
 
     }
 

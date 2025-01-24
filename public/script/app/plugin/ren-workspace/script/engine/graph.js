@@ -7,7 +7,7 @@ import { DragHandler } from "../handler/drag-handler.js";
 import { UINode } from "./node.js";
 import { UISocket } from "./socket.js";
 import { Link } from "./link.js";
-import { getWorkplace } from "@app/library/workplace.js";
+import { getWorkspace } from "@script/app/library/workspace.js";
 
 // import { UINode } from "./node.js";
 // import { UISocket } from "./socket.js";
@@ -49,7 +49,7 @@ class UIGraph extends H12 {
             return;
         };
 
-        this.#workplace = getWorkplace(this);
+        this.#workplace = getWorkspace(this);
 
         this.#registerViewport();
         this.#registerHandlers();

@@ -233,7 +233,7 @@ function phraseDOM(element = document.body) {
     const hasAlias = element.hasAttribute("alias");
     const isComponent = element.hasAttribute("args");
 
-    const scope = (isComponent && hasScope) ? element.getAttribute("scope") + "_@SCOPE" :  "this";
+    const scope = (isComponent && hasScope) ? element.getAttribute("scope").replace(/\{|\}|\s+/g, "") :  "this";
     const method = isComponent ? "component" : "node";
 
     let name;

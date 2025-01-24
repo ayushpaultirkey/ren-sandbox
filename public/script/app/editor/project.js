@@ -4,11 +4,13 @@ import { TabManager } from "@project/tabbar.js";
 import { StatusBar } from "@project/statusbar.js";
 import { Workspace } from "@project/workspace.js";
 import { WorkspaceRegistry } from "@config/registry.js";
+import { setActiveWorkspace } from "../library/workspace";
 
 
 class Project extends H12 {
 
     #isLoaded = false;
+    #activeWorkspace = null;
 
     constructor() {
         super();
@@ -77,6 +79,7 @@ class Project extends H12 {
         };
         this.child[uuid].isActive = true;
 
+
     }
 
     load(path) {
@@ -87,7 +90,7 @@ class Project extends H12 {
             };
 
             this.openWorkspace("Explorer", path);
-            //this.openWorkspace("main", "main.ren");
+            this.openWorkspace("main", "main.ren");
             
             this.root.classList.remove("hidden");
             this.#isLoaded = true;

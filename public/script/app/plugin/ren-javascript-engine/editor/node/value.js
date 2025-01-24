@@ -1,6 +1,6 @@
-import { INode, NODES_REGISTRY } from "../node.js";
-import { FloatSocket, StringSocket } from "../sockets/primitive.js";
-import { PRIMITIVE_TYPES } from "../types/default.js";
+import { INode, NODES_REGISTRY } from "@vm/node.js";
+import { FloatSocket, StringSocket } from "@vm/sockets/primitive.js";
+import { PRIMITIVE_TYPES } from "@vm/types/default.js";
 
 class MakeFloat extends INode {
 
@@ -56,9 +56,17 @@ class MakeString extends INode {
     
 }
 
-NODES_REGISTRY.registerMany({
+const nodes = {
     "INode.Value.MakeFloat": MakeFloat,
     "INode.Value.MakeString": MakeString
-});
+};
 
-export { MakeFloat };
+function register() {
+    NODES_REGISTRY.registerMany(nodes);
+};
+
+function unregister() {
+    NODES_REGISTRY.unregisterMany(nodes);
+};
+
+export { register, unregister, nodes };

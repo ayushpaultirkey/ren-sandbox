@@ -72,6 +72,13 @@ export default class H12 {
         */
         this.key = {};
 
+        /**
+            * A data that is passed from the parent component to its child components.
+            * If the child component doesnt have its own relay declared then it will
+            * be appended along with the parent relay.
+        */
+        this.relay = null;
+
     }
 
     /**
@@ -273,8 +280,9 @@ export default class H12 {
             const component = new node();
 
             component.id = args.id || component.id;
-            component.args = { ... args, child: children[0] };
             component.parent = this;
+            component.args = { ... args, child: children[0] };
+            component.relay = component.relay ? { ... this.relay, ... component.relay } : this.relay;
 
             this.child[component.id] = component;
             return component.init();

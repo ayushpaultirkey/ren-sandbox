@@ -52,9 +52,16 @@ class UIPropertyManager extends H12 {
     }
 
     refresh(ipropertyManager) {
+        
         if(this.#ipropertyManager) {
             this.#ipropertyManager.dispatcher.clearAll();
-        }
+        };
+
+        if(!ipropertyManager) {
+            console.error("Invalid property manager");
+            return;
+        };
+
         this.#ipropertyManager = ipropertyManager;
         this.#ipropertyManager.dispatcher.on("propertyAdded", () => this.#refreshProperties());
         this.#ipropertyManager.dispatcher.on("propertyRemoved", () => this.#refreshProperties());

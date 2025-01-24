@@ -1,11 +1,13 @@
 import { Workspace } from "@project/workspace.js";
 
+let activeWorkspace = null;
+
 /**
     * 
     * @param {import("@library/h12").default} component 
     * @returns {Workspace}
 */
-function getWorkplace(component) {
+function getWorkspace(component) {
 
     let current = component;
 
@@ -18,4 +20,12 @@ function getWorkplace(component) {
 
 }
 
-export { getWorkplace };
+function getActiveWorkspace() {
+    return activeWorkspace;
+}
+function setActiveWorkspace(workspace) {
+    console.warn(`Active workspace set to ${workspace.id}`);
+    activeWorkspace = workspace;
+}
+
+export { getWorkspace, getActiveWorkspace, setActiveWorkspace };

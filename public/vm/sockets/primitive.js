@@ -10,7 +10,7 @@ class WildcardSocket extends ISocket {
         displayColor: "#e5e7eb",
     }
 
-    constructor({ uuid = crypto.randomUUID(), outer = null, name = "float", type = null, isRuntime = false }) {
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "wildcard", type = null, isRuntime = false }) {
 
         super({ uuid, outer, name, type, isRuntime });
 

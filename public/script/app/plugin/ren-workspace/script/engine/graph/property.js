@@ -1,8 +1,8 @@
 import H12 from "@library/h12.js";
-import { Category } from "./nodelist.js";
-import { UIPropertyManager } from "./property/manager.js";
-import { getWorkplace } from "@app/library/workplace.js";
-import { Icon } from "../../../../control/icon.js";
+import { Category } from "../nodelist.js";
+import { UIPropertyManager } from "../property/manager.js";
+import { getWorkspace } from "@script/app/library/workspace.js";
+import { Icon } from "../../../../../control/icon.js";
 import { mdiAbacus } from "@mdi/js";
 
 

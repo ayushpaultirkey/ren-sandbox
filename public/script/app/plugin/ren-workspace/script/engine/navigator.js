@@ -1,7 +1,7 @@
 import H12 from "@library/h12.js";
 import { Category } from "./nodelist.js";
 import { UIPropertyManager } from "./property/manager.js";
-import { getWorkplace } from "@script/app/library/workplace.js";
+import { getWorkspace } from "@script/app/library/workspace.js";
 import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiClose, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlus } from "@mdi/js";
 import { Icon } from "../../../../control/icon.js";
 
@@ -19,7 +19,7 @@ class Navigator extends H12 {
 
     main(args) {
 
-        this.#workspace = getWorkplace(this);
+        this.#workspace = getWorkspace(this);
         
     }
 

@@ -1,29 +1,42 @@
 import "./../style/main.css";
 import { Workspace } from "@project/workspace";
 import { IEngine } from "@vm/engine";
+import { readFile, writeFile } from "@adapter/fs";
 
 import { Navigator } from "./engine/navigator";
 import { UIGraph } from "./engine/graph";
-import { GraphProperty } from "./engine/graph-property";
-import { readFile, writeFile } from "@adapter/fs";
+import { GraphProperty } from "./engine/graph/property";
+import { MainProperty, SideMenu } from "./engine/property/property";
 
 class UIEngine extends Workspace {
 
     /** @type {IEngine} */
     #iengine = null;
+    get iengine() {
+        return this.#iengine;
+    }
 
     /** @type {import("@vm/graphset").IGraphSet} */
     #igraphset = null;
+    get igraphset() {
+        return this.#igraphset;
+    };
 
     constructor() {
         super();
         this.activeGraphUUID = null;
+        this.relay = { workspace: this, igraphset: () => { return this.#igraphset } };
     }
+
     main(args) {
 
         this.load();
 
+        const { sideMenu, mainProperty } = this.child;
+        sideMenu.setTarget(mainProperty);
+
     }
+
     async load() {
 
         const path = this.args.path;
@@ -50,19 +63,26 @@ class UIEngine extends Workspace {
         this.dispatcher.on("openGraph", (uuid) => this.openGraph(uuid));
 
     }
+
     render() {
 
         return <>
             <div class="project-workspace">
+
+                <menu args alias={ SideMenu } id="sideMenu"></menu>
+                <property args alias={ MainProperty } id="mainProperty"></property>
+
                 <Navigator args id="navigator" workspace={ this }></Navigator>
                 <div id="viewport" class="viewport">
                     {graph}
                 </div>
                 <property args id="graphProperty" alias={ GraphProperty } workspace={ this }></property>
+                
             </div>
         </>
 
     }
+
     export() {
 
         const data = this.#igraphset.export();
@@ -80,6 +100,7 @@ class UIEngine extends Workspace {
         URL.revokeObjectURL(url);
 
     }
+
     async save() {
 
         const data = this.#igraphset.export();
@@ -88,6 +109,7 @@ class UIEngine extends Workspace {
         alert("Saved");
 
     }
+    
     debug() {
         console.log(this.#iengine);
     }
@@ -108,8 +130,12 @@ class UIEngine extends Workspace {
     }
 
     createGraphSet(uuid, data = { properties: {}, graphs: {}, custom: {} }) {
+
         this.#igraphset = this.#iengine.addGraphSet(uuid, data);
+        this.dispatcher.emit("graphSetLoaded", this.#igraphset);
+
         this.child.navigator.refreshGraphSet(this.#igraphset);
+
         console.warn("Graph Set added");
     }
 
@@ -138,7 +164,7 @@ class UIEngine extends Workspace {
             };
             this.activeGraphUUID = uuid;
             this.child.graphProperty.refresh(graph);
-
+            
             uiGraph(<>
                 <graph args alias={ UIGraph } iobject={ graph } id="graph"></graph>
             </>);
@@ -150,6 +176,7 @@ class UIEngine extends Workspace {
             console.error(error || "Error opening graph");
         }
     }
+
     destroy() {
         if(this.#iengine) {
             this.#iengine.destroy();

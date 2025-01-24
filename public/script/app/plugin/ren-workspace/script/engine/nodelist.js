@@ -2,7 +2,7 @@ import H12 from "@library/h12.js";
 import { dispatcher } from "@event/dispatcher.js";
 import VIEWPORT from "../config/viewport.js";
 import { NODES_REGISTRY } from "@vm/node.js";
-import { getWorkplace } from "@app/library/workplace.js";
+import { getWorkspace } from "@script/app/library/workspace.js";
 import { mdiCardBulletedOutline } from "@mdi/js";
 import { Icon } from "../../../../control/icon.js";
 
@@ -16,10 +16,13 @@ class Category extends H12 {
         this.workplace = null;
     }
     main(args) {
+
         if(args && args.auto) {
             this.createCategory();
-        }
-        this.workplace = getWorkplace(this);
+        };
+
+        this.workplace = this.relay["workspace"];
+
     }
     render() {
         return <>

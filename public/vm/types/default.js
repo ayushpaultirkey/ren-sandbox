@@ -13,4 +13,25 @@ const DERIVED_TYPES = {
     EVENT: "EVENT"
 }
 
+function registerPrimitiveType(type, value) {
+    PRIMITIVE_TYPES[type] = value;
+}
+function unregisterPrimitiveType(type) {
+    delete PRIMITIVE_TYPES[type];
+}
+
+function registerUserDefinedType(type, value) {
+    USER_DEFINED_TYPES[type] = value;
+}
+function unregisterUserDefinedType(type) {
+    delete USER_DEFINED_TYPES[type];
+}
+
+function registerDerivedType(type, value) {
+    DERIVED_TYPES[type] = value;
+}
+function unregisterDerivedType(type) {
+    delete DERIVED_TYPES[type];
+}
+
 export { PRIMITIVE_TYPES, USER_DEFINED_TYPES, DERIVED_TYPES };

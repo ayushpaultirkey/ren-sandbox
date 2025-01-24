@@ -6,7 +6,7 @@ async function getPlugins() {
     if(plugins) {
         return JSON.parse(plugins);
     };
-    const defaultPlugins = [ "ren-vs", "explorer" ];
+    const defaultPlugins = [ "ren-workspace", "explorer", "ren-javascript-engine" ];
     await writeFile("plugins", JSON.stringify(defaultPlugins));
     return defaultPlugins;
 

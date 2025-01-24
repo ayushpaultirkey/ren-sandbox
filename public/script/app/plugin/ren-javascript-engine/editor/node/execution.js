@@ -1,10 +1,10 @@
-import { INode, NODES_REGISTRY } from "../node.js";
-import { PRIMITIVE_TYPES } from "../types/default.js";
+import { INode, NODES_REGISTRY } from "@vm/node.js";
+import { PRIMITIVE_TYPES } from "@vm/types/default.js";
 
-import { ObjectSocket } from "../sockets/user.js";
-import { FloatSocket, StringSocket, WildcardSocket } from "../sockets/primitive.js";
-import { EventSocket, ExecutionSocket } from "../sockets/derived.js";
-import { ISocket } from "../socket.js";
+import { ObjectSocket } from "@vm/sockets/user.js";
+import { FloatSocket, StringSocket, WildcardSocket } from "@vm/sockets/primitive.js";
+import { EventSocket, ExecutionSocket } from "@vm/sockets/derived.js";
+import { ISocket } from "@vm/socket.js";
 
 
 class Callback extends INode {
@@ -211,9 +211,9 @@ class Delay extends INode {
 
     }
 
-}
+};
 
-NODES_REGISTRY.registerMany({
+const nodes = {
     "INode.Event.Begin": Begin,
     "INode.Event.Log": Log,
     "INode.Event.Alert": Alert,
@@ -221,4 +221,14 @@ NODES_REGISTRY.registerMany({
     "INode.Event.Callback": Callback,
     "INode.Event.CallbackDelay": CallbackDelay,
     "INode.Event.Delay": Delay
-});
+};
+
+function register() {
+    NODES_REGISTRY.registerMany(nodes);
+};
+
+function unregister() {
+    NODES_REGISTRY.unregisterMany(nodes);
+};
+
+export { register, unregister, nodes };

@@ -15,6 +15,9 @@ class INode extends IObject {
 
     /** @type {IPropertyManager} */
     #propertyManager = null;
+    get propertyManager() {
+        return this.#propertyManager;
+    }
 
     /** @type {Object.<string, ISocket>} */
     #inputs = {};
@@ -38,9 +41,6 @@ class INode extends IObject {
 
     }
 
-    get propertyManager() {
-        return this.#propertyManager;
-    }
 
     main({ properties = {}, custom = {}, inputs = {}, outputs = {} } = {}) {
         try {
@@ -208,10 +208,15 @@ const NODES_REGISTRY = {
     registerMany: function(nodes = {}) {
         for(const classId in nodes) {
             this.register(classId, nodes[classId]);
-        }
+        };
     },
     unregister: function(classId) {
         return REGISTERED_NODES.delete(classId);
+    },
+    unregisterMany: function(nodes = {}) {
+        for(const classId in nodes) {
+            this.unregister(classId);
+        };
     },
     get: function(classId) {
         return REGISTERED_NODES.get(classId);
