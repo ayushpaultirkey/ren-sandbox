@@ -24,6 +24,21 @@ input::-webkit-inner-spin-button {
 }
 
 
+.copy-highlight {
+    @apply transition-all rounded-sm;
+    animation: copy-highlight 0.5s ease-in-out;
+}
+@keyframes copy-highlight {
+    0% {
+        @apply bg-transparent;
+    }
+    15% {
+        @apply bg-zinc-200;
+    }
+    100% {
+        @apply bg-transparent;
+    }
+}
 
 .property-menu {
     @apply flex flex-col;

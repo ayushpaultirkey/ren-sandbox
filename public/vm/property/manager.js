@@ -43,10 +43,8 @@ class IPropertyManager extends IObject {
     addProperty(uuid, type, value = null, custom = {}) {
         try {
 
-            const newUUID = uuid || crypto.randomUUID();
-
-            if(this.#properties.has(newUUID)) {
-                throw new Error(`PropertyManager: Property "${newUUID}" already exists`);
+            if(this.#properties.has(uuid)) {
+                throw new Error(`PropertyManager: Property "${uuid}" already exists`);
             };
     
             const finalType = PRIMITIVE_TYPES[type] || USER_DEFINED_TYPES[type];
@@ -55,13 +53,13 @@ class IPropertyManager extends IObject {
             };
     
             const property = new IProperty({
-                uuid: newUUID,
+                uuid: uuid,
                 outer: this,
                 type: finalType,
                 value: value,
                 custom: custom
             });
-            this.#properties.set(newUUID, property);
+            this.#properties.set(uuid, property);
 
             this.dispatcher.emit("propertyAdded", property);
 

@@ -17,7 +17,7 @@ async function loadPlugins() {
     const plugins = await getPlugins();
 
     for(const plugin of plugins) {
-        const { register } = await import(`@plugin/${plugin}/main.js`);
+        const { register } = await import(`./plugin/${plugin}/main.js`);
         register();
     };
 

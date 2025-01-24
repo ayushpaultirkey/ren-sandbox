@@ -88,7 +88,7 @@ class ISocket extends IObject {
         if(this.#type == ISocket.TYPES.INPUT) {
             console.error("Cannot set input value");
             return;
-        }
+        };
         this.#value = value;
     }
 

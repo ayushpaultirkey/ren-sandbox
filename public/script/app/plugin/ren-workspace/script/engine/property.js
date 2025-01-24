@@ -1,6 +1,8 @@
 import H12 from "@library/h12.js";
-import { PRIMITIVE_TYPES } from "@vm/types/default.js";
+import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "@vm/types/default.js";
 import { Control, InputBox } from "../../../../control.js";
+import { Icon } from "@script/app/control/icon.js";
+import { mdiRefresh } from "@mdi/js";
 
 class UIProperty extends H12 {
 
@@ -19,7 +21,8 @@ class UIProperty extends H12 {
     main() {
 
         if(!this.#iproperty) return;
-        this.setValue(this.#iproperty.value);
+        this.build();
+        this.refresh();
 
         // const { control } = this.child;
         // control.setValue(this.#iproperty.value);
@@ -28,6 +31,10 @@ class UIProperty extends H12 {
         // });
 
     }
+    refresh() {
+        this.setValue(this.#iproperty.value);
+    }
+    build() {}
     render() {
 
         if(!this.args.iobject) return <><label>Invalid property</label></>;
@@ -58,16 +65,23 @@ class StringValue extends UIProperty {
     }
     template() {
         return <>
-            <input id="textbox" type="text" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="valueBox" type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
     setValue(value) {
-        const { textbox } = this.element;
-        textbox.value = value;
+        const { valueBox } = this.element;
+        valueBox.value = value;
     }
     updateValue() {
-        const { textbox } = this.element;
-        this.iproperty.value = textbox.value;
+        const { valueBox } = this.element;
+        this.iproperty.value = valueBox.value;
+    }
+    async paste() {
+
+        const value = await navigator.clipboard.readText();
+        this.setValue(value);
+        this.updateValue();
+
     }
 }
 
@@ -77,7 +91,29 @@ class FloatValue extends StringValue {
     }
     template() {
         return <>
-            <input id="textbox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="valueBox" type="number" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+        </>;
+    }
+}
+
+class IntegerValue extends StringValue {
+    constructor() {
+        super();
+    }
+    template() {
+        return <>
+            <input id="valueBox" type="number" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+        </>;
+    }
+}
+
+class ReferenceValue extends StringValue {
+    constructor() {
+        super();
+    }
+    template() {
+        return <>
+            <input id="valueBox" type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
 }
@@ -87,7 +123,9 @@ class FloatValue extends StringValue {
 
 const PROPERTY_REGISTRY = {
     [PRIMITIVE_TYPES.FLOAT]: FloatValue,
-    [PRIMITIVE_TYPES.STRING]: StringValue
+    [PRIMITIVE_TYPES.INTEGER]: IntegerValue,
+    [PRIMITIVE_TYPES.STRING]: StringValue,
+    [USER_DEFINED_TYPES.REFERENCE]: ReferenceValue
 }
 
 export { UIProperty, PROPERTY_REGISTRY };

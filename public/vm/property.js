@@ -20,6 +20,8 @@ class IProperty extends IObject {
         this.custom = custom || {};
         this.custom.name = custom.name || this.name;
 
+        this.handler = {};
+
     }
 
     get type() {

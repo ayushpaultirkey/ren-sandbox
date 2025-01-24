@@ -19,13 +19,43 @@ class WildcardSocket extends ISocket {
             PRIMITIVE_TYPES.WILDCARD,
             PRIMITIVE_TYPES.BOOLEAN,
             PRIMITIVE_TYPES.STRING,
-            PRIMITIVE_TYPES.INT,
+            PRIMITIVE_TYPES.INTEGER,
             PRIMITIVE_TYPES.FLOAT,
             USER_DEFINED_TYPES.OBJECT
         ]);
 
         this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;
 
+    }
+
+}
+
+class IntegerSocket extends ISocket {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "ISocket.IntegerSocket",
+        displayName: "Integer",
+        displayColor: "#00a73e"
+    }
+
+    constructor({ uuid = crypto.randomUUID(), outer = null, name = "integer", type = null, isRuntime = false }) {
+
+        super({ uuid, outer, name, type, isRuntime });
+
+        this.subType = PRIMITIVE_TYPES.INTEGER;
+        this.validSubTypes = new Set([
+            PRIMITIVE_TYPES.INTEGER,
+            PRIMITIVE_TYPES.FLOAT
+        ]);
+
+        this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;
+
+    }
+
+    setValue(value) {
+        const validValue = (isNaN(value)) ? null : parseInt(value);
+        super.setValue(validValue);
     }
 
 }
@@ -45,12 +75,17 @@ class FloatSocket extends ISocket {
 
         this.subType = PRIMITIVE_TYPES.FLOAT;
         this.validSubTypes = new Set([
-            PRIMITIVE_TYPES.INT,
+            PRIMITIVE_TYPES.INTEGER,
             PRIMITIVE_TYPES.FLOAT
         ]);
 
         this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;
 
+    }
+
+    setValue(value) {
+        const validValue = (isNaN(value)) ? null : parseFloat(value);
+        super.setValue(validValue);
     }
 
 }
@@ -70,13 +105,19 @@ class StringSocket extends ISocket {
 
         this.subType = PRIMITIVE_TYPES.STRING;
         this.validSubTypes = new Set([
-            PRIMITIVE_TYPES.STRING
+            PRIMITIVE_TYPES.STRING,
+            PRIMITIVE_TYPES.WILDCARD
         ]);
 
         this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;
 
     }
 
+    setValue(value) {
+        const validValue = (value) ? value.toString() : null;
+        super.setValue(validValue);
+    }
+
 }
 
-export { FloatSocket, StringSocket, WildcardSocket };
+export { FloatSocket, IntegerSocket, StringSocket, WildcardSocket };

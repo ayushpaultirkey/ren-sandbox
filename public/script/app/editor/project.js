@@ -91,7 +91,7 @@ class Project extends H12 {
             };
 
             this.openWorkspace("Explorer", path);
-            //this.openWorkspace("main", "main.ren");
+            this.openWorkspace("main", "main.ren");
             
             this.root.classList.remove("hidden");
             this.#isLoaded = true;

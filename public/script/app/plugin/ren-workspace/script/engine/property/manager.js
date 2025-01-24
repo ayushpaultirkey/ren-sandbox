@@ -2,6 +2,7 @@ import H12 from "@library/h12.js";
 import { PROPERTY_REGISTRY, UIProperty } from "../property.js";
 import { Icon } from "../../../../../control/icon.js";
 import { mdiClose, mdiPlus } from "@mdi/js";
+import { copyHighlight } from "@script/app/library/utility.js";
 
 class UIPropertyManager extends H12 {
 
@@ -16,7 +17,7 @@ class UIPropertyManager extends H12 {
     render() {
 
         return <>
-            <div>
+            <div class="select-none">
                 <div class="flex flex-row space-x-1">
                     <input id="propertyName" class="primary-input w-full" placeholder="Name" />
                     <select id="propertyType" class="primary-select" aria-label="Property Type">
@@ -88,7 +89,7 @@ class UIPropertyManager extends H12 {
 
             uiProperties(<>
                 <div class="flex flex-col">
-                    <label class="text-xs font-semibold">{ property.custom.name || "no name" } :</label>
+                    <label class="text-xs font-semibold" ondblclick={ (e) => { navigator.clipboard.writeText(uuid); copyHighlight(e.target); } }>{ property.custom.name || "no name" } :</label>
                     <div class="w-full flex flex-row space-x-1">
                         <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
                         <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } } aria-label="Remove">
@@ -119,8 +120,10 @@ class UIPropertyManager extends H12 {
         }
 
         const { propertyName, propertyType } = this.element;
+        const name = propertyName.value || "untitled";
+        const type = propertyType.value;
         
-        this.#ipropertyManager.addProperty(null, propertyType.value, null, { name: propertyName.value });
+        this.#ipropertyManager.addProperty(name, type, null, { name: name });
         propertyName.value = "";
 
     }
