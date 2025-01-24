@@ -50,7 +50,7 @@ class MakeInteger extends INode {
     }
 
     execute() {
-        let value = this.propertyManager.getProperty("value").value;
+        let value = this.propertyManager.getProperty("value0").value;
         value = !isNaN(value) ? parseInt(value) : null;
         this.getOutput("value0").setValue(value);
     }

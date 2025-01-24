@@ -7,7 +7,7 @@ class ExecutionSocket extends ISocket {
     static meta = {
         className: "ISocket.ExecutionSocket",
         displayName: "Exec",
-        displayColor: "#94a3b8"
+        displayColor: "#bdbdbd"
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "exec", type = null, isRuntime = false }) {

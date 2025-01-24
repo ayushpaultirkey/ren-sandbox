@@ -118,6 +118,17 @@ class ReferenceValue extends StringValue {
     }
 }
 
+class GraphSetValue extends StringValue {
+    constructor() {
+        super();
+    }
+    template() {
+        return <>
+            <input id="valueBox" disabled type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="[Runtime Reference]" />
+        </>;
+    }
+}
+
 
 
 
@@ -125,7 +136,8 @@ const PROPERTY_REGISTRY = {
     [PRIMITIVE_TYPES.FLOAT]: FloatValue,
     [PRIMITIVE_TYPES.INTEGER]: IntegerValue,
     [PRIMITIVE_TYPES.STRING]: StringValue,
-    [USER_DEFINED_TYPES.REFERENCE]: ReferenceValue
+    [USER_DEFINED_TYPES.REFERENCE]: ReferenceValue,
+    [USER_DEFINED_TYPES.GRAPH_SET]: GraphSetValue
 }
 
 export { UIProperty, PROPERTY_REGISTRY };

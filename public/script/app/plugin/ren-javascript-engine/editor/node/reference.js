@@ -20,7 +20,7 @@ class GetGraph extends INode {
     }
 
     main(args) {
-        this.addInput("graphset0", "graphset", GraphSetSocket);
+        this.addInput("graphset0", "graphset (self)", GraphSetSocket);
         this.addOutput("graph0", "graph", GraphSocket);
         this.propertyManager.addProperty("reference0", USER_DEFINED_TYPES.REFERENCE, "", { name: "reference" });
         super.main(args);
@@ -82,7 +82,7 @@ class GetGraphProperty extends INode {
 
     main(args) {
 
-        this.addInput("graph0", "graph", GraphSocket);
+        this.addInput("graph0", "graph (self)", GraphSocket);
         this.addOutput("value0", "value", WildcardSocket);
 
         this.propertyManager.addProperty("reference0", USER_DEFINED_TYPES.REFERENCE, "", { name: "reference" });
@@ -120,7 +120,7 @@ class GetGraphSetProperty extends INode {
 
     main(args) {
 
-        this.addInput("graphset0", "graphset", GraphSetSocket);
+        this.addInput("graphset0", "graphset (self)", GraphSetSocket);
         this.addOutput("value0", "value", WildcardSocket);
 
         this.propertyManager.addProperty("reference0", USER_DEFINED_TYPES.REFERENCE, "", { name: "reference" });
@@ -142,11 +142,98 @@ class GetGraphSetProperty extends INode {
 
 }
 
+class SetGraphProperty extends INode {
+    
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "INode.Reference.Graph.SetProperty",
+        displayName: "Set Property",
+        canCache: true
+    }
+    
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+    }
+
+    main(args) {
+
+        this.addInput("in0", "in", ExecutionSocket);
+        this.addInput("graph0", "graph (self)", GraphSocket);
+        this.addInput("value0", "value", WildcardSocket);
+        
+        this.addOutput("out0", "out", ExecutionSocket);
+
+        this.propertyManager.addProperty("reference0", USER_DEFINED_TYPES.REFERENCE, "", { name: "reference" });
+
+        super.main(args);
+
+    }
+
+    execute() {
+
+        const graph = this.getInput("graph0").getValue();
+        const value = this.getInput("value0").getValue();
+
+        const resolved = graph || this.outer;
+
+        const selfProperty = this.propertyManager.getProperty("reference0");
+        resolved.propertyManager.setProperty(selfProperty.value, value);
+
+        this.executeLinkedNode("out0", 0);
+
+    }
+
+}
+
+class SetGraphSetProperty extends INode {
+    
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "INode.Reference.GraphSet.SetProperty",
+        displayName: "Set Property",
+        canCache: true
+    }
+    
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+    }
+
+    main(args) {
+
+        this.addInput("in0", "in", ExecutionSocket);
+        this.addInput("graphset0", "graphset (self)", GraphSetSocket);
+        this.addInput("value0", "value", WildcardSocket);
+
+        this.addOutput("out0", "out", ExecutionSocket);
+
+        this.propertyManager.addProperty("reference0", USER_DEFINED_TYPES.REFERENCE, "", { name: "reference" });
+
+        super.main(args);
+    }
+
+    execute() {
+
+        const graphSet = this.getInput("graphset0").getValue();
+        const value = this.getInput("value0").getValue();
+
+        const resolved = graphSet || this.outer.outer;
+
+        const selfProperty = this.propertyManager.getProperty("reference0");
+        resolved.propertyManager.setProperty(selfProperty.value, value);
+
+        this.executeLinkedNode("out0", 0);
+
+    }
+
+}
+
 const nodes = [
     GetGraph,
     GetGraphSet,
     GetGraphProperty,
-    GetGraphSetProperty
+    GetGraphSetProperty,
+    SetGraphProperty,
+    SetGraphSetProperty
 ]
 
 function register() {

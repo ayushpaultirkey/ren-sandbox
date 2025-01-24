@@ -81,6 +81,9 @@
     @apply px-[8px];
     @apply relative;
 }
+.pin-holder > label {
+    @apply whitespace-nowrap;
+}
 .pin-holder > .pin {
     @apply absolute;
     @apply w-3 h-3;

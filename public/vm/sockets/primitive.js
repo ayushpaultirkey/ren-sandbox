@@ -7,7 +7,7 @@ class WildcardSocket extends ISocket {
     static meta = {
         className: "ISocket.WildcardSocket",
         displayName: "Float",
-        displayColor: "#e5e7eb",
+        displayColor: "#607d8b",
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "wildcard", type = null, isRuntime = false }) {
@@ -21,7 +21,8 @@ class WildcardSocket extends ISocket {
             PRIMITIVE_TYPES.STRING,
             PRIMITIVE_TYPES.INTEGER,
             PRIMITIVE_TYPES.FLOAT,
-            USER_DEFINED_TYPES.OBJECT
+            USER_DEFINED_TYPES.OBJECT,
+            USER_DEFINED_TYPES.GRAPH_SET
         ]);
 
         this.maxLinks = (type == ISocket.TYPES.OUTPUT) ? 100 : 1;

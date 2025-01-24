@@ -29,7 +29,7 @@ class GraphSocket extends ISocket {
     static meta = {
         className: "ISocket.Graph",
         displayName: "Graph",
-        displayColor: "#00a5f4"
+        displayColor: "#2196f3"
     }
 
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "graph", type = null, isRuntime = false }) {
