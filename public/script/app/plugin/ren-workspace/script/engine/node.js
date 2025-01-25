@@ -36,8 +36,8 @@ class UINode extends H12 {
             const x = this.root.style.left.replace("px", "");
             const y = this.root.style.top.replace("px", "");
     
-            this.#inode.custom["x"] = Math.round(x) || 5;
-            this.#inode.custom["y"] = Math.round(y) || 5;
+            this.#inode.custom["x"] = Math.round(x) || 50;
+            this.#inode.custom["y"] = Math.round(y) || 50;
 
         };
 
@@ -53,8 +53,8 @@ class UINode extends H12 {
         if(!this.args.iobject) return <><label>Invalid node</label></>;
         this.#inode = this.args.iobject;
 
-        if(this.#inode.custom.x == null) this.#inode.custom.x = 5;
-        if(this.#inode.custom.y == null) this.#inode.custom.y = 5;
+        if(this.#inode.custom.x == null) this.#inode.custom.x = 50;
+        if(this.#inode.custom.y == null) this.#inode.custom.y = 50;
         
         const x = Math.round(this.#inode.custom.x);
         const y = Math.round(this.#inode.custom.y);

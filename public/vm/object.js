@@ -4,15 +4,41 @@ class IObject {
 
     /** @type {string} */
     #uuid = null;
+    get uuid() {
+        return this.#uuid;
+    }
 
     /** @type {IObject} */
     #outer = null;
+    get outer() {
+        return this.#outer;
+    }
 
     /** @type {string} */
     #name = null;
+    get name() {
+        return this.#name;
+    }
+
+    /** @type {Object} */
+    #signature = null;
+    get signature() {
+        return this.#signature;
+    }
+    set signature(value) {
+        if(!this.#signature) {
+            this.#signature = value;
+        }
+        else {
+            console.error("Cannot set signature once set");
+        };
+    }
 
     /** @type {Dispatcher} */
     #dispatcher = new Dispatcher();
+    get dispatcher() {
+        return this.#dispatcher;
+    }
 
     /** @type {{ className: string, displayName: string }} */
     static meta = {
@@ -32,18 +58,6 @@ class IObject {
         this.#dispatcher.clearAll();
     }
 
-    get dispatcher() {
-        return this.#dispatcher;
-    }
-    get uuid() {
-        return this.#uuid;
-    }
-    get name() {
-        return this.#name;
-    }
-    get outer() {
-        return this.#outer;
-    }
     /**
         * @returns {{ className: string, displayName: string }}
     */

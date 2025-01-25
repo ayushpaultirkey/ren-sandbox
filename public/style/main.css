@@ -110,6 +110,11 @@ input::-webkit-inner-spin-button {
 .primary-select {
     @apply px-[2px];
 }
+.primary-btn:disabled,
+.primary-input:disabled,
+.primary-select:disabled {
+    @apply bg-zinc-700;
+}
 
 .primary-btn > svg {
     @apply fill-zinc-400;

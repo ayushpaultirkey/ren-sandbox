@@ -10,7 +10,7 @@ class CallbackDelay extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Timer.CallbackDelay",
+        className: "Javascript.Timer.CallbackDelay",
         displayName: "Callback Delay",
         canCache: true
     }
@@ -45,7 +45,7 @@ class Delay extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Timer.Delay",
+        className: "Javascript.Timer.Delay",
         displayName: "Delay",
         canCache: true
     }

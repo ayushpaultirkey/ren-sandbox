@@ -2,7 +2,7 @@ import H12 from "@library/h12.js";
 import { mdiClose, mdiPlus } from "@mdi/js";
 import { Icon } from "@script/app/control/icon.js";
 import { UIPropertyManager } from "../../engine/property/manager.js";
-import { copyHighlight } from "@script/app/library/utility.js";
+import { copyHighlight, copySimpleReference } from "@script/app/library/utility.js";
 
 class GraphSetManager extends H12 {
 
@@ -96,8 +96,8 @@ class GraphSetManager extends H12 {
         const graphs = this.#igraphset.graphs;
         for(const [uuid, graph] of graphs) {
             uiGraphs(<>
-                <div class="primary-input bg-opacity-50 flex flex-row items-center pr-1" onclick={ () => this.#openGraph(uuid) } ondblclick={ (e) => { e.stopPropagation(); e.preventDefault(); navigator.clipboard.writeText(uuid); copyHighlight(e.target); } }>
-                    <label class="w-full text-xs font-semibold">{ graph.custom.name }</label>
+                <div class="primary-input bg-opacity-50 flex flex-row items-center pr-1" ondblclick={ () => this.#openGraph(uuid) } onclick={ (e) => { e.stopPropagation(); e.preventDefault(); copySimpleReference(e.target, uuid, graph.custom.name); } }>
+                    <label class="w-full text-xs font-semibold pointer-events-none">{ graph.custom.name }</label>
                     <button class="primary-btn" onclick={ (e) => { e.stopPropagation(); this.#removeGraph(uuid); } } aria-label="Remove Graph">
                         <Icon args width="12px" height="12px" path={ mdiClose }></Icon>
                     </button>

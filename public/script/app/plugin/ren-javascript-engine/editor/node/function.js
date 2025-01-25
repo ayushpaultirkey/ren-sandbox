@@ -7,7 +7,7 @@ class Begin extends INode {
 
     /** @type {INode.meta} */
     static meta = {
-        className: "INode.Function.Begin",
+        className: "Javascript.Function.Begin",
         displayName: "Begin",
         canCache: true
     }
@@ -24,8 +24,14 @@ class Begin extends INode {
     }
 
     execute() {
-        console.log("begin");
+        
+        /** @type {import("@vm/graph.js").IGraph} */
+        const graph = this.outer;
+        const args = graph.inputs.getProperty("args0").value || {};
+
+        this.getOutput("args0").setValue(args);
         this.executeLinkedNode("out0", 0);
+        
     }
 
 }
@@ -35,7 +41,7 @@ class Return extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Function.Return",
+        className: "Javascript.Function.Return",
         displayName: "Return",
         canCache: true
     }
@@ -51,7 +57,13 @@ class Return extends INode {
     }
 
     execute() {
-        console.log("end");
+
+        const value = this.getInput("args0").getValue();
+
+        /** @type {import("@vm/graph.js").IGraph} */
+        const graph = this.outer;
+        graph.outputs.setProperty("args0", value || {});
+
     }
 
 }

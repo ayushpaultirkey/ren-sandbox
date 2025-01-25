@@ -7,7 +7,7 @@ class MakeFloat extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Make.Float",
+        className: "Javascript.Value.Make.Float",
         displayName: "Make Float",
         canCache: false,
     }
@@ -34,7 +34,7 @@ class MakeInteger extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Make.Integer",
+        className: "Javascript.Value.Make.Integer",
         displayName: "Make Integer",
         canCache: false,
     }
@@ -50,9 +50,13 @@ class MakeInteger extends INode {
     }
 
     execute() {
-        let value = this.propertyManager.getProperty("value0").value;
+
+        let value;
+        value = this.propertyManager.getProperty("value0").value;
         value = !isNaN(value) ? parseInt(value) : null;
+
         this.getOutput("value0").setValue(value);
+        
     }
 
 }
@@ -61,7 +65,7 @@ class MakeString extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Make.String",
+        className: "Javascript.Value.Make.String",
         displayName: "Make String",
         canCache: false,
     }
@@ -87,7 +91,7 @@ class MakeObject extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Make.Object",
+        className: "Javascript.Value.Make.Object",
         displayName: "Make Object",
         canCache: false,
     }
@@ -124,7 +128,7 @@ class BreakObject extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Break.Object",
+        className: "Javascript.Value.Break.Object",
         displayName: "Break Object",
         canCache: false,
     }
@@ -162,7 +166,7 @@ class WildcardToString extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Cast.WildcardToString",
+        className: "Javascript.Value.Cast.WildcardToString",
         displayName: "Wildcard to String",
         canCache: false,
     }
@@ -190,7 +194,7 @@ class FloatToString extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Cast.FloatToString",
+        className: "Javascript.Value.Cast.FloatToString",
         displayName: "Float to String",
         canCache: false,
     }
@@ -218,7 +222,7 @@ class IntegerToString extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Cast.IntegerToString",
+        className: "Javascript.Value.Cast.IntegerToString",
         displayName: "Integer to String",
         canCache: false,
     }
@@ -246,7 +250,7 @@ class StringToFloat extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Cast.StringToFloat",
+        className: "Javascript.Value.Cast.StringToFloat",
         displayName: "String to Float",
         canCache: false,
     }
@@ -274,7 +278,7 @@ class StringToInteger extends INode {
 
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Value.Cast.StringToInteger",
+        className: "Javascript.Value.Cast.StringToInteger",
         displayName: "String to Integer",
         canCache: false,
     }

@@ -2,7 +2,7 @@ import H12 from "@library/h12.js";
 import { PROPERTY_REGISTRY, UIProperty } from "../property.js";
 import { Icon } from "../../../../../control/icon.js";
 import { mdiClose, mdiPlus } from "@mdi/js";
-import { copyHighlight } from "@script/app/library/utility.js";
+import { copySimpleReference } from "@script/app/library/utility.js";
 
 class UIPropertyManager extends H12 {
 
@@ -89,7 +89,7 @@ class UIPropertyManager extends H12 {
 
             uiProperties(<>
                 <div class="flex flex-col">
-                    <label class="text-xs font-semibold" ondblclick={ (e) => { navigator.clipboard.writeText(uuid); copyHighlight(e.target); } }>{ property.custom.name || "no name" } :</label>
+                    <label class="text-xs font-semibold" ondblclick={ (e) => { copySimpleReference(e.target, uuid, property.custom.name) } }>{ property.custom.name || "no name" } :</label>
                     <div class="w-full flex flex-row space-x-1">
                         <property args alias={ propertyClass } id={ uuid } iobject={ property } class="w-full flex"></property>
                         <button class="primary-btn px-2 pt-[6px]" onclick={ () => { this.#removeProperty(uuid) } } aria-label="Remove">

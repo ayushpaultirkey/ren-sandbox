@@ -10,7 +10,7 @@ class Log extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Development.Log",
+        className: "Javascript.Development.Log",
         displayName: "Log",
         canCache: true
     }
@@ -41,7 +41,7 @@ class Alert extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Development.Alert",
+        className: "Javascript.Development.Alert",
         displayName: "Alert",
         canCache: true
     }

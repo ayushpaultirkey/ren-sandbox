@@ -2,7 +2,8 @@ import { IObject } from "./object.js";
 import { INode, NODES_REGISTRY } from "./node.js";
 import { IPropertyManager } from "./property/manager.js";
 import { ISocket } from "./socket.js";
-import { PRIMITIVE_TYPES } from "./types/default.js";
+import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "./types/default.js";
+import { IProperty } from "./property.js";
 
 class IGraph extends IObject {
 
@@ -45,6 +46,10 @@ class IGraph extends IObject {
     constructor({ uuid = crypto.randomUUID(), outer = null, name = "Graph" } = {}) {
 
         super({ uuid, outer, name });
+
+        this.#inputs = new IPropertyManager({ outer: this });
+        this.#outputs = new IPropertyManager({ outer: this });
+
         this.custom = {};
         this.#propertyManager = new IPropertyManager({ outer: this });
 
@@ -67,6 +72,9 @@ class IGraph extends IObject {
             const targetNode = this.getNode(link.targetNode);
             this.linkSocketsByUUID(sourceNode, link.sourceSocket, targetNode, link.targetSocket);
         }
+
+        this.#inputs.addProperty("args0", USER_DEFINED_TYPES.OBJECT, {}, { name: "args?" });
+        this.#outputs.addProperty("args0", USER_DEFINED_TYPES.OBJECT, {}, { name: "args?" });
 
         return true;
 
@@ -264,6 +272,10 @@ class IGraph extends IObject {
         node.execute();
     }
 
+    /**
+     * 
+     * @returns {INode}
+     */
     getEntryNode() {
         let node = null;
         this.#nodes.forEach((value) => {

@@ -87,6 +87,7 @@ class IGraphSet extends IObject {
             }
 
             const graph = new IGraph({ uuid: uuid, outer: this });
+            graph.signature = graphData;
             graph.main({
                 nodes: graphData.nodes,
                 links: graphData.links,

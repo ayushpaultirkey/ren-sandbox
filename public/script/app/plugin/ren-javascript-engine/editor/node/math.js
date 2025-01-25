@@ -10,7 +10,7 @@ class MathAdd extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Math.Add",
+        className: "Javascript.Math.Add",
         displayName: "Add",
         canCache: false
     }
@@ -43,7 +43,7 @@ class MathSubtract extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Math.Subtract",
+        className: "Javascript.Math.Subtract",
         displayName: "Subtract",
         canCache: false
     }
@@ -76,7 +76,7 @@ class MathMultiply extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Math.Multiply",
+        className: "Javascript.Math.Multiply",
         displayName: "Multiply",
         canCache: false
     }
@@ -110,7 +110,7 @@ class MathDivide extends INode {
     
     /** @type {IObject.meta} */
     static meta = {
-        className: "INode.Math.Divide",
+        className: "Javascript.Math.Divide",
         displayName: "Divide",
         canCache: false
     }

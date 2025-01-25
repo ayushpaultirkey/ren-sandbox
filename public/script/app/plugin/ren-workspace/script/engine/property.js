@@ -3,6 +3,7 @@ import { PRIMITIVE_TYPES, USER_DEFINED_TYPES } from "@vm/types/default.js";
 import { Control, InputBox } from "../../../../control.js";
 import { Icon } from "@script/app/control/icon.js";
 import { mdiRefresh } from "@mdi/js";
+import { copyHighlight, resolveReference } from "@script/app/library/utility.js";
 
 class UIProperty extends H12 {
 
@@ -23,12 +24,6 @@ class UIProperty extends H12 {
         if(!this.#iproperty) return;
         this.build();
         this.refresh();
-
-        // const { control } = this.child;
-        // control.setValue(this.#iproperty.value);
-        // control.dispatcher.on("onUpdated", (value) => {
-        //     this.#iproperty.value = value;
-        // });
 
     }
     refresh() {
@@ -65,7 +60,7 @@ class StringValue extends UIProperty {
     }
     template() {
         return <>
-            <input id="valueBox" type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="valueBox" type="text" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
     setValue(value) {
@@ -78,7 +73,9 @@ class StringValue extends UIProperty {
     }
     async paste() {
 
-        const value = await navigator.clipboard.readText();
+        copyHighlight(this.root);
+        
+        const value = await resolveReference();
         this.setValue(value);
         this.updateValue();
 
@@ -91,7 +88,7 @@ class FloatValue extends StringValue {
     }
     template() {
         return <>
-            <input id="valueBox" type="number" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="valueBox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
 }
@@ -102,7 +99,7 @@ class IntegerValue extends StringValue {
     }
     template() {
         return <>
-            <input id="valueBox" type="number" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+            <input id="valueBox" type="number" oninput={ this.updateValue } class="primary-input w-full h-full" placeholder="Value" />
         </>;
     }
 }
@@ -113,19 +110,16 @@ class ReferenceValue extends StringValue {
     }
     template() {
         return <>
-            <input id="valueBox" type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="Value" />
+            <div ondblclick={ (e) => { this.paste(); } } class="w-full flex flex-col">
+                <input id="valueBox" disabled type="text" class="primary-input w-full pointer-events-none" placeholder="Reference" />
+            </div>
         </>;
     }
 }
 
-class GraphSetValue extends StringValue {
+class GraphSetValue extends ReferenceValue {
     constructor() {
         super();
-    }
-    template() {
-        return <>
-            <input id="valueBox" disabled type="text" oninput={ this.updateValue } ondblclick={ (e) => { this.paste(); } } class="primary-input w-full h-full" placeholder="[Runtime Reference]" />
-        </>;
     }
 }
 
