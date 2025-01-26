@@ -189,6 +189,60 @@ class WildcardToString extends INode {
     }
     
 }
+class WildcardToFloat extends INode {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "Javascript.Value.Cast.WildcardToFloat",
+        displayName: "Wildcard to Float",
+        canCache: false,
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+    }
+
+    main(args) {
+        this.addInput("wildcard0", "wildcard", WildcardSocket);
+        this.addOutput("float0", "float", FloatSocket);
+        super.main(args);
+    }
+
+    execute() {
+
+        const value = this.getInput("wildcard0").getValue();
+        this.getOutput("float0").setValue(value || parseFloat(value));
+
+    }
+    
+}
+class WildcardToInteger extends INode {
+
+    /** @type {IObject.meta} */
+    static meta = {
+        className: "Javascript.Value.Cast.WildcardToInteger",
+        displayName: "Wildcard to Integer",
+        canCache: false,
+    }
+
+    constructor({ uuid, outer }) {
+        super({ uuid, outer });
+    }
+
+    main(args) {
+        this.addInput("wildcard0", "wildcard", WildcardSocket);
+        this.addOutput("integer0", "integer", IntegerSocket);
+        super.main(args);
+    }
+
+    execute() {
+
+        const value = this.getInput("wildcard0").getValue();
+        this.getOutput("integer0").setValue(value || parseInt(value));
+
+    }
+    
+}
 
 class FloatToString extends INode {
 
@@ -309,6 +363,8 @@ const nodes = [
     MakeObject,
     BreakObject,
     WildcardToString,
+    WildcardToFloat,
+    WildcardToInteger,
     FloatToString,
     IntegerToString,
     StringToFloat,

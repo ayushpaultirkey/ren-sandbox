@@ -20,20 +20,20 @@ class MathAdd extends INode {
     }
 
     main(args) {
-        this.addInput("in0", "a", FloatSocket);
-        this.addInput("in1", "b", FloatSocket);
-        this.addOutput("out0", "result", FloatSocket);
+        this.addInput("in_a0", "a", FloatSocket);
+        this.addInput("in_a1", "b", FloatSocket);
+        this.addOutput("out_a0", "result", FloatSocket);
         super.main(args);
     }
 
     execute() {        
 
-        const a1 = this.getInput("a1").getValue();
-        const a2 = this.getInput("a2").getValue();
+        const a1 = this.getInput("in_a0").getValue();
+        const a2 = this.getInput("in_a1").getValue();
 
         const result = a1 + a2;
 
-        this.getOutput("out0").setValue(result);
+        this.getOutput("out_a0").setValue(result);
 
     }
 
@@ -53,20 +53,20 @@ class MathSubtract extends INode {
     }
 
     main(args) {
-        this.addInput("in0", "a", FloatSocket);
-        this.addInput("in1", "b", FloatSocket);
-        this.addOutput("out0", "result", FloatSocket);
+        this.addInput("in_a0", "a", FloatSocket);
+        this.addInput("in_a1", "b", FloatSocket);
+        this.addOutput("out_a0", "result", FloatSocket);
         super.main(args);
     }
 
     execute() {        
 
-        const a1 = this.getInput("a1").getValue();
-        const a2 = this.getInput("a2").getValue();
+        const a1 = this.getInput("in_a0").getValue();
+        const a2 = this.getInput("in_a1").getValue();
 
         const result = a1 - a2;
 
-        this.getOutput("out0").setValue(result);
+        this.getOutput("out_a0").setValue(result);
 
     }
 
@@ -86,20 +86,20 @@ class MathMultiply extends INode {
     }
 
     main(args) {
-        this.addInput("in0", "a", FloatSocket);
-        this.addInput("in1", "b", FloatSocket);
-        this.addOutput("out0", "result", FloatSocket);
+        this.addInput("in_a0", "a", FloatSocket);
+        this.addInput("in_a1", "b", FloatSocket);
+        this.addOutput("out_a0", "result", FloatSocket);
         super.main(args);
     }
 
     execute() {        
 
-        const a1 = this.getInput("a1").getValue();
-        const a2 = this.getInput("a2").getValue();
+        const a1 = this.getInput("in_a0").getValue();
+        const a2 = this.getInput("in_a1").getValue();
 
         const result = a1 * a2;
 
-        this.getOutput("out0").setValue(result);
+        this.getOutput("out_a0").setValue(result);
 
     }
 
@@ -120,20 +120,20 @@ class MathDivide extends INode {
     }
 
     main(args) {
-        this.addInput("in0", "a", FloatSocket);
-        this.addInput("in1", "b", FloatSocket);
-        this.addOutput("out0", "result", FloatSocket);
+        this.addInput("in_a0", "a", FloatSocket);
+        this.addInput("in_a1", "b", FloatSocket);
+        this.addOutput("out_a0", "result", FloatSocket);
         super.main(args);
     }
 
     execute() {        
 
-        const a1 = this.getInput("a1").getValue();
-        const a2 = this.getInput("a2").getValue();
+        const a1 = this.getInput("in_a0").getValue();
+        const a2 = this.getInput("in_a1").getValue();
 
         const result = a1 / a2;
 
-        this.getOutput("out0").setValue(result);
+        this.getOutput("out_a0").setValue(result);
 
     }
 
