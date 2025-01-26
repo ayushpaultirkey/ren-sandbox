@@ -1,4 +1,4 @@
-import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlusThick } from "@mdi/js";
+import { mdiAbacus, mdiBug, mdiCardBulletedOutline, mdiCog, mdiContentSave, mdiPackageUp, mdiPlay, mdiPlusThick } from "@mdi/js";
 import { Icon } from "@script/app/control/icon.js";
 import { Property, PropertyMenu, PropertyTab } from "../../layout/property.js";
 import { GraphSetTab, GraphTab, NodeListTab } from "./tab.js";
@@ -22,11 +22,14 @@ class SideMenu extends PropertyMenu {
                 <button title="Properties" onclick={ () => { this.switchTab("graphSet") } }>
                     <Icon args path={ mdiAbacus }></Icon>
                 </button>
-                <button title="Run" class="hidden">
+                <button title="Run">
                     <Icon args path={ mdiPlay }></Icon>
                 </button>
                 <button title="Debug" onclick={ () => { this.debug() } }>
                     <Icon args path={ mdiBug }></Icon>
+                </button>
+                <button title="Property">
+                    <Icon args path={ mdiCog }></Icon>
                 </button>
                 <button title="Export" onclick={ () => { this.export() } }>
                     <Icon args path={ mdiPackageUp }></Icon>
